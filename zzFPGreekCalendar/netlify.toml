@@ -1,6 +1,7 @@
 [build]
   publish = "."
-  functions = "Netlify/Functions"
+  functions = "netlify/functions"
 
 [functions]
   node_bundler = "esbuild"
+  timeout = 30
