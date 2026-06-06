@@ -1635,7 +1635,6 @@ const App = {
     // Try Netlify proxy first (works when hosted on Netlify — API key added server-side)
     // Falls back to direct API when running inside Claude.ai artifact context
     const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,
-      tools:[{type:'web_search_20250305',name:'web_search'}],
       messages:[{role:'user',content:prompt}]});
     let res;
     try{
