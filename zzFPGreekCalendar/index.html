@@ -1615,7 +1615,7 @@ const App = {
     }catch(e){
       console.warn('Web search failed:',e.message);
       document.getElementById('genBtnTxt').innerHTML='Using template...';
-      st.innerHTML='Web search unavailable. Generating template...';
+      st.innerHTML='Search note: '+e.message.slice(0,80)+'. Generating template...';
       await new Promise(r=>setTimeout(r,500));
       const sid=name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)||'s'+Date.now();
       const sh=name.split(' ').filter(w=>w.length>2).map(w=>w[0]).join('').toUpperCase().slice(0,5)||'SCH';
@@ -1646,9 +1646,20 @@ const App = {
     if(!res.ok)throw new Error('API '+res.status);
     const d=await res.json();
     const raw=d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    // Strip markdown fences if present
+    let clean=raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
     let p;
-    try{p=JSON.parse(raw);}catch(_){const s=raw.indexOf('{'),e=raw.lastIndexOf('}');if(s>=0&&e>s)p=JSON.parse(raw.slice(s,e+1));else throw new Error('No JSON');}
-    if(!p||!p.school||!p.events)throw new Error('Bad structure');
+    try{p=JSON.parse(clean);}catch(_){
+      // Find outermost JSON object
+      const s=clean.indexOf('{');
+      const e=clean.lastIndexOf('}');
+      if(s>=0&&e>s){
+        try{p=JSON.parse(clean.slice(s,e+1));}catch(e2){throw new Error('JSON parse failed: '+clean.slice(0,100));}
+      } else {
+        throw new Error('No JSON found in response: '+clean.slice(0,100));
+      }
+    }
+    if(!p||!p.school||!p.events)throw new Error('Missing school or events in: '+JSON.stringify(Object.keys(p||{})));
     p.events=p.events.map(ev=>Object.assign({},ev,{school:p.school.id}));
     return p;
   },
