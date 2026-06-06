@@ -33,13 +33,21 @@ exports.handler = async function(event) {
 
     const data = await response.json();
 
+    // Strip markdown fences from Claude's text response server-side
     if (response.ok && data.content) {
-      const textBlock = data.content.find(b => b.type === 'text');
-      if (textBlock) {
-        console.log('Claude response (first 500 chars):', textBlock.text.slice(0, 500));
-      }
+      data.content = data.content.map(block => {
+        if (block.type === 'text') {
+          let text = block.text.trim();
+          // Remove ```json or ``` wrappers
+          text = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '');
+          text = text.replace(/\s*```\s*$/i, '').trim();
+          console.log('Cleaned response starts with:', text.slice(0, 80));
+          return { ...block, text };
+        }
+        return block;
+      });
     } else {
-      console.error('Anthropic error:', response.status, JSON.stringify(data));
+      console.error('Anthropic error:', response.status, JSON.stringify(data).slice(0, 200));
     }
 
     return {
