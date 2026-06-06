@@ -1631,10 +1631,10 @@ const App = {
   },
 
   async _webSearch(schoolName){
-    const prompt='Generate a Fall 2026 Greek life sales calendar for "'+schoolName+'" for a Fresh Prints apparel rep. Use your knowledge of this school\'s actual Greek chapters and academic calendar. Return ONLY valid compact JSON: {"school":{"id":"4charID","name":"Full Name","short":"ABBREV","location":"City, ST","color":"#hex"},"events":[{"id":"s-slug","school":"same-id","orgName":"Org Name","orgType":"ifc|panhellenic|nphc|campus","title":"Title","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","type":"recruitment|bidday|philanthropy|homecoming|parentsweekend|formal|newmember|greekweek|social|campus|intake","approx":true,"salesPotential":"high|medium|low","outreachDays":42,"notes":"Pitch advice"}]}. Include 15 events Aug-Dec 2026. Use actual chapter names. approx:false for confident dates. outreachDays: 56 bid day/homecoming, 42 formals/recruitment, 28 philanthropy.';
+    const prompt='Generate a Fall 2026 Greek life sales calendar for "'+schoolName+'" for a Fresh Prints apparel rep. Use your knowledge of this school\'s actual Greek chapters and academic calendar. Return ONLY raw JSON with no markdown fences, no explanation, no whitespace. Start your response with { and end with }. JSON: {"school":{"id":"4charID","name":"Full Name","short":"ABBREV","location":"City, ST","color":"#hex"},"events":[{"id":"s-slug","school":"same-id","orgName":"Org Name","orgType":"ifc|panhellenic|nphc|campus","title":"Title","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","type":"recruitment|bidday|philanthropy|homecoming|parentsweekend|formal|newmember|greekweek|social|campus|intake","approx":true,"salesPotential":"high|medium|low","outreachDays":42,"notes":"Pitch advice"}]}. Include 12 events Aug-Dec 2026. Use actual chapter names. approx:false for confident dates. outreachDays: 56 bid day/homecoming, 42 formals/recruitment, 28 philanthropy.';
     // Try Netlify proxy first (works when hosted on Netlify — API key added server-side)
     // Falls back to direct API when running inside Claude.ai artifact context
-    const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,
+    const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:3500,
       messages:[{role:'user',content:prompt}]});
     let res;
     try{
