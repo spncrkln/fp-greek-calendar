@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='14' fill='%23FF5500'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-family='Arial Black,sans-serif' font-weight='900' font-size='46' fill='white'%3EFP%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='14' fill='%23FF5500'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-family='Arial Black,sans-serif' font-weight='900' font-size='46' fill='white'%3EFP%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FP Greek Life Sales Calendar — Fall 2026 v4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fp:#FF5500;--fp-lt:#FF7A30;--navy:#0A1628;--navy-mid:#162440;
+  --cream:#FEFAF6;--tan:#F5EDE0;--white:#fff;--text:#0A1628;
+  --muted:#64748B;--border:#E5DDD3;--sh:0 1px 4px rgba(10,22,40,.07);
+  --sh2:0 4px 16px rgba(10,22,40,.11);--sh3:0 8px 32px rgba(10,22,40,.18);
+  --r:12px;--rs:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+
+/* ─── HEADER ─── */
+.hdr{background:var(--navy);height:56px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;box-shadow:0 2px 20px rgba(10,22,40,.4);}
+.hdr-l{display:flex;align-items:center;gap:12px;min-width:0;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:var(--fp);letter-spacing:-.4px;text-transform:uppercase;white-space:nowrap;}
+.logo em{color:rgba(255,255,255,.2);font-style:normal;margin:0 5px;}
+.hdr-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,.38);white-space:nowrap;display:none;}
+.hdr-pill{background:var(--fp);color:#fff;font-size:9px;font-weight:900;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;}
+.hdr-date{font-size:11px;color:rgba(255,255,255,.3);font-weight:600;white-space:nowrap;}
+
+/* ─── LEGEND ─── */
+.leg-bar{background:var(--navy-mid);padding:7px 20px;display:flex;align-items:center;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.leg-bar::-webkit-scrollbar{display:none;}
+.leg{display:flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,.45);font-weight:700;white-space:nowrap;flex-shrink:0;}
+.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.leg-div{width:1px;height:10px;background:rgba(255,255,255,.12);flex-shrink:0;}
+
+
+/* ─── FILTER BAR ─── */
+.fbar{background:var(--white);border-bottom:3px solid var(--fp);padding:10px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.fg{display:flex;align-items:center;gap:6px;}
+.fl{font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted);letter-spacing:.7px;white-space:nowrap;}
+.fsel{font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;border:2px solid var(--border);border-radius:7px;padding:6px 9px;background:var(--white);color:var(--text);cursor:pointer;outline:none;transition:border-color .15s;max-width:180px;}
+.fsel:hover,.fsel:focus{border-color:var(--fp);}
+.fdiv{width:1px;height:24px;background:var(--border);flex-shrink:0;}
+.vtabs{display:flex;gap:2px;background:var(--tan);padding:3px;border-radius:8px;}
+.vtab{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:5px 10px;border:none;border-radius:6px;cursor:pointer;color:var(--muted);background:transparent;transition:all .15s;white-space:nowrap;}
+.vtab.on{background:var(--white);color:var(--text);box-shadow:var(--sh);}
+.dl-btn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:6px 12px;background:var(--navy);color:#fff;border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:4px;transition:background .12s;margin-left:auto;white-space:nowrap;}
+.dl-btn:hover{background:var(--navy-mid);}
+
+/* ─── MAIN ─── */
+.main{max-width:1380px;margin:0 auto;padding:16px 20px;}
+
+/* ─── ALERTS ─── */
+.sec-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+.alerts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;margin-bottom:18px;}
+.a-card{background:var(--white);border-radius:var(--rs);padding:10px 12px;display:flex;align-items:flex-start;gap:9px;box-shadow:var(--sh);border-left:4px solid transparent;cursor:pointer;transition:transform .1s,box-shadow .1s;}
+.a-card:hover{transform:translateY(-1px);box-shadow:var(--sh2);}
+.a-card.urgent{border-left-color:#EF4444;}
+.a-card.soon{border-left-color:#F59E0B;}
+.a-card.active{border-left-color:var(--fp);}
+.a-card.upcoming{border-left-color:#7C3AED;}
+.a-icon{font-size:17px;flex-shrink:0;margin-top:1px;}
+.a-body{flex:1;min-width:0;}
+.a-top{display:flex;align-items:center;gap:5px;margin-bottom:2px;flex-wrap:wrap;}
+.a-timing{font-size:10px;font-weight:900;white-space:nowrap;}
+.a-ttl{font-size:11px;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.a-sub{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.t-red{color:#EF4444;}.t-amber{color:#D97706;}.t-orange{color:var(--fp);}.t-purple{color:#7C3AED;}
+
+/* ─── SCHOOL BADGE ─── */
+.sb{font-size:9px;font-weight:900;padding:2px 5px;border-radius:3px;color:#fff;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;flex-shrink:0;}
+
+/* ─── CALENDAR ─── */
+.cal-outer{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.cal-wrap{background:var(--white);border-radius:var(--r);box-shadow:var(--sh2);overflow:hidden;min-width:500px;}
+.cal-hdr{background:var(--navy);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;}
+.cal-nav{background:rgba(255,255,255,.11);border:none;color:#fff;width:32px;height:32px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .12s;flex-shrink:0;}
+.cal-nav:hover{background:rgba(255,255,255,.22);}
+.cal-mid{text-align:center;}
+.cal-mo-lbl{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:-.4px;}
+.cal-mo-lbl span{color:var(--fp);}
+.cal-count{font-size:10px;color:rgba(255,255,255,.38);margin-top:1px;}
+.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);background:var(--navy-mid);}
+.cal-dow div{text-align:center;padding:6px 2px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.38);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);}
+.cal-day{background:var(--white);min-height:78px;padding:5px 6px;cursor:default;transition:background .1s;}
+.cal-day:hover{background:#FAFAF8;}
+.cal-day.other{background:#FAFAF8;}
+.cal-day.other .dn{color:#C8C0B5;}
+.cal-day.today{background:#FFF3EC;}
+.dn{font-size:11px;font-weight:800;color:var(--text);display:inline-block;margin-bottom:3px;}
+.cal-day.today .dn{background:var(--fp);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;}
+.cal-chips{display:flex;flex-direction:column;gap:2px;}
+.cal-chip{font-size:9px;font-weight:800;padding:2px 4px;border-radius:3px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35;transition:opacity .1s;}
+.cal-chip:hover{opacity:.75;}
+.cal-more{font-size:9px;font-weight:700;color:var(--muted);padding:1px 3px;cursor:pointer;}
+
+/* ─── EVENT CARDS ─── */
+.list-mhdr{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--text);padding:13px 0 7px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.list-mc{font-size:10px;font-weight:700;color:var(--muted);background:rgba(100,116,139,.1);padding:2px 7px;border-radius:20px;}
+
+.ecard{background:var(--white);border-radius:var(--rs);padding:12px 14px;display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;box-shadow:var(--sh);cursor:pointer;transition:transform .1s,box-shadow .1s;border-left:4px solid transparent;margin-bottom:6px;}
+.ecard:hover{transform:translateY(-1px);box-shadow:var(--sh2);}
+.ecard:active{transform:translateY(0);}
+.ecard-dt{text-align:center;min-width:44px;}
+.ecard-mo{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.ecard-d{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);line-height:1;}
+.ecard-thru{font-size:8px;font-weight:700;color:var(--muted);text-transform:uppercase;}
+.ecard-range-s,.ecard-range-e{font-size:9px;font-weight:800;color:var(--text);white-space:nowrap;}
+.ecard-range-sep{font-size:9px;color:var(--muted);line-height:1;margin:1px 0;}
+.ecard-body{min-width:0;}
+.ecard-top{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px;}
+.ecard-ttl{font-size:13px;font-weight:800;color:var(--text);line-height:1.25;}
+.ecard-org{font-size:11px;color:var(--muted);font-weight:600;margin-top:1px;}
+.ecard-acts{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+
+/* ─── BADGES ─── */
+.badge{font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;white-space:nowrap;}
+.b-approx{background:#FEF3C7;color:#92400E;}
+.b-confirmed{background:#D1FAE5;color:#065F46;}
+.b-override{background:#EDE9FE;color:#5B21B6;}
+.b-remind{background:#EDE9FE;color:#5B21B6;}
+.s-h{background:#FFF0E8;color:var(--fp);}
+.s-m{background:#FEF3C7;color:#B45309;}
+.s-l{background:#F1F5F9;color:#64748B;}
+
+/* ─── ACTION BTNS ─── */
+.act-row{display:flex;gap:4px;}
+.abt{font-family:'Outfit',sans-serif;font-size:10px;font-weight:800;padding:4px 7px;border-radius:5px;border:1.5px solid var(--border);background:var(--white);color:var(--text);cursor:pointer;transition:all .12s;white-space:nowrap;display:flex;align-items:center;gap:2px;min-height:28px;}
+.abt:hover{background:var(--tan);border-color:var(--fp);color:var(--fp);}
+.abt.primary{background:var(--fp);color:#fff;border-color:var(--fp);}
+.abt.primary:hover{background:#E04A00;}
+.du{font-size:10px;font-weight:700;color:var(--muted);text-align:right;white-space:nowrap;}
+.du.win{color:var(--fp);font-weight:900;}
+
+/* ─── OUTREACH VIEW ─── */
+.ov-sec{margin-bottom:20px;}
+.ov-hdr{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.ov-lbl{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--text);}
+.ov-sub{font-size:10px;font-weight:700;color:var(--muted);padding:2px 8px;border-radius:20px;background:rgba(100,116,139,.1);}
+
+/* ─── MODAL ─── */
+.overlay{position:fixed;inset:0;background:rgba(10,22,40,.65);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .2s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--white);border-radius:14px;width:100%;max-width:500px;box-shadow:var(--sh3);overflow:hidden;transform:scale(.95) translateY(8px);transition:transform .2s;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.overlay.open .modal{transform:scale(1) translateY(0);}
+.m-top{padding:18px 18px 0;}
+.m-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.m-typebar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px;}
+.m-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text);line-height:1.2;}
+.m-close{background:var(--tan);border:none;width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:14px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;}
+.m-close:hover{background:var(--border);}
+.m-body{padding:0 18px 18px;}
+.m-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:13px;}
+.m-info{background:var(--tan);border-radius:7px;padding:8px 10px;}
+.m-info-l{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:2px;}
+.m-info-v{font-size:11px;font-weight:800;color:var(--text);}
+.m-notes{background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:7px;padding:10px;font-size:11px;color:#1A4731;line-height:1.55;margin-bottom:13px;font-weight:500;}
+.m-div{height:1px;background:var(--border);margin:12px 0;}
+.m-sec{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px;}
+.m-acts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.mact{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:9px 11px;border-radius:7px;border:2px solid transparent;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;gap:5px;min-height:40px;}
+.mact.google{background:#4285F4;color:#fff;}
+.mact.google:hover{background:#3574E2;}
+.mact.ical{background:var(--navy);color:#fff;}
+.mact.ical:hover{background:var(--navy-mid);}
+.mact.edit{background:transparent;border-color:var(--border);color:var(--text);}
+.mact.edit:hover{border-color:var(--fp);color:var(--fp);}
+.mact.remind{background:transparent;border-color:var(--border);color:var(--text);}
+.mact.remind.on{background:#EDE9FE;border-color:#7C3AED;color:#5B21B6;}
+.mact.remind:hover{border-color:#7C3AED;color:#5B21B6;}
+
+.epanel,.rpanel{background:var(--tan);border-radius:7px;padding:11px;margin-bottom:11px;}
+.epanel-lbl{display:block;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:7px;}
+.erow{display:flex;gap:6px;}
+.dinput{font-family:'Outfit',sans-serif;flex:1;padding:7px 9px;border:2px solid var(--border);border-radius:6px;font-size:12px;font-weight:700;color:var(--text);background:#fff;outline:none;min-width:0;}
+.dinput:focus{border-color:var(--fp);}
+.r-opts{display:flex;gap:5px;flex-wrap:wrap;}
+.rbtn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:5px 9px;border-radius:6px;border:2px solid var(--border);background:#fff;cursor:pointer;transition:all .12s;color:var(--text);}
+.rbtn:hover,.rbtn.on{border-color:#7C3AED;background:#EDE9FE;color:#5B21B6;}
+.rbtn.clr{color:#EF4444;border-color:#FECACA;}
+.rbtn.clr:hover{background:#FEF2F2;border-color:#EF4444;}
+
+/* ─── ADD SCHOOL MODAL ─── */
+.as-modal{background:var(--white);border-radius:14px;width:100%;max-width:460px;box-shadow:var(--sh3);overflow:hidden;transform:scale(.95) translateY(8px);transition:transform .2s;}
+.overlay.open .as-modal{transform:scale(1) translateY(0);}
+.as-hdr{background:var(--navy);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;}
+.as-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;}
+.as-body{padding:20px;}
+.as-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;font-weight:500;}
+.as-input-wrap{margin-bottom:14px;}
+.as-lbl{display:block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:7px;}
+.as-input{font-family:'Outfit',sans-serif;width:100%;padding:10px 12px;border:2px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;color:var(--text);background:#fff;outline:none;transition:border-color .15s;}
+.as-input:focus{border-color:var(--fp);}
+.gen-btn{font-family:'Outfit',sans-serif;width:100%;padding:12px;background:var(--fp);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;transition:background .12s;display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;}
+.gen-btn:hover:not(:disabled){background:var(--fp-lt);}
+.gen-btn:disabled{opacity:.6;cursor:not-allowed;}
+.as-status{margin-top:14px;padding:12px;border-radius:8px;font-size:12px;font-weight:600;display:none;}
+.as-status.loading{background:#EFF6FF;color:#1D4ED8;display:flex;align-items:center;gap:8px;}
+.as-status.success{background:#F0FDF4;color:#166534;display:flex;align-items:center;gap:8px;}
+.as-status.error{background:#FEF2F2;color:#991B1B;display:block;}
+.as-status.error strong{display:block;margin-bottom:4px;}
+.spin{display:inline-block;animation:spin .8s linear infinite;font-size:16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.as-note{font-size:10px;color:var(--muted);margin-top:12px;text-align:center;line-height:1.5;}
+
+/* ─── EMPTY STATE ─── */
+.empty{text-align:center;padding:44px 20px;color:var(--muted);}
+.empty .em{font-size:34px;margin-bottom:10px;}
+.empty p{font-size:14px;font-weight:700;}
+.empty small{font-size:11px;font-weight:500;display:block;margin-top:5px;}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .2s ease forwards;}
+
+/* ─── RESPONSIVE ─── */
+@media(min-width:600px){
+  .hdr-sub{display:block;}
+  .hdr{padding:0 24px;}
+  .schools-bar,.fbar,.main{padding-left:24px;padding-right:24px;}
+  .ecard{grid-template-columns:46px 1fr auto;}
+  .m-info-grid{grid-template-columns:1fr 1fr;}
+  .m-acts{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:599px){
+  .cal-day{min-height:58px;}
+  .cal-mo-lbl{font-size:15px;}
+  .fsel{font-size:12px;max-width:140px;}
+  .overlay{padding:0;align-items:flex-end;}
+  .modal{border-radius:14px 14px 0 0;max-height:88vh;}
+  .as-modal{border-radius:14px 14px 0 0;}
+  .m-info-grid{grid-template-columns:1fr;}
+  .m-acts{grid-template-columns:1fr;}
+  .ecard{grid-template-columns:40px 1fr;}
+  .ecard-acts{display:none;}
+  .dl-btn{display:none;}
+  .fdiv{display:none;}
+  .fbar{gap:6px;}
+}
+
+/* ─── INLINE LEGEND (below calendar) ─── */
+.inline-legend{display:flex;flex-wrap:wrap;gap:8px 14px;padding:12px 16px;background:var(--navy-mid);border-radius:0 0 var(--r) var(--r);}
+.inline-legend .leg{color:rgba(255,255,255,.55);}
+.inline-legend .leg-div{background:rgba(255,255,255,.15);}
+.inline-legend .leg{font-size:11px;}
+.inline-legend .leg-dot{width:9px;height:9px;}
+
+/* ─── WEEKLY VIEW ─── */
+.w-outer{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.w-wrap{background:var(--white);border-radius:var(--r);box-shadow:var(--sh2);overflow:hidden;min-width:500px;}
+.w-hdr{background:var(--navy);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;}
+.w-hdr-lbl{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;letter-spacing:-.3px;}
+.w-hdr-lbl span{color:var(--fp);}
+.w-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);}
+.w-day{background:var(--white);min-height:100px;padding:6px 5px;display:flex;flex-direction:column;overflow-y:auto;max-height:380px;}
+.w-day.w-today{background:#FFF3EC;}
+.w-day-hdr{text-align:center;padding-bottom:5px;border-bottom:1px solid var(--border);margin-bottom:4px;flex-shrink:0;}
+.w-dow{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);}
+.w-dnum{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--text);line-height:1;}
+.w-today .w-dnum{background:var(--fp);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin:1px auto;font-size:11px;}
+.w-mon-lbl{font-size:8px;font-weight:700;color:var(--muted);text-transform:uppercase;}
+.w-events{display:flex;flex-direction:column;gap:3px;flex:1;}
+.w-chip{font-size:9px;font-weight:700;padding:3px 5px;border-radius:4px;cursor:pointer;transition:opacity .1s;line-height:1.4;word-break:break-word;}
+.w-chip:hover{opacity:.8;}
+.w-chip-sb{display:inline-block;font-size:7px;font-weight:900;padding:1px 3px;border-radius:3px;color:#fff;margin-right:2px;vertical-align:middle;}
+.w-empty{font-size:9px;color:var(--border);text-align:center;padding:8px 0;}
+
+/* ─── SETTINGS MODAL ─── */
+.settings-btn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:6px 11px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .12s;white-space:nowrap;}
+.settings-btn:hover{background:rgba(255,255,255,.2);color:#fff;}
+.set-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);}
+.set-row:last-child{border-bottom:none;}
+.set-type{display:flex;align-items:center;gap:7px;flex:1;min-width:0;}
+.set-type-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.set-type-lbl{font-size:12px;font-weight:700;color:var(--text);}
+.set-input-wrap{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.set-adj{font-family:'Outfit',sans-serif;font-size:14px;font-weight:900;width:26px;height:26px;border:1.5px solid var(--border);border-radius:6px;background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;color:var(--text);}
+.set-adj:hover{border-color:var(--fp);color:var(--fp);}
+.set-num{font-size:13px;font-weight:800;color:var(--text);width:28px;text-align:center;}
+.set-unit{font-size:10px;color:var(--muted);font-weight:600;}
+.set-reset{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:7px 14px;background:var(--fp-tan);color:var(--text);border:1.5px solid var(--border);border-radius:7px;cursor:pointer;transition:all .12s;margin-top:12px;}
+.set-reset:hover{border-color:var(--fp);color:var(--fp);}
+.set-ai-btn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:7px 14px;background:var(--navy);color:#fff;border:none;border-radius:7px;cursor:pointer;transition:background .12s;margin-top:12px;margin-left:8px;}
+.set-ai-btn:hover{background:var(--navy-mid);}
+.set-ai-tip{font-size:10px;color:var(--muted);margin-top:10px;line-height:1.5;padding:8px 10px;background:var(--fp-tan);border-radius:6px;}
+
+/* ─── SCHOOL SELECTOR IN FILTER BAR ─── */
+.ms-btn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;padding:6px 9px;background:var(--fp-tan);color:var(--text);border:2px solid var(--border);border-radius:7px;cursor:pointer;transition:all .12s;flex-shrink:0;}
+.ms-btn:hover{border-color:var(--fp);color:var(--fp);}
+/* ─── SCHOOL MANAGER MODAL ─── */
+.sm-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.sm-row:last-child{border-bottom:none;}
+.sm-label{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer;}
+.sm-name{font-size:13px;font-weight:700;color:var(--text);}
+.sm-loc{font-size:11px;color:var(--muted);font-weight:500;}
+.sm-tag{font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;background:rgba(100,116,139,.12);color:var(--muted);}
+.sm-del{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:4px 8px;background:#FEF2F2;color:#EF4444;border:1.5px solid #FECACA;border-radius:6px;cursor:pointer;transition:all .12s;flex-shrink:0;}
+.sm-del:hover{background:#FEE2E2;border-color:#EF4444;}
+.sm-chk{width:16px;height:16px;accent-color:var(--fp);cursor:pointer;flex-shrink:0;}
+/* ─── SALES PRIORITY OVERRIDE ─── */
+.sp-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
+.sp-btn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:6px 12px;border-radius:7px;border:2px solid var(--border);background:var(--white);cursor:pointer;transition:all .12s;color:var(--text);}
+.sp-btn:hover{opacity:.85;}
+.sp-btn.sp-active-high{background:#FFF0E8;border-color:var(--fp);color:var(--fp);}
+.sp-btn.sp-active-medium{background:#FEF3C7;border-color:#D97706;color:#B45309;}
+.sp-btn.sp-active-low{background:#F1F5F9;border-color:#64748B;color:#475569;}
+.sp-reset{background:transparent;border-color:var(--border);color:var(--muted);}
+.sp-reset:hover{border-color:var(--fp);color:var(--fp);}
+@media(max-width:599px){.owb-label{display:none;}.settings-btn{padding:6px 9px;}.hdr-date{display:none;}}
+
+/* ─── ORDER / DUPLICATE ─── */
+.ord-btns{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px;}
+.ord-btn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:5px 10px;border-radius:7px;border:2px solid var(--border);background:#fff;cursor:pointer;transition:all .12s;}
+.ord-btn.a-pitched{background:#EFF6FF;border-color:#2563EB;color:#1D4ED8;}
+.ord-btn.a-proposal{background:#F3E8FF;border-color:#7C3AED;color:#5B21B6;}
+.ord-btn.a-won{background:#D1FAE5;border-color:#059669;color:#065F46;}
+.ord-btn.a-lost{background:#FEE2E2;border-color:#EF4444;color:#991B1B;}
+.ord-dot{width:7px;height:7px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:3px;}
+.od-pitched{background:#2563EB;}.od-proposal{background:#7C3AED;}.od-won{background:#059669;}.od-lost{background:#EF4444;}
+.dup-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
+.dup-row:last-child{border-bottom:none;}
+.dup-chk{width:15px;height:15px;accent-color:var(--fp);cursor:pointer;flex-shrink:0;}
+.dup-go{font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;padding:8px;background:var(--navy);color:#fff;border:none;border-radius:7px;cursor:pointer;width:100%;margin-top:10px;}
+/* ─── CUSTOM EVENT MODAL ─── */
+.ce-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.ce-full{grid-column:1/-1;}
+.ce-lbl{display:block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:5px;}
+.ce-input,.ce-select,.ce-textarea{font-family:'Outfit',sans-serif;width:100%;padding:8px 10px;border:2px solid var(--border);border-radius:7px;font-size:13px;font-weight:600;color:var(--text);background:#fff;outline:none;box-sizing:border-box;}
+.ce-input:focus,.ce-select:focus,.ce-textarea:focus{border-color:var(--fp);}
+.ce-textarea{resize:vertical;min-height:70px;}
+.ce-sp-row{display:flex;gap:6px;}
+.ce-sp-btn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:6px 12px;border-radius:7px;border:2px solid var(--border);background:#fff;cursor:pointer;transition:all .12s;}
+.ce-sp-btn.csp-h{background:#FFF0E8;border-color:var(--fp);color:var(--fp);}
+.ce-sp-btn.csp-m{background:#FEF3C7;border-color:#D97706;color:#B45309;}
+.ce-sp-btn.csp-l{background:#F1F5F9;border-color:#64748B;color:#475569;}
+.add-ev-btn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;padding:6px 14px;background:var(--fp);color:#fff;border:none;border-radius:7px;cursor:pointer;transition:background .12s;}.add-ev-btn:hover{opacity:.85;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="logo">Fresh Prints<em>×</em>Greek</div>
+    <div class="hdr-sub">Sales Calendar — Fall 2026</div>
+    <div class="hdr-pill">v4</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+  <button class="settings-btn" onclick="App.openSettings()">⚙️ <span class="owb-label">Outreach Windows</span></button>
+  <div class="hdr-date" id="hdDate"></div>
+</div>
+</div>
+
+<div class="leg-bar" id="legBar"></div>
+
+<div class="fbar">
+  <div class="fg">
+    <span class="fl">View</span>
+    <div class="vtabs" id="vtabs">
+      <button class="vtab" onclick="App.setView('calendar')">📅 Month</button>
+      <button class="vtab" onclick="App.setView('week')">📆 Week</button>
+      <button class="vtab" onclick="App.setView('list')">📋 Events</button>
+      <button class="vtab" onclick="App.setView('outreach')">🎯 Outreach</button>
+    </div>
+  </div>
+  <div class="fdiv"></div>
+  <div class="fg">
+    <span class="fl">School</span>
+    <select class="fsel" id="schoolSel" onchange="App.handleSchoolSel(this.value)" style="min-width:160px;"></select>
+    <button class="ms-btn" onclick="App.openSM()" title="Manage schools">⚙</button>
+  </div>
+  <div class="fdiv"></div>
+  <div class="fg">
+    <span class="fl">Org</span>
+    <select class="fsel" id="orgSel" onchange="App.setOrg(this.value)"></select>
+  </div>
+  <div class="fg">
+    <span class="fl">Type</span>
+    <select class="fsel" id="typeSel" onchange="App.setType(this.value)"></select>
+  </div>
+  <button class="add-ev-btn" onclick="App.openAddEv()">+ Add Event</button>
+  <button class="dl-btn" onclick="App.dlAll()">📥 Export .ics</button>
+</div>
+
+<div class="main">
+  <div id="alertsPanel"></div>
+  <div id="content"></div>
+</div>
+
+<!-- EVENT MODAL -->
+<div class="overlay" id="evOverlay" onmousedown="App._mdTarget=event.target" onclick="App.maybeClose(event,'evOverlay')">
+  <div class="modal" id="evModal">
+    <div class="m-top">
+      <div class="m-hdr">
+        <div><div class="m-typebar" id="mTypebar"></div><div class="m-title" id="mTitle"></div></div>
+        <button class="m-close" onclick="App.closeEv()">✕</button>
+      </div>
+    </div>
+    <div class="m-body">
+      <div class="m-info-grid" id="mInfoGrid"></div>
+      <div class="m-notes" id="mNotes"></div>
+      <div class="m-div"></div>
+      <div class="m-sec">Add to Calendar</div>
+      <div class="m-acts">
+        <button class="mact google" id="mGoogle">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Google Calendar
+        </button>
+        <button class="mact ical" id="mIcal">📅 Download .ics</button>
+      </div>
+      <div class="m-div"></div>
+      <div class="m-sec">Customize</div>
+      <div class="m-acts">
+        <button class="mact edit" id="mEditBtn" onclick="App.toggleEdit()">✏️ Override Date</button>
+        <button class="mact remind" id="mRemindBtn" onclick="App.toggleRemind()">🔔 Set Reminder</button>
+      </div>
+      <div class="mdiv"></div>
+      <div class="m-sec">Sales Priority</div>
+      <div class="sp-btns" id="spBtns"></div>
+      <div class="mdiv"></div>
+      <div class="m-sec">Order Status</div>
+      <div class="ord-btns" id="ordBtns"></div>
+      <div class="mdiv"></div>
+      <div class="m-sec">Duplicate to Schools</div>
+      <button class="mact edit" style="margin-bottom:8px" onclick="App.toggleDup()">📋 Duplicate to Other Schools</button>
+      <div id="dupPanel" style="display:none">
+        <div class="rpanel"><label class="epanel-lbl">Copy this event to</label>
+        <div id="dupSchools"></div>
+        <button class="dup-go" onclick="App.executeDuplicate()">Create Copies</button></div>
+      </div>
+      <div id="editPanel" style="display:none">
+        <div class="epanel">
+          <label class="epanel-lbl">Pin the confirmed date once you know it</label>
+          <div class="erow">
+            <input type="date" class="dinput" id="dateIn">
+            <button class="abt primary" onclick="App.saveOverride()">Save</button>
+            <button class="abt" onclick="App.clearOverride()">Clear</button>
+          </div>
+        </div>
+      </div>
+      <div id="remindPanel" style="display:none">
+        <div class="rpanel">
+          <label class="epanel-lbl">Remind me X days before — so I know when to reach out</label>
+          <div class="r-opts" id="rOpts"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="overlay" id="setOverlay" onclick="App.maybeClose(event,'setOverlay')" onmousedown="App._mdTarget=event.target">
+  <div class="as-modal">
+    <div class="as-hdr" style="background:var(--fp-navy-mid)">
+      <div class="as-title" style="font-size:16px">⚙️ Outreach Window Settings</div>
+      <button class="m-close" onclick="App.closeSettings()" style="background:rgba(255,255,255,.15);color:#fff;">✕</button>
+    </div>
+    <div class="as-body">
+      <div class="as-desc">Set how many days before each event type the Outreach Radar starts alerting you. This tells you when to reach out to sell merch.</div>
+      <div id="setRows"></div>
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
+        <button class="set-reset" onclick="App.resetSettings()">↺ Reset to Defaults</button>
+        <button class="set-ai-btn" onclick="App.settingsAiAdvice()">✨ Ask AI for Advice</button>
+      </div>
+      <div class="set-ai-tip" id="setAiTip" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- SCHOOL MANAGER MODAL -->
+<div class="overlay" id="smOverlay" onclick="App.maybeClose(event,'smOverlay')" onmousedown="App._mdTarget=event.target">
+  <div class="as-modal">
+    <div class="as-hdr" style="background:var(--navy-mid)">
+      <div class="as-title" style="font-size:16px">⚙️ Manage Schools</div>
+      <button class="m-close" onclick="App.closeSM()" style="background:rgba(255,255,255,.15);color:#fff;">✕</button>
+    </div>
+    <div class="as-body">
+      <div class="as-desc">Toggle schools on or off. Pre-loaded schools can be hidden but not deleted. AI-generated schools can be permanently removed.</div>
+      <div id="smList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SCHOOL MODAL -->
+<div class="overlay" id="asOverlay" onclick="App.maybeClose(event,'asOverlay')">
+  <div class="as-modal">
+    <div class="as-hdr">
+      <div class="as-title">✨ Add a New Market</div>
+      <button class="m-close" onclick="App.closeAs()" style="background:rgba(255,255,255,.15);color:#fff;">✕</button>
+    </div>
+    <div class="as-body">
+      <div class="as-desc">Type any school name. When hosted on Netlify, the tool searches the web for their Greek chapters, recruitment dates, homecoming, and academic calendar to build a real Fall 2026 calendar. Falls back to template dates if offline.</div>
+      <div class="as-input-wrap">
+        <label class="as-lbl">School Name</label>
+        <input type="text" class="as-input" id="asInput" placeholder='e.g. "University of Georgia"' onkeydown="if(event.key==='Enter')App.generate()">
+      </div>
+      <button class="gen-btn" id="genBtn" onclick="App.generate()">
+        <span id="genBtnTxt">📋 Generate Template Calendar</span>
+      </button>
+      <div class="as-status" id="asStatus"></div>
+      <div class="as-note">All dates are template approximations — use the ✏️ override button on each event to pin confirmed dates as you learn them.</div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:14px 20px;font-size:10px;color:#B0A898;font-weight:600;font-family:sans-serif;">
+  Fresh Prints Greek Life Sales Calendar · Fall 2026
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════
+const TODAY = new Date('2026-06-05');
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_S=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DAYS_S=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+
+// ═══════════════════════════════════════════════════════
+// ORG DIRECTORY — every active Greek org at each market
+// Used to: (a) populate org dropdown, (b) match org to council
+// for smart filtering (selecting "Zeta Tau Alpha" shows all
+// CPC/PHC council events at schools where ZTA exists)
+// ═══════════════════════════════════════════════════════
+// ─── ORG DIRECTORY last updated from FP system screenshots 2026-06-05 ───
+const ORG_DIRECTORY = {
+  gcsu: {
+    // CPC Sororities — confirmed from FP accounts list (92 accounts at GCSU)
+    panhellenic: ['Alpha Delta Pi','Alpha Gamma Delta','Alpha Omicron Pi','Delta Gamma',
+                  'Delta Zeta','Kappa Delta','Phi Mu','Zeta Tau Alpha'],
+    // IFC Fraternities — confirmed from FP accounts list
+    ifc: ['Alpha Tau Omega','Delta Sigma Phi','Kappa Alpha Order','Kappa Sigma',
+          'Phi Delta Theta','Pi Kappa Alpha','Pi Kappa Phi','Theta Chi'],
+    // NPHC
+    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Delta Sigma Theta',
+           'Kappa Alpha Psi','Omega Psi Phi'],
+    // Service sorority (not CPC)
+    service: ['Gamma Sigma Sigma'],
+    // Professional/honor fraternities (not IFC social)
+    professional: ['Delta Sigma Pi','Phi Alpha Delta','Chi Epsilon'],
+    // Key account values (from FP system, for context):
+    // Delta Zeta $14,644 | ZTA $7,488 | ADPi $4,286 | AOII $1,632 | ATO $1,966
+  },
+  csu: {
+    // PHA Sororities (12 chapters) — confirmed from FP accounts (170 accounts at CSU)
+    // KEY ACCOUNTS: Pi Beta Phi $27,668 | KAT $20,230 | ZTA $19,469 | KSig $16,043 | LCA $10,711
+    panhellenic: ['Alpha Chi Omega','Alpha Phi','Alpha Xi Delta','Chi Omega',
+                  'Delta Delta Delta','Delta Gamma','Gamma Phi Beta','Kappa Alpha Theta',
+                  'Kappa Kappa Gamma','Phi Mu','Pi Beta Phi','Zeta Tau Alpha'],
+    // IFC Fraternities (23 chapters) — confirmed from FP accounts
+    ifc: ['Alpha Gamma Rho','Alpha Sigma Phi','Alpha Tau Omega','Beta Theta Pi',
+          'Delta Chi','Delta Tau Delta','FarmHouse','Kappa Sigma','Lambda Chi Alpha',
+          'Phi Delta Theta','Phi Gamma Delta','Phi Kappa Tau','Phi Kappa Theta',
+          'Pi Kappa Alpha','Pi Kappa Phi','Sigma Alpha Epsilon','Sigma Nu',
+          'Sigma Phi Epsilon','Sigma Pi','Sigma Tau Gamma','Tau Kappa Epsilon',
+          'Theta Chi','Triangle'],
+    // Multicultural Greek Council
+    multicultural: ['Alpha Epsilon Pi','Kappa Delta Chi','Lambda Theta Nu',
+                    'Lambda Theta Phi','Mu Sigma Upsilon','Nu Alpha Kappa','Sigma Lambda Beta'],
+    // Professional fraternities (not IFC social)
+    professional: ['Delta Mu Delta','Delta Sigma Pi'],
+    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Delta Sigma Theta',
+           'Kappa Alpha Psi','Omega Psi Phi'],
+  },
+  drexel: {
+    // PHC: Delta Zeta $46,447 | SigEp $24,220 | DKE $19,750 | PhiSigSig $14,536
+    panhellenic: ['Alpha Sigma Alpha','Delta Gamma','Delta Phi Epsilon','Delta Zeta','Phi Sigma Sigma'],
+    ifc: ['Alpha Chi Rho','Alpha Epsilon Pi','Delta Kappa Epsilon','Delta Sigma Phi',
+          'Lambda Chi Alpha','Pi Kappa Alpha','Pi Kappa Phi','Pi Lambda Phi',
+          'Sigma Alpha Mu','Sigma Phi Epsilon','Tau Kappa Epsilon','Theta Chi','Theta Tau'],
+    mgc: ['Alpha Phi Lambda','Chi Upsilon Sigma','Delta Epsilon Psi','Delta Phi Omega',
+          'Groove Phi Groove','Iota Nu Delta','Kappa Phi Lambda','Lambda Alpha Upsilon','Sigma Beta Rho'],
+    professional: ['Delta Sigma Pi','Kappa Phi Gamma','Phi Alpha Delta','Phi Chi'],
+    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Delta Sigma Theta','Kappa Alpha Psi','Omega Psi Phi'],
+  },
+  monmouth: {
+    // PHA Sororities confirmed — KEY: Alpha Sigma Tau $13,478 | Panhellenic Board $5,064
+    panhellenic: ['Alpha Omicron Pi','Alpha Sigma Tau','Alpha Xi Delta',
+                  'Delta Phi Epsilon','Phi Sigma Sigma','Zeta Tau Alpha'],
+    ifc: ['Alpha Chi Rho','Kappa Sigma','Phi Kappa Psi',
+          'Sigma Pi','Sigma Tau Gamma','Tau Delta Phi'],
+    multicultural: ['Chi Upsilon Sigma','Lambda Theta Alpha','Lambda Theta Phi'],
+    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Omega Psi Phi'],
+  },
+  marshall: {
+    // KEY: Alpha Xi Delta $16,965 | Delta Zeta $9,125 | AChiO $7,294 | Kappa Sigma $2,173 (CONFIRMED)
+    panhellenic: ['Alpha Chi Omega','Alpha Xi Delta','Delta Zeta','Sigma Sigma Sigma'],
+    // Kappa Sigma confirmed from FP system ($2,173) — now 8 IFC chapters
+    ifc: ['Alpha Tau Omega','Kappa Alpha Order','Kappa Sigma','Pi Kappa Alpha',
+          'Sigma Alpha Epsilon','Sigma Nu','Sigma Phi Epsilon','Sigma Tau Gamma'],
+    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Delta Sigma Theta','Kappa Alpha Psi','Omega Psi Phi'],
+    professional: ['Delta Sigma Pi'],
+  },
+};
+
+// Council-level orgName keywords for smart org filtering
+const COUNCIL_KEYS = {
+  panhellenic:   ['Panhellenic','CPC','PHC','PHA'],
+  ifc:           ['IFC'],
+  nphc:          ['NPHC','IGC'],
+  mgc:           ['NPHC','IGC','MGC'],
+  multicultural: ['Greek Life'],
+  service:       ['Greek Life'],
+  professional:  ['Greek Life'],
+};
+
+
+const ETYPES={
+  recruitment:   {label:'Recruitment',   color:'#7C3AED',bg:'#EDE9FE'},
+  bidday:        {label:'Bid Day 🎉',     color:'#EF4444',bg:'#FEE2E2'},
+  philanthropy:  {label:'Philanthropy',   color:'#059669',bg:'#D1FAE5'},
+  homecoming:    {label:'Homecoming',     color:'#D97706',bg:'#FEF3C7'},
+  parentsweekend:{label:'Parents/Family', color:'#2563EB',bg:'#DBEAFE'},
+  formal:        {label:'Formal/Social',  color:'#DB2777',bg:'#FCE7F3'},
+  newmember:     {label:'New Members',    color:'#0D9488',bg:'#CCFBF1'},
+  greekweek:     {label:'Greek Week',     color:'#0EA5E9',bg:'#E0F2FE'},
+  social:        {label:'Social',         color:'#9333EA',bg:'#F3E8FF'},
+  campus:        {label:'Campus',         color:'#64748B',bg:'#F1F5F9'},
+  intake:        {label:'NPHC Intake',    color:'#BE185D',bg:'#FCE7F3'},
+};
+
+// ═══════════════════════════════════════════════════════
+// SCHOOLS — Pre-loaded (mutable, can be hidden)
+// ═══════════════════════════════════════════════════════
+const DEFAULT_SCHOOLS={
+  gcsu:    {id:'gcsu',    name:'Georgia College & State University',short:'GCSU',    location:'Milledgeville, GA',color:'#003087',preloaded:true},
+  csu:     {id:'csu',     name:'Colorado State University',         short:'CSU',     location:'Fort Collins, CO', color:'#1E4D2B',preloaded:true},
+  drexel:  {id:'drexel',  name:'Drexel University',                 short:'Drexel',  location:'Philadelphia, PA', color:'#07294D',preloaded:true},
+  monmouth:{id:'monmouth',name:'Monmouth University',               short:'Monmouth',location:'West Long Branch, NJ',color:'#002D62',preloaded:true},
+  marshall:{id:'marshall',name:'Marshall University',               short:'Marshall',location:'Huntington, WV',   color:'#00AC3E',preloaded:true},
+};
+
+// ═══════════════════════════════════════════════════════
+// EVENTS — Pre-loaded Fall 2026 data
+// Sources: Official school FSL pages, athletic schedules,
+// national org philanthropy calendars, 2024/2025 patterns.
+// approx:false = confirmed from official source
+// approx:true  = estimated from historical patterns
+// ═══════════════════════════════════════════════════════
+const DEFAULT_EVENTS=[
+
+// ────────────────────── GCSU ──────────────────────────
+// Confirmed from: www.gcsu.edu/fsl/panhellenic (CPC 2026 schedule)
+// Confirmed from: www.gcsu.edu/fsl/ifc (IFC Fall 2026 schedule)
+// CPC SORORITIES: Alpha Delta Pi · Alpha Gamma Delta · Alpha Omicron Pi · Delta Gamma · Delta Zeta · Kappa Delta · Phi Mu · Zeta Tau Alpha
+// IFC FRATERNITIES: Alpha Tau Omega · Delta Sigma Phi · Kappa Sigma · Phi Delta Theta · Pi Kappa Alpha · Pi Kappa Phi · Theta Chi (KA suspended through July 2027)
+// NPHC: Alpha Phi Alpha · Alpha Kappa Alpha · Delta Sigma Theta · Omega Psi Phi + others
+
+{id:'g-cpc-movin',school:'gcsu',orgName:'All CPC Sororities',orgType:'panhellenic',title:'CPC Recruitment Move-In & Orientation',startDate:'2026-08-06',endDate:'2026-08-06',type:'recruitment',approx:false,salesPotential:'medium',outreachDays:14,notes:'PNM move-in day with Parent Orientation at 2pm in Russell Auditorium. Kicks off CPC recruitment week for all 8 sororities. Pitch Rho Gamma matching outfits and recruitment supply kits — totes, lanyards, chapter polos.'},
+{id:'g-cpc-rec',school:'gcsu',orgName:'All CPC Sororities',orgType:'panhellenic',title:'CPC Formal Recruitment Week',startDate:'2026-08-07',endDate:'2026-08-12',type:'recruitment',approx:false,salesPotential:'high',outreachDays:21,notes:'CONFIRMED Fall 2026. Meet & Greet Aug 7-8, Philanthropy Aug 9-10, Sisterhood & Leadership Aug 11, Preference Aug 12. All 8 chapters — ADPi, AGD, AOII, DG, DZ, KD, Phi Mu, ZTA. Active member matching outfits are consistent high-volume orders.'},
+{id:'g-cpc-bidday',school:'gcsu',orgName:'All CPC Sororities',orgType:'panhellenic',title:'🎉 CPC Bid Day',startDate:'2026-08-13',endDate:'2026-08-13',type:'bidday',approx:false,salesPotential:'high',outreachDays:28,notes:'CONFIRMED Aug 13, 2026. All 8 CPC sororities simultaneously reveal new member classes. Bid day boxes, reveal shirts, matching tanks. Pitch to chapter presidents no later than mid-July.'},
+{id:'g-cpc-biglittle',school:'gcsu',orgName:'All CPC Sororities',orgType:'panhellenic',title:'Big/Little Reveal Week',startDate:'2026-09-12',endDate:'2026-09-18',type:'social',approx:true,salesPotential:'high',outreachDays:21,notes:'~4-5 weeks after bid day. New members assigned big sisters. Matching shirts, baskets, "Big/Little" custom items are popular. Bundle this pitch with bid day gear — same chapter, two massive apparel windows.'},
+{id:'g-ifc-rec',school:'gcsu',orgName:'All IFC Fraternities',orgType:'ifc',title:'IFC Fall Recruitment',startDate:'2026-09-11',endDate:'2026-09-17',type:'recruitment',approx:false,salesPotential:'high',outreachDays:21,notes:'CONFIRMED Fall 2026 (per GCSU IFC site). Registration closes Sept 9. 7 active chapters: Alpha Tau Omega, Delta Sigma Phi, Kappa Sigma, Phi Delta Theta, Pi Kappa Alpha, Pi Kappa Phi, Theta Chi. Rush T-shirts and event apparel are primary pitch.'},
+{id:'g-ifc-bidday',school:'gcsu',orgName:'All IFC Fraternities',orgType:'ifc',title:'🎉 IFC Bid Day',startDate:'2026-09-18',endDate:'2026-09-18',type:'bidday',approx:false,salesPotential:'high',outreachDays:28,notes:'CONFIRMED end of IFC Fall Recruitment. 7 fraternities take new pledge classes. Pledge class shirts and new member kits. Pitch 3-4 weeks before for on-time delivery.'},
+{id:'g-zta-tp',school:'gcsu',orgName:'Zeta Tau Alpha',orgType:'panhellenic',title:'ZTA Think Pink Month',startDate:'2026-10-01',endDate:'2026-10-31',type:'philanthropy',approx:true,salesPotential:'high',outreachDays:21,notes:"October = Breast Cancer Awareness Month = ZTA's cause. Think Pink events: walks, tabling, fundraisers. Pink-themed shirts and tanks with chapter letters. Pitch by early September."},
+{id:'g-adpi-philan',school:'gcsu',orgName:'Alpha Delta Pi',orgType:'panhellenic',title:"ADPi Alzheimer's Philanthropy Events",startDate:'2026-10-14',endDate:'2026-10-14',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"ADPi's national philanthropy supports the Alzheimer's Association. Fall fundraising events include tabling, walk events, and awareness programming. Annual T-shirt order opportunity."},
+{id:'g-agd-philan',school:'gcsu',orgName:'Alpha Gamma Delta',orgType:'panhellenic',title:'AGD Fight Hunger + Diabetes Awareness',startDate:'2026-11-01',endDate:'2026-11-07',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:'AGD partners with Action Against Hunger. November is also Diabetes Awareness Month — AGD chapters run programming in this window. Philanthropy event shirts.'},
+{id:'g-aoii-philan',school:'gcsu',orgName:'Alpha Omicron Pi',orgType:'panhellenic',title:'AOII Arthritis Foundation Events',startDate:'2026-10-24',endDate:'2026-10-24',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:'AOII national philanthropy is the Arthritis Foundation. Fall awareness and fundraising events.'},
+{id:'g-kd-philan',school:'gcsu',orgName:'Kappa Delta',orgType:'panhellenic',title:'KD CASA Philanthropy',startDate:'2026-10-17',endDate:'2026-10-17',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:'Kappa Delta supports CASA (Court Appointed Special Advocates). Fall events ahead of their signature spring Shamrock philanthropy.'},
+{id:'g-phimu-philan',school:'gcsu',orgName:'Phi Mu',orgType:'panhellenic',title:'Phi Mu CMN Philanthropy',startDate:'2026-10-22',endDate:'2026-10-22',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Phi Mu's national philanthropy is Children's Miracle Network. Fall fundraising events and awareness programming."},
+{id:'g-ato-philan',school:'gcsu',orgName:'Alpha Tau Omega',orgType:'ifc',title:'ATO Make-A-Wish Philanthropy',startDate:'2026-10-15',endDate:'2026-10-15',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"ATO's national philanthropy is Make-A-Wish Foundation. Fall fundraising events. Philanthropy event shirts."},
+{id:'g-ks-philan',school:'gcsu',orgName:'Kappa Sigma',orgType:'ifc',title:'Kappa Sigma Military Heroes Month',startDate:'2026-11-01',endDate:'2026-11-11',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Kappa Sigma's national philanthropy is Military Heroes — honoring veterans. November (Veterans Day month) is the primary window. Patriotic-themed apparel."},
+{id:'g-pdt-philan',school:'gcsu',orgName:'Phi Delta Theta',orgType:'ifc',title:'Phi Delt ALS Awareness Events',startDate:'2026-10-22',endDate:'2026-10-22',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Phi Delta Theta partners with the ALS Association (Lou Gehrig Disease awareness). Fall fundraising events."},
+{id:'g-pikapp-philan',school:'gcsu',orgName:'Pi Kappa Phi',orgType:'ifc',title:'Pi Kapp Push America Events',startDate:'2026-10-28',endDate:'2026-10-28',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Pi Kappa Phi's philanthropy Push America serves people with disabilities. Annual fall fundraising event."},
+{id:'g-nphc',school:'gcsu',orgName:'All NPHC Organizations',orgType:'nphc',title:'NPHC Fall Intake Period',startDate:'2026-10-01',endDate:'2026-10-31',type:'intake',approx:true,salesPotential:'medium',outreachDays:28,notes:'GCSU NPHC chapters conduct intake throughout fall. Line jackets and crossing gear are high-value, high-margin categories. Each crossing is a separate opportunity.'},
+{id:'g-parents',school:'gcsu',orgName:'Campus-Wide',orgType:'campus',title:"Parents & Family Weekend",startDate:'2026-10-09',endDate:'2026-10-11',type:'parentsweekend',approx:true,salesPotential:'high',outreachDays:28,notes:"Approximate. GCSU holds an annual fall Family Weekend. Greek chapters host open houses for parents. Pitch branded 'parent gift' bundles — sweatshirts, totes — to chapter officers in September."},
+{id:'g-cpc-nme',school:'gcsu',orgName:'All CPC Sororities',orgType:'panhellenic',title:'CPC New Member Education Period',startDate:'2026-08-14',endDate:'2026-10-09',type:'newmember',approx:true,salesPotential:'medium',outreachDays:14,notes:'8-week NME period for fall new members. NME class shirts, chapter totes, educational merchandise are steady sellers throughout.'},
+{id:'g-ifc-nme',school:'gcsu',orgName:'All IFC Fraternities',orgType:'ifc',title:'IFC New Member / Pledge Period',startDate:'2026-09-19',endDate:'2026-11-13',type:'newmember',approx:true,salesPotential:'medium',outreachDays:14,notes:'6-8 week pledge education period. Pledge class shirts and fraternity merchandise for each of the 7 IFC chapters.'},
+{id:'g-formals',school:'gcsu',orgName:'All Greek Life',orgType:'campus',title:'Fall Formals & Date Functions',startDate:'2026-11-07',endDate:'2026-11-21',type:'formal',approx:true,salesPotential:'high',outreachDays:21,notes:'November is the primary window for fall formals and themed date functions. Custom date function shirts are among the highest per-capita revenue items. Pitch each chapter in mid-October.'},
+{id:'g-hc-note',school:'gcsu',orgName:'Campus-Wide',orgType:'campus',title:'⚠️ Homecoming — SPRING (Feb 2027)',startDate:'2027-02-15',endDate:'2027-02-20',type:'homecoming',approx:true,salesPotential:'high',outreachDays:28,notes:"IMPORTANT: GCSU Homecoming is in February, NOT fall. 2026 theme was 'Ignite the Thunder: Bobcat Games' (Feb 16-21 week). Greek chapters compete in parade floats and competitions. Begin outreach for Homecoming apparel in late January 2027."},
+
+// ────────────────────── CSU ───────────────────────────
+// Confirmed from: fsl.colostate.edu (PHA Primary Recruitment Sept 26-29, 2026)
+// Confirmed from: csurams.com (Homecoming Oct 16-18, 2025 pattern)
+// PHA SORORITIES (10): Alpha Chi Omega · Alpha Phi · Alpha Xi Delta · Chi Omega · Delta Delta Delta · Delta Gamma · Gamma Phi Beta · Kappa Alpha Theta · Kappa Kappa Gamma · Pi Beta Phi
+// IFC FRATERNITIES (23 total): Alpha Sigma Phi · Alpha Tau Omega · Delta Chi · FarmHouse · Kappa Sigma · Lambda Chi Alpha · Phi Delta Theta · Phi Gamma Delta · Phi Kappa Tau · Sigma Alpha Epsilon · Sigma Nu · Sigma Phi Epsilon · Sigma Pi · Sigma Tau Gamma · Tau Kappa Epsilon · Theta Chi · (+ agricultural/professional chapters)
+
+{id:'c-block',school:'csu',orgName:'All Greek Life',orgType:'campus',title:'FSL Welcome Back Block Party',startDate:'2026-08-28',endDate:'2026-08-28',type:'social',approx:true,salesPotential:'medium',outreachDays:7,notes:'FSL back-to-school block party early in fall semester. All 50+ chapters participate. Good early-semester visibility and relationship-building.'},
+{id:'c-ifc-rush',school:'csu',orgName:'All IFC Fraternities',orgType:'ifc',title:'IFC Informal Fall Recruitment',startDate:'2026-09-01',endDate:'2026-09-25',type:'recruitment',approx:true,salesPotential:'high',outreachDays:14,notes:'CSU IFC runs informal recruitment through early fall. 23 fraternities each host individual events. Pitch custom rush T-shirts and event apparel to chapter officers in August — large IFC means significant volume.'},
+{id:'c-pha-rec',school:'csu',orgName:'All Panhellenic Sororities',orgType:'panhellenic',title:'PHA Primary Recruitment',startDate:'2026-09-26',endDate:'2026-09-29',type:'recruitment',approx:false,salesPotential:'high',outreachDays:21,notes:'CONFIRMED Fall 2026 dates (per CSU FSL website). All 10 NPC sororities participate. Rho Gamma matching outfits and round-specific chapter gear are high-volume pre-recruitment orders.'},
+{id:'c-pha-bidday',school:'csu',orgName:'All Panhellenic Sororities',orgType:'panhellenic',title:'🎉 PHA Bid Day',startDate:'2026-09-29',endDate:'2026-09-29',type:'bidday',approx:false,salesPotential:'high',outreachDays:28,notes:'CONFIRMED. All 10 sorority chapters simultaneously reveal new member classes. CSU has ~3,000 Greek members — massive community. Bid day boxes, reveal shirts. Pitch minimum 4 weeks out.'},
+{id:'c-pha-bl',school:'csu',orgName:'All Panhellenic Sororities',orgType:'panhellenic',title:'PHA Big/Little Reveal Week',startDate:'2026-10-20',endDate:'2026-10-27',type:'social',approx:true,salesPotential:'high',outreachDays:21,notes:'~3-4 weeks after bid day. 10 sorority chapters running big/little simultaneously = significant volume. Matching shirts and custom items. Bundle into your bid day pitch.'},
+{id:'c-hc',school:'csu',orgName:'Campus-Wide',orgType:'campus',title:'Homecoming & Family Weekend',startDate:'2026-10-15',endDate:'2026-10-17',type:'homecoming',approx:true,salesPotential:'high',outreachDays:28,notes:"Approximate based on 2025 (Oct 16-18 vs Hawai'i). Festival on the Oval, Friday Night Lights (bonfire + pep rally), football game. Greek chapters compete in house decorations and floats. Spirit shirts, tailgate gear."},
+{id:'c-zta-tp',school:'csu',orgName:'Zeta Tau Alpha',orgType:'panhellenic',title:'ZTA Think Pink Month',startDate:'2026-10-01',endDate:'2026-10-31',type:'philanthropy',approx:true,salesPotential:'high',outreachDays:21,notes:"ZTA's signature October philanthropy for breast cancer awareness. Events include charity walks, fundraiser tabling, and awareness programming. Pink apparel with Greek letters reliably sells."},
+{id:'c-achi-philan',school:'csu',orgName:'Alpha Chi Omega',orgType:'panhellenic',title:'AChiO Domestic Violence Awareness',startDate:'2026-10-14',endDate:'2026-10-17',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"October is Domestic Violence Awareness Month — Alpha Chi Omega's national cause. Chapter events include awareness programming and fundraising. Purple/white themed event apparel."},
+{id:'c-axi-philan',school:'csu',orgName:'Alpha Xi Delta',orgType:'panhellenic',title:'AXiD Autism Speaks Events',startDate:'2026-10-22',endDate:'2026-10-22',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Alpha Xi Delta's national philanthropy is Autism Speaks. Fall awareness and fundraising events."},
+{id:'c-ddd-philan',school:'csu',orgName:'Delta Delta Delta',orgType:'panhellenic',title:"Tri Delta St. Jude's Philanthropy",startDate:'2026-10-29',endDate:'2026-10-29',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Delta Delta Delta's national philanthropy is St. Jude Children's Research Hospital. Fall fundraising events are common around October/November."},
+{id:'c-kd-philan',school:'csu',orgName:'Kappa Delta',orgType:'panhellenic',title:'KD Fall Philanthropy Events',startDate:'2026-10-07',endDate:'2026-10-14',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"KD supports CASA year-round. Major spring event is KDCHELLA (confirmed April 2026 at CSU). Fall has additional fundraisers and awareness events."},
+{id:'c-kkgphilan',school:'csu',orgName:'Kappa Kappa Gamma',orgType:'panhellenic',title:'KKG Mental Health Awareness Events',startDate:'2026-10-10',endDate:'2026-10-10',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"KKG's philanthropy focuses on mental health and wellness initiatives. Fall awareness programming."},
+{id:'c-nphc',school:'csu',orgName:'All NPHC Organizations',orgType:'nphc',title:'NPHC Fall Intake Period',startDate:'2026-09-15',endDate:'2026-11-01',type:'intake',approx:true,salesPotential:'medium',outreachDays:28,notes:"CSU NPHC has 3 fraternities and 2 sororities. Intake periods run throughout the semester. Line jackets and paraphernalia are primary apparel categories."},
+{id:'c-ks-philan',school:'csu',orgName:'Kappa Sigma',orgType:'ifc',title:'Kappa Sigma Military Heroes Month',startDate:'2026-11-01',endDate:'2026-11-11',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Kappa Sigma national philanthropy is Military Heroes — November (Veterans Day month) is primary window. Patriotic-themed apparel."},
+{id:'c-sae-philan',school:'csu',orgName:'Sigma Alpha Epsilon',orgType:'ifc',title:'SAE Philanthropy Events',startDate:'2026-10-22',endDate:'2026-10-22',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:'SAE chapter philanthropy event — varies by chapter. Fall fundraising programming.'},
+{id:'c-pha-nme',school:'csu',orgName:'All Panhellenic Sororities',orgType:'panhellenic',title:'PHA New Member Education Period',startDate:'2026-09-30',endDate:'2026-11-20',type:'newmember',approx:true,salesPotential:'medium',outreachDays:7,notes:'8-week NME period for fall new members across all 10 chapters. Class shirts and chapter apparel.'},
+{id:'c-pha-formals',school:'csu',orgName:'All Panhellenic Sororities',orgType:'panhellenic',title:'Sorority Date Functions',startDate:'2026-10-28',endDate:'2026-11-14',type:'formal',approx:true,salesPotential:'high',outreachDays:21,notes:"PHA sororities host late-fall date functions. Custom date shirts are some of the most creative orders — great for showcasing Fresh Prints' design capabilities."},
+{id:'c-ifc-formals',school:'csu',orgName:'All IFC Fraternities',orgType:'ifc',title:'IFC Fall Formals & Date Parties',startDate:'2026-11-04',endDate:'2026-11-21',type:'formal',approx:true,salesPotential:'high',outreachDays:21,notes:'November formal/date party window for CSU IFC. 23 fraternities = significant volume. Pitch starting mid-October.'},
+{id:'c-initiations',school:'csu',orgName:'All IFC Fraternities',orgType:'ifc',title:'IFC New Member Initiations',startDate:'2026-11-17',endDate:'2026-11-21',type:'newmember',approx:true,salesPotential:'medium',outreachDays:14,notes:'IFC chapters initiate pledge classes in mid-late November. Chapter merchandise and initiation gifts.'},
+
+// ────────────────────── DREXEL ────────────────────────
+// Confirmed from: drexel.edu/studentlife/fsl (IFC Rush Sept 22–Oct 4, 2025 pattern; PHC Sept 24-28, 2025 pattern)
+// IFC FRATERNITIES (12 active): Alpha Chi Rho · Alpha Epsilon Pi · Alpha Pi Lambda (local) · Delta Sigma Phi · Lambda Chi Alpha · Pi Kappa Alpha · Pi Kappa Phi · Pi Lambda Phi · Sigma Alpha Mu · Sigma Phi Epsilon · Tau Kappa Epsilon · Theta Chi
+// PHC SORORITIES (5): Alpha Sigma Alpha · Delta Gamma · Delta Phi Epsilon · Delta Zeta · Phi Sigma Sigma
+// IGC: Delta Epsilon Psi · Groove Phi Groove · Iota Nu Delta · Lambda Alpha Upsilon · Sigma Beta Rho · Chi Upsilon Sigma · Delta Phi Omega
+// NOTE: Phi Kappa Psi + Beta Theta Pi are UNRECOGNIZED as of 2025
+
+{id:'d-nitr',school:'drexel',orgName:'All Greek Life',orgType:'campus',title:'Night on the Row (Welcome Week)',startDate:'2026-09-17',endDate:'2026-09-17',type:'social',approx:true,salesPotential:'high',outreachDays:14,notes:"Annual FSL tradition during Welcome Week — all chapters open their houses to new students. One of Drexel's biggest Greek recruitment visibility events. Pitch chapter event shirts to each house."},
+{id:'d-mtg',school:'drexel',orgName:'All Greek Life',orgType:'campus',title:'Meet the Greeks',startDate:'2026-09-19',endDate:'2026-09-19',type:'social',approx:true,salesPotential:'medium',outreachDays:7,notes:'FSL-coordinated all-Greek introduction event. Good relationship-building touchpoint before recruitment begins.'},
+{id:'d-ifc-rush',school:'drexel',orgName:'All IFC Fraternities',orgType:'ifc',title:'IFC Fall Rush',startDate:'2026-09-22',endDate:'2026-10-04',type:'recruitment',approx:true,salesPotential:'high',outreachDays:14,notes:"Approximate based on 2025 (Sept 22–Oct 4). Drexel quarter system starts mid-September. Active IFC: Alpha Chi Rho, Alpha Epsilon Pi, Delta Sigma Phi, Lambda Chi Alpha, Pi Kappa Alpha, Pi Kappa Phi, Pi Lambda Phi, Sigma Alpha Mu, Sigma Phi Epsilon, Tau Kappa Epsilon, Theta Chi. NOTE: Phi Kappa Psi + Beta Theta Pi are unrecognized (2025)."},
+{id:'d-phc-rec',school:'drexel',orgName:'All PHC Sororities',orgType:'panhellenic',title:'PHC Formal Recruitment',startDate:'2026-09-24',endDate:'2026-09-27',type:'recruitment',approx:true,salesPotential:'high',outreachDays:14,notes:'Approximate based on 2025 (Sept 24-28). 5 PHC sororities: Alpha Sigma Alpha, Delta Gamma, Delta Phi Epsilon, Delta Zeta, Phi Sigma Sigma.'},
+{id:'d-phc-bidday',school:'drexel',orgName:'All PHC Sororities',orgType:'panhellenic',title:'🎉 PHC Bid Day',startDate:'2026-09-28',endDate:'2026-09-28',type:'bidday',approx:true,salesPotential:'high',outreachDays:21,notes:'End of PHC formal recruitment. 5 sorority chapters reveal new member classes. Bid day boxes and chapter reveal shirts.'},
+{id:'d-biglittle',school:'drexel',orgName:'All PHC Sororities',orgType:'panhellenic',title:'Big/Little Reveal Week',startDate:'2026-10-20',endDate:'2026-10-27',type:'social',approx:true,salesPotential:'high',outreachDays:21,notes:"~4 weeks after bid day. Big/little gift exchange. Note Drexel's co-op schedule may shift some members off campus — timing can vary by chapter."},
+{id:'d-dpe-ph',school:'drexel',orgName:'Delta Phi Epsilon',orgType:'panhellenic',title:'DPE Crown the Cure Events',startDate:'2026-10-14',endDate:'2026-10-17',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:'DPE national philanthropy benefits the Cystic Fibrosis Foundation. Annual fall fundraising events.'},
+{id:'d-dz-ph',school:'drexel',orgName:'Delta Zeta',orgType:'panhellenic',title:'DZ Hearing & Speech Foundation Events',startDate:'2026-10-21',endDate:'2026-10-21',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"DZ's philanthropy supports hearing and speech programs through the Starkey Hearing Foundation."},
+{id:'d-dg-ph',school:'drexel',orgName:'Delta Gamma',orgType:'panhellenic',title:'DG Service for Sight Events',startDate:'2026-10-24',endDate:'2026-10-24',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Delta Gamma's philanthropy is Service for Sight — supporting vision assistance and guide dog programs. Annual fall philanthropy event."},
+{id:'d-asa-ph',school:'drexel',orgName:'Alpha Sigma Alpha',orgType:'panhellenic',title:'ASA Prevent Child Abuse Events',startDate:'2026-11-07',endDate:'2026-11-07',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Alpha Sigma Alpha's philanthropy is Prevent Child Abuse America. Fall fundraising programming."},
+{id:'d-sigep-ph',school:'drexel',orgName:'Sigma Phi Epsilon',orgType:'ifc',title:'SigEp Balanced Man Philanthropy',startDate:'2026-10-22',endDate:'2026-10-22',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"SigEp's Balanced Man Program focuses on mental health and wellness. Fall philanthropy event."},
+{id:'d-pka-ph',school:'drexel',orgName:'Pi Kappa Alpha',orgType:'ifc',title:'Pike Philanthropy Events',startDate:'2026-10-28',endDate:'2026-10-28',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:'Pi Kappa Alpha chapter philanthropy event. Varies by chapter focus.'},
+{id:'d-nphc',school:'drexel',orgName:'IGC / NPHC Organizations',orgType:'nphc',title:'IGC / NPHC Fall Intake',startDate:'2026-10-01',endDate:'2026-11-15',type:'intake',approx:true,salesPotential:'medium',outreachDays:28,notes:"Drexel's Intercultural Greek Council (IGC) and NPHC chapters conduct fall intake. Line jackets and paraphernalia are primary categories. IGC chapters: Delta Epsilon Psi, Groove Phi Groove, Iota Nu Delta, Lambda Alpha Upsilon, Sigma Beta Rho, Chi Upsilon Sigma, Delta Phi Omega."},
+{id:'d-hazing',school:'drexel',orgName:'All Greek Life',orgType:'campus',title:'Hazing Prevention Awareness Week',startDate:'2026-10-19',endDate:'2026-10-23',type:'campus',approx:true,salesPotential:'low',outreachDays:7,notes:'Annual FSL educational programming week. Low direct apparel opportunity but good relationship touchpoint.'},
+{id:'d-phc-formals',school:'drexel',orgName:'All PHC Sororities',orgType:'panhellenic',title:'PHC Date Functions',startDate:'2026-10-28',endDate:'2026-11-07',type:'formal',approx:true,salesPotential:'high',outreachDays:21,notes:'PHC sorority date functions in late Oct/early Nov before end of fall quarter. Custom date shirts.'},
+{id:'d-ifc-formals',school:'drexel',orgName:'All IFC Fraternities',orgType:'ifc',title:'IFC Fall Formals & Date Parties',startDate:'2026-11-12',endDate:'2026-11-20',type:'formal',approx:true,salesPotential:'high',outreachDays:21,notes:'End of fall quarter — IFC chapters run formals and date parties. Themed shirts and event apparel.'},
+{id:'d-hc-note',school:'drexel',orgName:'Campus-Wide',orgType:'campus',title:'⚠️ Homecoming — JANUARY (Jan 2027)',startDate:'2027-01-22',endDate:'2027-01-24',type:'homecoming',approx:true,salesPotential:'high',outreachDays:28,notes:"IMPORTANT: Drexel Homecoming is in JANUARY (winter tradition). 2026 was Jan 23-24 (bonfire Fri + basketball vs Northeastern Sat at the DAC). Plan your winter merch push for early January 2027."},
+
+// ────────────────────── MONMOUTH ──────────────────────
+// DEFERRED RUSH CAMPUS — 12+ credits + 2.5 GPA required
+// Confirmed from: monmouth.edu/fsl (chapters page)
+// IFC FRATERNITIES (9): Alpha Phi Alpha · Alpha Chi Rho · Lambda Theta Phi · Kappa Sigma · Omega Psi Phi · Phi Kappa Psi · Sigma Pi · Sigma Tau Gamma · Tau Delta Phi
+// SORORITIES (9): Alpha Kappa Alpha · Alpha Omicron Pi · Alpha Sigma Tau · Alpha Xi Delta · Chi Upsilon Sigma · Delta Phi Epsilon · Lambda Theta Alpha · Phi Sigma Sigma · Zeta Tau Alpha
+// PHA FORMAL REC CHAPTERS (6): AOII · AST · AXiD · DPE · PhiSigSig · ZTA
+// NOTE: Delta Tau Delta, Tau Kappa Epsilon, Theta Xi, Alpha Kappa Psi = UNRECOGNIZED (withdrawn 2024-25)
+
+{id:'m-ifc-rush',school:'monmouth',orgName:'All IFC Fraternities',orgType:'ifc',title:'IFC Informal Fall Recruitment',startDate:'2026-09-14',endDate:'2026-10-09',type:'recruitment',approx:true,salesPotential:'medium',outreachDays:14,notes:"DEFERRED RUSH CAMPUS — students need 12+ credits and 2.5+ GPA. No formal fall rush for fraternities. Informal recruitment only. Active chapters: Alpha Chi Rho, Kappa Sigma, Phi Kappa Psi, Sigma Pi, Sigma Tau Gamma, Tau Delta Phi + NPHC fraternities. NOTE: Delta Tau Delta, TKE, Theta Xi = unrecognized."},
+{id:'m-phc-cob',school:'monmouth',orgName:'All Panhellenic Sororities',orgType:'panhellenic',title:'Panhellenic COB / Fall Informal Recruitment',startDate:'2026-09-20',endDate:'2026-11-01',type:'recruitment',approx:true,salesPotential:'medium',outreachDays:14,notes:"FORMAL SORORITY RECRUITMENT IS IN SPRING (late February). Fall is Continuous Open Bidding for eligible students. 6 PHA chapters: AOII, Alpha Sigma Tau, Alpha Xi Delta, DPE, Phi Sigma Sigma, ZTA."},
+{id:'m-hc',school:'monmouth',orgName:'Campus-Wide',orgType:'campus',title:'Homecoming Weekend',startDate:'2026-10-03',endDate:'2026-10-04',type:'homecoming',approx:true,salesPotential:'high',outreachDays:28,notes:'Approximate based on 2025 (Oct 3 vs Towson football). Alumni tailgate + football game. Greek chapters involved in homecoming court, activities, and alumni engagement. Order of Omega hosts FSL Alumni Hall of Fame ceremony.'},
+{id:'m-zta-tp',school:'monmouth',orgName:'Zeta Tau Alpha',orgType:'panhellenic',title:'ZTA Think Pink Month',startDate:'2026-10-01',endDate:'2026-10-31',type:'philanthropy',approx:true,salesPotential:'high',outreachDays:21,notes:"October Think Pink philanthropy for breast cancer awareness. One of the most consistent apparel orders from ZTA chapters."},
+{id:'m-dpe-ph',school:'monmouth',orgName:'Delta Phi Epsilon',orgType:'panhellenic',title:'DPE Crown the Cure',startDate:'2026-10-17',endDate:'2026-10-17',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:'DPE annual Cystic Fibrosis Foundation philanthropy event.'},
+{id:'m-axid-ph',school:'monmouth',orgName:'Alpha Xi Delta',orgType:'panhellenic',title:'AXiD Autism Speaks Events',startDate:'2026-10-22',endDate:'2026-10-22',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:'AXiD national philanthropy benefiting Autism Speaks. Fall fundraising events.'},
+{id:'m-aoii-ph',school:'monmouth',orgName:'Alpha Omicron Pi',orgType:'panhellenic',title:'AOII Arthritis Foundation Events',startDate:'2026-10-24',endDate:'2026-10-24',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:'AOII national philanthropy is the Arthritis Foundation. Fall awareness and fundraising events.'},
+{id:'m-ast-ph',school:'monmouth',orgName:'Alpha Sigma Tau',orgType:'panhellenic',title:'AST Habitat for Humanity Events',startDate:'2026-10-28',endDate:'2026-10-28',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Alpha Sigma Tau's philanthropy is Habitat for Humanity. Fall service and fundraising events."},
+{id:'m-pss-ph',school:'monmouth',orgName:'Phi Sigma Sigma',orgType:'panhellenic',title:'Phi Sigma Sigma Foundation Events',startDate:'2026-11-07',endDate:'2026-11-07',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:'Phi Sigma Sigma Foundation annual philanthropy event.'},
+{id:'m-nphc',school:'monmouth',orgName:'All NPHC Organizations',orgType:'nphc',title:'NPHC Fall Intake',startDate:'2026-10-01',endDate:'2026-11-15',type:'intake',approx:true,salesPotential:'medium',outreachDays:28,notes:'NPHC chapters: Alpha Kappa Alpha, Alpha Phi Alpha, Omega Psi Phi + Lambda Theta Phi, Lambda Theta Alpha, Chi Upsilon Sigma. Intake periods throughout fall semester.'},
+{id:'m-biglittle',school:'monmouth',orgName:'All Panhellenic Sororities',orgType:'panhellenic',title:'Big/Little Reveal (COB New Members)',startDate:'2026-10-24',endDate:'2026-10-31',type:'social',approx:true,salesPotential:'medium',outreachDays:21,notes:'For students who joined via fall COB. Smaller volume than schools with formal fall recruitment.'},
+{id:'m-formals',school:'monmouth',orgName:'All IFC Fraternities',orgType:'ifc',title:'Fall Formals & Date Functions',startDate:'2026-11-07',endDate:'2026-11-21',type:'formal',approx:true,salesPotential:'high',outreachDays:21,notes:'IFC chapters host fall formals and themed date functions in November. Custom date shirts are popular.'},
+{id:'m-pha-spring',school:'monmouth',orgName:'All Panhellenic Sororities',orgType:'panhellenic',title:'⚠️ PHA Formal Recruitment — SPRING (Feb 2027)',startDate:'2027-02-20',endDate:'2027-02-23',type:'recruitment',approx:true,salesPotential:'high',outreachDays:28,notes:'IMPORTANT: Monmouth PHA Formal Recruitment is in SPRING. Confirmed late-February pattern (Feb 20-23 in 2026). 6 PHA sororities. Plan bid day box and reveal shirt outreach for early February 2027.'},
+
+// ────────────────────── MARSHALL ─────────────────────
+// Confirmed from: marshall.edu/fsl (chapter listings)
+// Confirmed from: herdzone.com (Homecoming Oct 18, 2025 = game vs Sun Belt West)
+// PHC SORORITIES (4): Alpha Chi Omega · Alpha Xi Delta · Delta Zeta · Sigma Sigma Sigma
+// IFC FRATERNITIES (7): Alpha Tau Omega · Kappa Alpha Order · Pi Kappa Alpha · Sigma Alpha Epsilon · Sigma Nu · Sigma Phi Epsilon · Sigma Tau Gamma
+// NPHC (5): Alpha Kappa Alpha · Alpha Phi Alpha · Delta Sigma Theta · Kappa Alpha Psi · Omega Psi Phi
+
+{id:'mu2-phc-rec',school:'marshall',orgName:'All PHC Sororities',orgType:'panhellenic',title:'PHC Formal Recruitment',startDate:'2026-09-07',endDate:'2026-09-11',type:'recruitment',approx:true,salesPotential:'high',outreachDays:14,notes:'Approximate. Marshall PHC holds formal fall recruitment. 4 NPC sororities: Alpha Chi Omega, Alpha Xi Delta, Delta Zeta, Sigma Sigma Sigma.'},
+{id:'mu2-phc-bidday',school:'marshall',orgName:'All PHC Sororities',orgType:'panhellenic',title:'🎉 PHC Bid Day',startDate:'2026-09-12',endDate:'2026-09-12',type:'bidday',approx:true,salesPotential:'high',outreachDays:21,notes:'Approximate. PHC bid day for all 4 sororities. Bid day boxes and reveal shirts. Pitch 3 weeks out.'},
+{id:'mu2-ifc-rec',school:'marshall',orgName:'All IFC Fraternities',orgType:'ifc',title:'IFC Fall Recruitment',startDate:'2026-09-01',endDate:'2026-09-18',type:'recruitment',approx:true,salesPotential:'high',outreachDays:14,notes:'Approximate. Marshall IFC fall recruitment. 7 IFC chapters: Alpha Tau Omega, Kappa Alpha Order, Pi Kappa Alpha, Sigma Alpha Epsilon, Sigma Nu, Sigma Phi Epsilon, Sigma Tau Gamma.'},
+{id:'mu2-ifc-bidday',school:'marshall',orgName:'All IFC Fraternities',orgType:'ifc',title:'🎉 IFC Bid Day',startDate:'2026-09-19',endDate:'2026-09-19',type:'bidday',approx:true,salesPotential:'high',outreachDays:21,notes:'Approximate IFC bid day. Pledge class shirts and new member kits for all 7 IFC chapters.'},
+{id:'mu2-phc-nme',school:'marshall',orgName:'All PHC Sororities',orgType:'panhellenic',title:'PHC New Member Education Period',startDate:'2026-09-13',endDate:'2026-11-07',type:'newmember',approx:true,salesPotential:'high',outreachDays:7,notes:'8-week NME period for fall sorority new members across all 4 PHC chapters. Big/little reveal, NME shirts.'},
+{id:'mu2-biglittle',school:'marshall',orgName:'All PHC Sororities',orgType:'panhellenic',title:'Big/Little Reveal Week',startDate:'2026-10-10',endDate:'2026-10-16',type:'social',approx:true,salesPotential:'high',outreachDays:21,notes:'~4 weeks after bid day. Matching shirts and big/little gift exchange across all 4 PHC sororities.'},
+{id:'mu2-hc-week',school:'marshall',orgName:'Campus-Wide',orgType:'campus',title:'Homecoming Week',startDate:'2026-10-12',endDate:'2026-10-16',type:'homecoming',approx:true,salesPotential:'high',outreachDays:28,notes:'Approximate based on 2025 (Oct 13-18 week). Full week: parade, Homecoming Court, stunt shows, alumni events. Greek chapters compete in competitions and float building. Major spirit apparel window.'},
+{id:'mu2-hc-game',school:'marshall',orgName:'Campus-Wide',orgType:'campus',title:'Homecoming Football Game',startDate:'2026-10-17',endDate:'2026-10-17',type:'homecoming',approx:true,salesPotential:'high',outreachDays:28,notes:"Approximate. 2025 was Oct 18 vs Sun Belt West opponent. Marshall's all-time Homecoming record is 69-46-8. Tailgate shirts, chapter spirit wear, and alumni apparel all sell well."},
+{id:'mu2-nphc',school:'marshall',orgName:'All NPHC Organizations',orgType:'nphc',title:'NPHC Fall Intake Period',startDate:'2026-09-20',endDate:'2026-11-01',type:'intake',approx:true,salesPotential:'medium',outreachDays:28,notes:'Marshall NPHC: Alpha Phi Alpha, Alpha Kappa Alpha, Kappa Alpha Psi, Omega Psi Phi, Delta Sigma Theta. 5 chapters conduct intake in fall. Line jackets and paraphernalia.'},
+{id:'mu2-achi-ph',school:'marshall',orgName:'Alpha Chi Omega',orgType:'panhellenic',title:'AChiO Domestic Violence Awareness (Denim & Donuts)',startDate:'2026-10-14',endDate:'2026-10-17',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"October is Domestic Violence Awareness Month — Alpha Chi Omega's cause. 'Denim & Donuts' fundraiser confirmed at Marshall (April 2025 + fall). Alpha Chi Omega WON Greek Sing 2025 at Marshall."},
+{id:'mu2-axid-ph',school:'marshall',orgName:'Alpha Xi Delta',orgType:'panhellenic',title:'AXiD Autism Speaks + Strawberry Breakfast',startDate:'2026-10-22',endDate:'2026-10-22',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"AXiD philanthropy benefits Autism Speaks. The beloved Strawberry Breakfast is a confirmed spring event at Marshall; fall fundraisers also occur."},
+{id:'mu2-dz-ph',school:'marshall',orgName:'Delta Zeta',orgType:'panhellenic',title:'Delta Zeta Hearing Foundation Events',startDate:'2026-10-28',endDate:'2026-10-28',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Delta Zeta national philanthropy supports hearing and speech programs. Delta Zeta was Greek Sing champion in 2024 at Marshall — strong chapter."},
+{id:'mu2-trisig-ph',school:'marshall',orgName:'Sigma Sigma Sigma',orgType:'panhellenic',title:'Tri Sigma Robbie Page Memorial Philanthropy',startDate:'2026-11-07',endDate:'2026-11-07',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"Sigma Sigma Sigma's national philanthropy is the Robbie Page Memorial, benefiting children with special needs."},
+{id:'mu2-sigep-ph',school:'marshall',orgName:'Sigma Phi Epsilon',orgType:'ifc',title:'SigEp Balanced Man / Autism Awareness',startDate:'2026-10-17',endDate:'2026-10-17',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"SigEp partners with CARES for autism awareness. Confirmed annual event at Marshall (and Greek Sing winner 2025). Annual philanthropy car wash 'Mo Wash' confirmed."},
+{id:'mu2-sae-ph',school:'marshall',orgName:'Sigma Alpha Epsilon',orgType:'ifc',title:"SAE Mo Wash Philanthropy",startDate:'2026-10-21',endDate:'2026-10-21',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:"SAE's 'Mo Wash' car wash philanthropy confirmed at Marshall (April 2025). Fall events also possible. Event T-shirts are a consistent order."},
+{id:'mu2-ifc-nme',school:'marshall',orgName:'All IFC Fraternities',orgType:'ifc',title:'IFC New Member / Pledge Period',startDate:'2026-09-20',endDate:'2026-11-14',type:'newmember',approx:true,salesPotential:'medium',outreachDays:14,notes:'New member education period for IFC fraternities. Pledge class shirts and fraternity merchandise for all 7 IFC chapters.'},
+{id:'mu2-phc-formals',school:'marshall',orgName:'All PHC Sororities',orgType:'panhellenic',title:'Sorority Date Functions',startDate:'2026-10-29',endDate:'2026-11-14',type:'formal',approx:true,salesPotential:'high',outreachDays:21,notes:'PHC sorority date functions and semi-formals in late Oct/early November. Custom date shirts across all 4 chapters.'},
+{id:'mu2-ifc-formals',school:'marshall',orgName:'All IFC Fraternities',orgType:'ifc',title:'IFC Fall Formals & Date Parties',startDate:'2026-11-06',endDate:'2026-11-21',type:'formal',approx:true,salesPotential:'high',outreachDays:21,notes:'November formal and date party window for IFC. 7 fraternities. Themed shirts consistently popular.'},
+{id:'mu2-ks-philan',school:'marshall',orgName:'Kappa Sigma',orgType:'ifc',title:'Kappa Sigma Military Heroes Month',startDate:'2026-11-01',endDate:'2026-11-11',type:'philanthropy',approx:true,salesPotential:'medium',outreachDays:14,notes:'Kappa Sigma national philanthropy is Military Heroes — honoring veterans. November (Veterans Day month) is the primary window. Account value $2,173 confirmed in FP system.'},
+{id:'mu2-greek-wk',school:'marshall',orgName:'All Greek Life',orgType:'campus',title:'⚠️ Greek Week / Greek Sing — SPRING (Apr 2027)',startDate:'2027-03-29',endDate:'2027-04-04',type:'greekweek',approx:true,salesPotential:'high',outreachDays:28,notes:'IMPORTANT: Marshall Greek Week is in SPRING (March 31–April 5, 2025 pattern). Greek Sing on final Saturday — Alpha Chi Omega and Sigma Phi Epsilon won in 2025. Greek Week competition shirts are a major annual order. Plan outreach for early March 2027.'},
+];
+
+// ═══════════════════════════════════════════════════════
+// APP
+// ═══════════════════════════════════════════════════════
+const App = {
+  view: window.innerWidth < 600 ? 'list' : 'calendar',  // 'calendar'|'week'|'list'|'outreach'
+  school:'all', org:'all', type:'all',
+  year:2026, month:7, // 0-indexed: 7 = August
+  activeId:null, showEdit:false, showRemind:false,
+  schools:{}, events:[], hiddenSchools:[], aiSchools:{}, customEvents:[],
+  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{},
+
+  // ── INIT ────────────────────────────────────────────
+  init(){
+    // Load storage
+    try{this.overrides=JSON.parse(localStorage.getItem('fp-ov')||'{}');}catch(e){}
+    this.loadOutreachSettings();
+    this.loadSalesOverrides();
+    this.loadOrderStatus();
+    this.loadCustomEvents();
+    try{this.reminders=JSON.parse(localStorage.getItem('fp-rm')||'{}');}catch(e){}
+    try{this.hiddenSchools=JSON.parse(localStorage.getItem('fp-hidden')||'[]');}catch(e){}
+    try{this.aiSchools=JSON.parse(localStorage.getItem('fp-ai-schools')||'{}');}catch(e){}
+
+    // Build schools object (defaults + AI-generated)
+    this.schools = {...DEFAULT_SCHOOLS};
+    Object.values(this.aiSchools).forEach(d=>{
+      if(d&&d.school) this.schools[d.school.id]={...d.school,preloaded:false};
+    });
+
+    // Build events array
+    this.events = [...DEFAULT_EVENTS];
+    Object.values(this.aiSchools).forEach(d=>{
+      if(d&&d.events) d.events.forEach(ev=>this.events.push(ev));
+    });
+
+    // UI setup
+    document.getElementById('hdDate').textContent = 'Today: Jun 5, 2026';
+    this.buildLegend();
+    this.buildFilters();
+    this.setView(this.view, true);
+  },
+
+  save(){
+    try{localStorage.setItem('fp-ov',JSON.stringify(this.overrides));}catch(e){}
+    try{localStorage.setItem('fp-rm',JSON.stringify(this.reminders));}catch(e){}
+    try{localStorage.setItem('fp-hidden',JSON.stringify(this.hiddenSchools));}catch(e){}
+    try{localStorage.setItem('fp-ai-schools',JSON.stringify(this.aiSchools));}catch(e){}
+  },
+
+  visibleSchoolIds(){
+    return Object.keys(this.schools).filter(id=>!this.hiddenSchools.includes(id));
+  },
+
+  daysUntil(d){
+    if(!d)return 999;
+    const t=new Date(d+'T12:00:00');
+    return Math.ceil((t-TODAY)/86400000);
+  },
+  evDate(ev){return this.overrides[ev.id]||ev.startDate;},
+  evEnd(ev){return this.overrides[ev.id]?(this.overrides[ev.id]):(ev.endDate||ev.startDate);},
+  isOverridden(id){return!!this.overrides[id];},
+
+  fmt(d){
+    const dt=new Date(d+'T12:00:00');
+    return `${MONTHS_S[dt.getMonth()]} ${dt.getDate()}, ${dt.getFullYear()}`;
+  },
+  fmtS(d){
+    const dt=new Date(d+'T12:00:00');
+    return `${MONTHS_S[dt.getMonth()]} ${dt.getDate()}`;
+  },
+
+  getFiltered(){
+    const visible=this.visibleSchoolIds();
+    const selOrg=this.org;
+
+    // Build: for each visible school, which council does the selected org belong to?
+    const orgCouncils={};
+    if(selOrg!=='all'){
+      visible.forEach(sid=>{
+        const dir=ORG_DIRECTORY[sid];
+        if(!dir)return;
+        for(const[ct,orgs]of Object.entries(dir)){
+          if(Array.isArray(orgs)&&orgs.includes(selOrg)){orgCouncils[sid]=ct;break;}
+        }
+      });
+    }
+
+    return this.events.filter(ev=>{
+      if(!visible.includes(ev.school))return false;
+      if(this.school!=='all'&&ev.school!==this.school)return false;
+      if(this.type!=='all'&&ev.type!==this.type)return false;
+      if(selOrg==='all')return true;
+      if(ev.orgName===selOrg)return true;
+
+      // Smart council matching: show council events for the org's council at that school
+      const ct=orgCouncils[ev.school];
+      if(!ct)return false; // org not at this school
+      const keys=COUNCIL_KEYS[ct]||[];
+      if(keys.some(k=>ev.orgName.includes(k)))return true;
+      // Always include All Greek Life and Campus-Wide
+      if(ev.orgName==='All Greek Life'||ev.orgName==='Campus-Wide')return true;
+      return false;
+    });
+  },
+
+  getForDay(yr,mo,day){
+    const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    return this.getFiltered().filter(ev=>ds>=this.evDate(ev)&&ds<=this.evEnd(ev));
+  },
+
+  outreachStatus(ev){
+    const ds=this.daysUntil(this.evDate(ev));
+    if(ds<0)return'past';
+    const dt=ds-this.getOutreachDays(ev);
+    if(dt<=0)return'active';
+    if(dt<=7)return'urgent';
+    if(dt<=21)return'soon';
+    if(dt<=45)return'upcoming';
+    return'future';
+  },
+
+  // ── UI BUILDS ───────────────────────────────────────
+  legendHTML(){
+    const items=[
+      {color:'#7C3AED',l:'Recruitment'},{color:'#EF4444',l:'Bid Day'},
+      {color:'#059669',l:'Philanthropy'},{color:'#D97706',l:'Homecoming'},
+      {color:'#2563EB',l:'Parents/Family'},{color:'#DB2777',l:'Formal/Social'},
+      {color:'#0D9488',l:'New Members'},{color:'#BE185D',l:'NPHC Intake'},
+    ];
+    return '<div class="inline-legend">'+
+      items.map(i=>`<div class="leg"><div class="leg-dot" style="background:${i.color}"></div>${i.l}</div>`).join('')+
+    '</div>';
+  },
+  buildLegend(){
+    // Inline legend now appears below calendar — keep bar but make it thin
+    const el = document.getElementById('legBar');
+    if(el) el.style.display='none'; // hide the top bar
+  },
+
+
+
+  buildFilters(){
+    // School select
+    const ssel=document.getElementById('schoolSel');
+    if(ssel){
+      const vis=this.visibleSchoolIds();
+      ssel.innerHTML=
+        `<option value="all"${this.school==='all'?' selected':''}>All Schools (${vis.length})</option>`+
+        vis.map(id=>{
+          const s=this.schools[id];
+          return`<option value="${id}"${id===this.school?' selected':''}>${s.name}</option>`;
+        }).join('')+
+        `<option disabled>──────────────</option>`+
+        `<option value="__add__">➕ Add New School...</option>`+
+        `<option value="__manage__">⚙️ Manage Schools...</option>`;
+    }
+    // Org select — built from ORG_DIRECTORY (all orgs at visible schools) + event orgNames
+    const visible=this.visibleSchoolIds();
+    const councilOpts=['All Greek Life','Campus-Wide','All IFC Fraternities',
+      'All Panhellenic Sororities','All CPC Sororities','All PHC Sororities',
+      'All NPHC Organizations','IGC / NPHC Organizations'];
+    const orgSet=new Set(['all']);
+    councilOpts.forEach(o=>orgSet.add(o));
+    visible.forEach(sid=>{
+      const dir=ORG_DIRECTORY[sid];
+      if(!dir)return;
+      Object.values(dir).flat().forEach(org=>orgSet.add(org));
+    });
+    this.events.filter(e=>visible.includes(e.school)).forEach(e=>{
+      if(!councilOpts.includes(e.orgName))orgSet.add(e.orgName);
+    });
+    const orgs=Array.from(orgSet).sort((a,b)=>{
+      if(a==='all')return -1; if(b==='all')return 1;
+      const ac=councilOpts.includes(a),bc=councilOpts.includes(b);
+      if(ac&&!bc)return -1; if(!ac&&bc)return 1;
+      return a.localeCompare(b);
+    });
+    const osel=document.getElementById('orgSel');
+    if(!osel)return;
+    osel.innerHTML=orgs.map(o=>`<option value="${o}"${o===this.org?' selected':''}>${o==='all'?'All Organizations':o}</option>`).join('');
+    // Type select
+    const tsel=document.getElementById('typeSel');
+    tsel.innerHTML=`<option value="all"${this.type==='all'?' selected':''}>All Types</option>`+
+      Object.entries(ETYPES).map(([k,v])=>`<option value="${k}"${k===this.type?' selected':''}>${v.label}</option>`).join('');
+  },
+
+  hideSchool(id){
+    if(!this.hiddenSchools.includes(id))this.hiddenSchools.push(id);
+    this.save();
+    this.buildFilters();
+    this.render();
+  },
+
+  confirmDelete(id){
+    const s=this.schools[id];
+    if(!s||s.preloaded){alert('Pre-loaded schools can only be hidden, not deleted. Use ⊘ to hide.');return;}
+    if(confirm(`Permanently delete "${s.name}" and all its generated events?\n\nThis cannot be undone.`)){
+      // Remove from aiSchools
+      delete this.aiSchools[id];
+      this.save();
+      // Remove from runtime
+      delete this.schools[id];
+      for(let i=this.events.length-1;i>=0;i--){if(this.events[i].school===id)this.events.splice(i,1);}
+      if(this.org!=='all'){const found=this.events.some(e=>e.orgName===this.org);if(!found)this.org='all';}
+        this.buildFilters();
+      this.render();
+    }
+  },
+
+  restoreAll(){
+    this.hiddenSchools=[];
+    this.save();
+    this.buildFilters();
+    this.render();
+  },
+
+  setView(v, skipRender){
+    this.view=v;
+    if(v==='week'){this.weekStart=null;this.initWeekStart();} // sync week to current month
+    document.querySelectorAll('.vtab').forEach((t,i)=>{
+      t.classList.toggle('on',['calendar','week','list','outreach'][i]===v);
+    });
+    if(!skipRender)this.render();
+    else this.render();
+  },
+  setOrg(v){this.org=v;this.render();},
+  setType(v){this.type=v;this.render();},
+
+  render(){
+    this.renderAlerts();
+    if(this.view==='calendar')this.renderCalendar();
+    else if(this.view==='week')this.renderWeekly();
+    else if(this.view==='list')this.renderList();
+    else this.renderOutreach();
+  },
+
+  // ── ALERTS ──────────────────────────────────────────
+  renderAlerts(){
+    const evs=this.getFiltered()
+      .filter(ev=>{const s=this.outreachStatus(ev);return['active','urgent','soon','upcoming'].includes(s)&&this.getSalesPotential(ev)!=='low';})
+      .sort((a,b)=>this.daysUntil(this.evDate(a))-this.daysUntil(this.evDate(b)))
+      .slice(0,6);
+    if(!evs.length){document.getElementById('alertsPanel').innerHTML='';return;}
+    const cards=evs.map(ev=>{
+      const status=this.outreachStatus(ev);
+      const days=this.daysUntil(this.evDate(ev));
+      const dt=days-this.getOutreachDays(ev);
+      const s=this.schools[ev.school];
+      let icon='📋',tc='t-orange',txt='';
+      if(status==='active'){icon='🔥';txt=`REACH OUT NOW (${days}d away)`;tc='t-red';}
+      else if(status==='urgent'){icon='⚡';txt=`Outreach opens in ${dt}d`;tc='t-red';}
+      else if(status==='soon'){icon='🎯';txt=`Outreach opens in ${dt}d`;tc='t-amber';}
+      else{icon='📅';txt=`Outreach opens in ${dt}d`;tc='t-purple';}
+      return`<div class="a-card ${status}" onclick="App.openEv('${ev.id}')">
+        <div class="a-icon">${icon}</div>
+        <div class="a-body">
+          <div class="a-top"><div class="sb" style="background:${s.color}">${s.short}</div><span class="a-timing ${tc}">${txt}</span></div>
+          <div class="a-ttl">${ev.title.replace(/[🎉⚠️]/g,'').trim()}</div>
+          <div class="a-sub">${ev.orgName} · ${this.fmtS(this.evDate(ev))}</div>
+        </div>
+      </div>`;
+    }).join('');
+    document.getElementById('alertsPanel').innerHTML=
+      `<div class="sec-title">🎯 Outreach Radar <span style="font-family:'Outfit';text-transform:none;letter-spacing:0;font-weight:500;font-size:11px;color:var(--muted)"> — events approaching your outreach window</span></div>
+      <div class="alerts-grid">${cards}</div>`;
+  },
+
+  // ── CALENDAR ────────────────────────────────────────
+  renderCalendar(){
+    const yr=this.year,mo=this.month;
+    const total=this.getFiltered().filter(ev=>{
+      const s=new Date(this.evDate(ev)+'T12:00:00'),e=new Date(this.evEnd(ev)+'T12:00:00');
+      const ms=new Date(yr,mo,1),me=new Date(yr,mo+1,0);
+      return s<=me&&e>=ms;
+    }).length;
+    const first=new Date(yr,mo,1).getDay();
+    const dim=new Date(yr,mo+1,0).getDate();
+    const prev=new Date(yr,mo,0).getDate();
+    let days='';
+    for(let i=first-1;i>=0;i--)days+=`<div class="cal-day other"><span class="dn">${prev-i}</span></div>`;
+    for(let d=1;d<=dim;d++){
+      const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const isToday=ds==='2026-06-05';
+      const devs=this.getForDay(yr,mo,d);
+      const max=3;
+      const chips=devs.slice(0,max).map(ev=>{
+        const t=ETYPES[ev.type];
+        return`<div class="cal-chip" style="background:${t.bg};color:${t.color}" onclick="App.openEv('${ev.id}');event.stopPropagation()" title="${ev.title}">${this.schools[ev.school].short}: ${ev.title.replace(/[🎉⚠️]/g,'').trim()}</div>`;
+      }).join('');
+      const more=devs.length>max?`<div class="cal-more">+${devs.length-max} more</div>`:'';
+      days+=`<div class="cal-day${isToday?' today':''}"><span class="dn">${d}</span><div class="cal-chips">${chips}${more}</div></div>`;
+    }
+    const total2=first+dim;
+    const rem=total2%7===0?0:7-(total2%7);
+    for(let i=1;i<=rem;i++)days+=`<div class="cal-day other"><span class="dn">${i}</span></div>`;
+    document.getElementById('content').innerHTML=`
+      <div class="cal-outer"><div class="cal-wrap fu">
+        <div class="cal-hdr">
+          <button class="cal-nav" onclick="App.prevMo()">◀</button>
+          <div class="cal-mid"><div class="cal-mo-lbl">${MONTHS[mo]}<span> ${yr}</span></div><div class="cal-count">${total} event${total!==1?'s':''} this month</div></div>
+          <button class="cal-nav" onclick="App.nextMo()">▶</button>
+        </div>
+        <div class="cal-dow">${DAYS_S.map(d=>`<div>${d}</div>`).join('')}</div>
+        <div class="cal-grid">${days}</div>
+      </div></div>
+      ${this.legendHTML()}`;
+  },
+  prevMo(){if(this.month===0){this.month=11;this.year--;}else this.month--;this.renderCalendar();},
+  nextMo(){if(this.month===11){this.month=0;this.year++;}else this.month++;this.renderCalendar();},
+
+  // ── LIST ────────────────────────────────────────────
+  renderList(){
+    const evs=this.getFiltered().sort((a,b)=>this.evDate(a).localeCompare(this.evDate(b)));
+    if(!evs.length){document.getElementById('content').innerHTML=this.empty('No events match your filters.','Try adjusting the org or type filters above.');return;}
+    const g={};
+    evs.forEach(ev=>{
+      const d=new Date(this.evDate(ev)+'T12:00:00');
+      const k=`${d.getFullYear()}-${d.getMonth()}`;
+      if(!g[k])g[k]={l:`${MONTHS[d.getMonth()]} ${d.getFullYear()}`,evs:[]};
+      g[k].evs.push(ev);
+    });
+    const html=Object.values(g).map(grp=>`
+      <div class="list-mhdr">${grp.l} <span class="list-mc">${grp.evs.length}</span></div>
+      ${grp.evs.map(ev=>this.ecard(ev)).join('')}`).join('');
+    document.getElementById('content').innerHTML=`<div class="fu">${html}</div>`;
+  },
+
+  ecard(ev){
+    const s=this.schools[ev.school];
+    const t=ETYPES[ev.type];
+    const sd=new Date(this.evDate(ev)+'T12:00:00');
+    const ed=new Date(this.evEnd(ev)+'T12:00:00');
+    const isMulti=this.evDate(ev)!==this.evEnd(ev);
+    const days=this.daysUntil(this.evDate(ev));
+    const inWin=this.outreachStatus(ev)==='active';
+    const rem=this.reminders[ev.id];
+    const sl={high:'🔥 High',medium:'⚡ Med',low:'🌱 Low'};
+    const sc={high:'s-h',medium:'s-m',low:'s-l'};
+    const curSP=this.getSalesPotential(ev);
+    const ab=this.isOverridden(ev.id)?`<span class="badge b-override">✏️ Overridden</span>`:ev.approx?`<span class="badge b-approx">~ Approx</span>`:`<span class="badge b-confirmed">✓ Confirmed</span>`;
+    const rb=rem?`<span class="badge b-remind">🔔 ${rem}d</span>`:'';
+    const ob=this.ordBadge(ev.id);
+    const dTxt=days<0?'Past':days===0?'Today!':days>365?`${Math.round(days/30)}mo`:`${days}d`;
+    return`<div class="ecard" style="border-left-color:${t.color}" onclick="App.openEv('${ev.id}')">
+      <div class="ecard-dt">
+        ${isMulti?`<div class="ecard-range-s">${MONTHS_S[sd.getMonth()]} ${sd.getDate()}</div><div class="ecard-range-sep">—</div><div class="ecard-range-e">${MONTHS_S[ed.getMonth()]} ${ed.getDate()}</div>`:`<div class="ecard-mo">${MONTHS_S[sd.getMonth()]}</div><div class="ecard-d">${sd.getDate()}</div>`}
+      </div>
+      <div class="ecard-body">
+        <div class="ecard-top"><div class="sb" style="background:${s.color}">${s.short}</div><span class="badge" style="background:${t.bg};color:${t.color}">${t.label}</span>${ab}${rb}${ob}</div>
+        <div class="ecard-ttl">${ev.title}</div>
+        <div class="ecard-org">${ev.orgName}</div>
+      </div>
+      <div class="ecard-acts">
+        <span class="badge ${sc[curSP]}">${sl[curSP]}${this.salesOverrides[ev.id]?'*':''}</span>
+        <div class="act-row" onclick="event.stopPropagation()">
+          <button class="abt" title="Google Cal" onclick="App.addGoogle('${ev.id}')">G</button>
+          <button class="abt" title=".ics" onclick="App.dlIcs('${ev.id}')">📅</button>
+        </div>
+        <div class="du ${inWin?'win':''}">${inWin?'📣 ':' '}${dTxt}</div>
+      </div>
+    </div>`;
+  },
+
+  empty(msg,sub){return`<div class="empty"><div class="em">🔍</div><p>${msg}</p><small>${sub}</small></div>`;},
+
+  // ── OUTREACH ────────────────────────────────────────
+  renderOutreach(){
+    var allF=this.getFiltered().filter(function(ev){return App.daysUntil(App.evDate(ev))>=0;});
+    var pl={pitched:0,proposal:0,won:0,lost:0};
+    allF.forEach(function(ev){var s=App.getOrderStatus(ev.id);if(s&&pl[s]!==undefined)pl[s]++;});
+    var plTotal=pl.pitched+pl.proposal+pl.won+pl.lost;
+    var pipeHtml='';
+    if(plTotal>0){
+      var parts='<span style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Pipeline</span>';
+      if(pl.pitched)parts+='<span style="font-size:12px;font-weight:800;color:#1D4ED8"><span class="ord-dot od-pitched"></span>'+pl.pitched+' Pitched</span>';
+      if(pl.proposal)parts+='<span style="font-size:12px;font-weight:800;color:#5B21B6"><span class="ord-dot od-proposal"></span>'+pl.proposal+' Proposal</span>';
+      if(pl.won)parts+='<span style="font-size:12px;font-weight:800;color:#065F46"><span class="ord-dot od-won"></span>'+pl.won+' Won</span>';
+      if(pl.lost)parts+='<span style="font-size:12px;font-weight:800;color:#991B1B"><span class="ord-dot od-lost"></span>'+pl.lost+' Lost</span>';
+      pipeHtml='<div style="background:var(--white);border-radius:var(--rs);padding:12px 16px;box-shadow:var(--sh);margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">'+parts+'</div>';
+    }
+    const evs=this.getFiltered().map(ev=>({...ev,_d:this.daysUntil(this.evDate(ev)),_s:this.outreachStatus(ev)})).filter(ev=>ev._d>=0).sort((a,b)=>a._d-b._d);
+    const groups=[
+      {key:'active',  l:'🔥 Reach Out NOW',        sub:'Outreach window is open today'},
+      {key:'urgent',  l:'⚡ Act This Week',          sub:'Outreach window opens in less than 7 days'},
+      {key:'soon',    l:'📅 Coming Up (2-3 weeks)',  sub:'Window opens in 7-21 days'},
+      {key:'upcoming',l:'🗓️ On the Horizon',         sub:'Window opens in 21-45 days'},
+      {key:'future',  l:'📌 Plan Ahead',             sub:'More than 45 days until outreach window'},
+    ];
+    const html=groups.map(g=>{
+      const ge=evs.filter(ev=>ev._s===g.key);
+      if(!ge.length)return'';
+      return`<div class="ov-sec"><div class="ov-hdr"><span class="ov-lbl">${g.l}</span><span class="ov-sub">${g.sub} · ${ge.length}</span></div>${ge.map(ev=>this.ecard(ev)).join('')}</div>`;
+    }).join('');
+    document.getElementById('content').innerHTML='<div class="fu">'+pipeHtml+(html||this.empty('No upcoming events.','Adjust your filters or add more schools.'))+'</div>';
+  },
+
+  // ── EVENT MODAL ─────────────────────────────────────
+  openEv(id){
+    const ev=this.events.find(e=>e.id===id);
+    if(!ev)return;
+    this.activeId=id;
+    this.showEdit=false;
+    this.showRemind=false;
+    const s=this.schools[ev.school];
+    const t=ETYPES[ev.type];
+    const days=this.daysUntil(this.evDate(ev));
+    const dtOut=days-ev.outreachDays;
+    const sl={high:'🔥 High Sales Potential',medium:'⚡ Medium Sales Potential',low:'🌱 Lower Priority'};
+    document.getElementById('mTypebar').innerHTML=
+      `<div class="sb" style="background:${s.color}">${s.short}</div>
+       <span class="badge" style="background:${t.bg};color:${t.color}">${t.label}</span>
+       ${this.isOverridden(id)?'<span class="badge b-override">✏️ Overridden</span>':ev.approx?'<span class="badge b-approx">~ Approximate</span>':'<span class="badge b-confirmed">✓ Confirmed</span>'}`;
+    document.getElementById('mTitle').textContent=ev.title;
+    const endStr=ev.endDate&&this.evEnd(ev)!==this.evDate(ev)?` → ${this.fmt(this.evEnd(ev))}`:'';
+    document.getElementById('mInfoGrid').innerHTML=
+      `<div class="m-info"><div class="m-info-l">Date</div><div class="m-info-v">${this.fmt(this.evDate(ev))}${endStr}</div></div>
+       <div class="m-info"><div class="m-info-l">Organization</div><div class="m-info-v">${ev.orgName}</div></div>
+       <div class="m-info"><div class="m-info-l">Timing</div><div class="m-info-v">${days<0?'Past event':days===0?'Today!':days+' days away'}</div></div>
+       <div class="m-info"><div class="m-info-l">Outreach Window</div><div class="m-info-v">${dtOut<=0?'📣 Window is OPEN':'Opens in '+dtOut+' days'}</div></div>
+       <div class="m-info" style="grid-column:1/-1"><div class="m-info-l">Sales Opportunity</div><div class="m-info-v">${sl[ev.salesPotential]}</div></div>`;
+    document.getElementById('mNotes').textContent=ev.notes;
+    document.getElementById('mGoogle').onclick=()=>this.addGoogle(id);
+    document.getElementById('mIcal').onclick=()=>this.dlIcs(id);
+    const hasR=!!this.reminders[id];
+    document.getElementById('mRemindBtn').classList.toggle('on',hasR);
+    document.getElementById('mRemindBtn').textContent=hasR?`🔔 Remind: ${this.reminders[id]}d before`:'🔔 Set Reminder';
+    document.getElementById('dateIn').value=this.overrides[id]||ev.startDate;
+    document.getElementById('editPanel').style.display='none';
+    document.getElementById('remindPanel').style.display='none';
+    document.getElementById('rOpts').innerHTML=[7,14,21,28,45].map(d=>
+      `<button class="rbtn ${this.reminders[id]===d?'on':''}" onclick="App.setR(${d})">${d}d</button>`
+    ).join('')+`<button class="rbtn clr" onclick="App.clearR()">✕ Clear</button>`;
+    this.renderSpBtns();
+    this.renderOrdBtns();
+    document.getElementById('dupPanel').style.display='none';
+    document.getElementById('evOverlay').classList.add('open');
+  },
+  closeEv(){document.getElementById('evOverlay').classList.remove('open');this.activeId=null;},
+  _mdTarget:null,
+  maybeClose(e,id){
+    // Only close if both mousedown AND click happened on the overlay itself (not dragged from inside)
+    if(e.target===document.getElementById(id) && this._mdTarget===document.getElementById(id)){
+      if(id==='evOverlay')this.closeEv();
+      else if(id==='asOverlay')this.closeAs();
+      else if(id==='setOverlay')this.closeSettings();
+      else if(id==='smOverlay')this.closeSM();
+    }
+    this._mdTarget=null;
+  },
+  toggleEdit(){this.showEdit=!this.showEdit;this.showRemind=false;document.getElementById('editPanel').style.display=this.showEdit?'block':'none';document.getElementById('remindPanel').style.display='none';},
+  toggleRemind(){this.showRemind=!this.showRemind;this.showEdit=false;document.getElementById('remindPanel').style.display=this.showRemind?'block':'none';document.getElementById('editPanel').style.display='none';},
+  saveOverride(){
+    const v=document.getElementById('dateIn').value;
+    if(!v||!this.activeId)return;
+    this.overrides[this.activeId]=v;this.save();this.closeEv();this.render();
+  },
+  clearOverride(){
+    if(!this.activeId)return;
+    delete this.overrides[this.activeId];this.save();
+    const ev=this.events.find(e=>e.id===this.activeId);
+    document.getElementById('dateIn').value=ev?ev.startDate:'';
+  },
+  setR(d){
+    if(!this.activeId)return;
+    this.reminders[this.activeId]=d;this.save();
+    document.querySelectorAll('#rOpts .rbtn:not(.clr)').forEach((b,i)=>b.classList.toggle('on',[7,14,21,28,45][i]===d));
+    document.getElementById('mRemindBtn').classList.add('on');
+    document.getElementById('mRemindBtn').textContent=`🔔 Remind: ${d}d before`;
+    this.render();
+  },
+  clearR(){
+    if(!this.activeId)return;
+    delete this.reminders[this.activeId];this.save();
+    document.querySelectorAll('#rOpts .rbtn').forEach(b=>b.classList.remove('on'));
+    document.getElementById('mRemindBtn').classList.remove('on');
+    document.getElementById('mRemindBtn').textContent='🔔 Set Reminder';
+    this.render();
+  },
+
+  // ── ORDER STATUS ──────────────────────────────────────────
+  orderStatus:{},
+  loadOrderStatus(){try{this.orderStatus=JSON.parse(localStorage.getItem('fp-ord')||'{}');}catch(e){this.orderStatus={};}},
+  saveOrderStatus(){try{localStorage.setItem('fp-ord',JSON.stringify(this.orderStatus));}catch(e){}},
+  getOrderStatus(id){return this.orderStatus[id]||null;},
+  setOrderStatus(id,s){
+    if(!s){delete this.orderStatus[id];}else{this.orderStatus[id]=s;}
+    this.saveOrderStatus();this.renderOrdBtns();this.render();
+  },
+  renderOrdBtns(){
+    const el=document.getElementById('ordBtns');
+    if(!el||!this.activeId)return;
+    const cur=this.getOrderStatus(this.activeId);
+    const opts=[
+      {k:'pitched',label:'📤 Pitched',cls:'a-pitched'},
+      {k:'proposal',label:'📋 Proposal',cls:'a-proposal'},
+      {k:'won',label:'✅ Won',cls:'a-won'},
+      {k:'lost',label:'❌ Lost',cls:'a-lost'},
+    ];
+    el.innerHTML=opts.map(function(o){
+      return '<button class="ord-btn '+(cur===o.k?o.cls:'')+'" data-ord="'+o.k+'" onclick="App.clickOrd(this)">'+o.label+'</button>';
+    }).join('');
+  },
+  clickOrd(btn){
+    const k=btn.getAttribute('data-ord');
+    const cur=this.getOrderStatus(this.activeId);
+    this.setOrderStatus(this.activeId,cur===k?null:k);
+  },
+  ordBadge(id){
+    const s=this.getOrderStatus(id);
+    if(!s)return'';
+    const m={pitched:{d:'od-pitched',l:'Pitched'},proposal:{d:'od-proposal',l:'Proposal'},won:{d:'od-won',l:'Won'},lost:{d:'od-lost',l:'Lost'}};
+    const c=m[s];
+    return c?'<span class="badge" style="background:rgba(0,0,0,.06)"><span class="ord-dot '+c.d+'"></span>'+c.l+'</span>':'';
+  },
+
+  // ── DUPLICATE EVENT ───────────────────────────────────────
+  toggleDup(){
+    const p=document.getElementById('dupPanel');
+    if(!p)return;
+    p.style.display=p.style.display==='none'?'block':'none';
+    if(p.style.display==='block')this.renderDupSchools();
+  },
+  renderDupSchools(){
+    const ev=this.events.find(function(e){return e.id===App.activeId;});
+    if(!ev){document.getElementById('dupSchools').innerHTML='';return;}
+    const others=this.visibleSchoolIds().filter(function(id){return id!==ev.school;});
+    if(!others.length){document.getElementById('dupSchools').innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0">No other schools in your markets.</div>';return;}
+    const self=this;
+    document.getElementById('dupSchools').innerHTML=others.map(function(id){
+      const s=self.schools[id];
+      const dir=ORG_DIRECTORY[id];
+      const has=dir&&Object.values(dir).some(function(orgs){return Array.isArray(orgs)&&orgs.includes(ev.orgName);});
+      return '<div class="dup-row"><input class="dup-chk" type="checkbox" id="dup-'+id+'"'+(has?' checked':'')+'>'+
+        '<label for="dup-'+id+'" style="cursor:pointer;flex:1;font-size:12px;font-weight:700">'+
+        s.short+' &mdash; '+s.name+(has?' <span style="font-size:9px;background:rgba(5,150,105,.12);color:#065F46;padding:1px 5px;border-radius:3px">Has this org</span>':'')+
+        '</label></div>';
+    }).join('');
+  },
+  executeDuplicate(){
+    const ev=this.events.find(function(e){return e.id===App.activeId;});
+    if(!ev)return;
+    const others=this.visibleSchoolIds().filter(function(id){return id!==ev.school;});
+    const sel=others.filter(function(id){var el=document.getElementById('dup-'+id);return el&&el.checked;});
+    if(!sel.length){alert('Check at least one school.');return;}
+    const src=this.schools[ev.school];
+    const self=this;
+    sel.forEach(function(schoolId){
+      const newId='dup-'+schoolId+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,5);
+      const newEv=Object.assign({},ev,{id:newId,school:schoolId,_custom:true,approx:true,
+        notes:ev.notes+' [Duplicated from '+(src?src.short:ev.school)+']'});
+      self.customEvents.push(newEv);self.events.push(newEv);
+    });
+    this.saveCustomEvents();this.closeEv();this.render();
+  },
+
+  loadCustomEvents(){
+    try{this.customEvents=JSON.parse(localStorage.getItem('fp-ce')||'[]');}catch(e){this.customEvents=[];}
+    var self=this;
+    this.customEvents.forEach(function(ev){if(!self.events.find(function(e){return e.id===ev.id;}))self.events.push(ev);});
+  },
+  saveCustomEvents(){try{localStorage.setItem('fp-ce',JSON.stringify(this.customEvents));}catch(e){}},
+  _ceSP:'high',
+  openAddEv(){
+    var ss=document.getElementById('ce-school');
+    if(ss){ss.innerHTML=this.visibleSchoolIds().map(function(id){return '<option value="'+id+'">'+App.schools[id].name+'</option>';}).join('');}
+    var ts=document.getElementById('ce-type');
+    if(ts){ts.innerHTML=Object.entries(ETYPES).map(function(e){return '<option value="'+e[0]+'">'+e[1].label+'</option>';}).join('');}
+    this._ceSP='high';this.updateCeSPBtns();
+    var sd=document.getElementById('ce-start');if(sd&&!sd.value)sd.value='2026-09-01';
+    document.getElementById('ceStatus').style.display='none';
+    document.getElementById('ceOverlay').classList.add('open');
+  },
+  closeAddEv(){document.getElementById('ceOverlay').classList.remove('open');},
+  setCeSP(p){this._ceSP=p;this.updateCeSPBtns();},
+  updateCeSPBtns(){
+    var m={h:'high',m:'medium',l:'low'};
+    Object.keys(m).forEach(function(x){var btn=document.getElementById('ce-sp-'+x);if(btn)btn.className='ce-sp-btn'+(App._ceSP===m[x]?' csp-'+x:'');});
+  },
+  saveCustomEvent(){
+    var school=document.getElementById('ce-school').value;
+    var title=(document.getElementById('ce-title').value||'').trim();
+    var org=(document.getElementById('ce-org').value||'').trim();
+    var start=document.getElementById('ce-start').value;
+    var end=document.getElementById('ce-end').value||start;
+    var type=document.getElementById('ce-type').value||'social';
+    var notes=(document.getElementById('ce-notes').value||'').trim();
+    var st=document.getElementById('ceStatus');
+    if(!school||!title||!org||!start){st.className='as-status error';st.style.display='block';st.innerHTML='<strong>Required:</strong> School, Title, Org, and Start Date.';return;}
+    var od=type==='bidday'||type==='homecoming'?56:type==='formal'||type==='recruitment'?42:14;
+    var ev={id:'ce-'+Date.now(),school:school,orgName:org,orgType:'custom',title:title,startDate:start,endDate:end,type:type,approx:false,salesPotential:this._ceSP,outreachDays:od,notes:notes||'Custom event.',_custom:true};
+    this.customEvents.push(ev);this.events.push(ev);this.saveCustomEvents();
+    ['ce-title','ce-org','ce-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    document.getElementById('ce-end').value='';
+    st.className='as-status success';st.style.display='flex';st.innerHTML='✅ Event added!';
+    var self=this;setTimeout(function(){self.closeAddEv();st.style.display='none';self.buildFilters();self.render();},1200);
+  },
+
+  // ── SCHOOL MANAGER ─────────────────────────────────────
+  openSM(){this.renderSMList();document.getElementById('smOverlay').classList.add('open');},
+  closeSM(){document.getElementById('smOverlay').classList.remove('open');},
+
+  renderSMList(){
+    const el=document.getElementById('smList');
+    if(!el)return;
+    const all=Object.keys(this.schools);
+    const vis=this.visibleSchoolIds();
+    el.innerHTML=all.map(id=>{
+      const s=this.schools[id];
+      const isVis=vis.includes(id);
+      const isAI=!s.preloaded;
+      return`<div class="sm-row">
+        <label class="sm-label">
+          <input class="sm-chk" type="checkbox" ${isVis?'checked':''} onchange="App.toggleSchool('${id}',this.checked)">
+          <div>
+            <div class="sm-name">${s.name}</div>
+            <div class="sm-loc">${s.location} <span class="sm-tag">${isAI?'Added':'Built-in'}</span></div>
+          </div>
+        </label>
+        ${isAI?`<button class="sm-del" onclick="App.confirmDelete('${id}')">🗑 Delete</button>`:''}
+      </div>`;
+    }).join('');
+  },
+
+  toggleSchool(id,checked){
+    if(checked){this.hiddenSchools=this.hiddenSchools.filter(h=>h!==id);}
+    else{if(!this.hiddenSchools.includes(id))this.hiddenSchools.push(id);}
+    this.save();
+    this.buildFilters();
+    if(!this.visibleSchoolIds().includes(this.school))this.school='all';
+    this.render();
+    this.renderSMList();
+  },
+
+  handleSchoolSel(v){
+    if(v==='__add__'){
+      const sel=document.getElementById('schoolSel');
+      if(sel)sel.value=this.school||'all';
+      this.openAs();
+    } else if(v==='__manage__'){
+      const sel=document.getElementById('schoolSel');
+      if(sel)sel.value=this.school||'all';
+      this.openSM();
+    } else {
+      this.school=v;
+      this.render();
+    }
+  },
+
+  // ── SALES PRIORITY OVERRIDE ──────────────────────────────
+  salesOverrides: {},
+
+  loadSalesOverrides(){
+    try{this.salesOverrides=JSON.parse(localStorage.getItem('fp-so')||'{}');}catch(e){this.salesOverrides={};}
+  },
+
+  saveSalesOverrides(){
+    try{localStorage.setItem('fp-so',JSON.stringify(this.salesOverrides));}catch(e){}
+  },
+
+  getSalesPotential(ev){
+    return this.salesOverrides[ev.id]||ev.salesPotential;
+  },
+
+  setSalePriority(p){
+    if(!this.activeId)return;
+    this.salesOverrides[this.activeId]=p;
+    this.saveSalesOverrides();
+    this.renderSpBtns();
+    this.render();
+  },
+
+  clearSalePriority(){
+    if(!this.activeId)return;
+    delete this.salesOverrides[this.activeId];
+    this.saveSalesOverrides();
+    this.renderSpBtns();
+    this.render();
+  },
+
+  renderSpBtns(){
+    const el=document.getElementById('spBtns');
+    if(!el||!this.activeId)return;
+    const ev=this.events.find(e=>e.id===this.activeId);
+    if(!ev)return;
+    const cur=this.getSalesPotential(ev);
+    const isOverridden=!!this.salesOverrides[this.activeId];
+    const opts=[
+      {k:'high',   label:'🔥 High',   css:'sp-active-high'},
+      {k:'medium', label:'⚡ Medium', css:'sp-active-medium'},
+      {k:'low',    label:'🌱 Low',    css:'sp-active-low'},
+    ];
+    el.innerHTML=opts.map(o=>
+      `<button class="sp-btn ${cur===o.k?o.css:''}" onclick="App.setSalePriority('${o.k}')">${o.label}</button>`
+    ).join('')+(isOverridden?`<button class="sp-btn sp-reset" onclick="App.clearSalePriority()">↺ Default</button>`:'');
+  },
+
+  // ── OUTREACH SETTINGS ──────────────────────────────────
+  outreachSettings: {},
+
+  loadOutreachSettings(){
+    try{
+      const stored=JSON.parse(localStorage.getItem('fp-os')||'{}');
+      // Migrate old flat format {type:days} → {_global:{type:days}}
+      if(stored&&typeof Object.values(stored)[0]==='number'){
+        this.outreachSettings={_global:stored};
+      } else {
+        this.outreachSettings=stored;
+      }
+    } catch(e){this.outreachSettings={};}
+  },
+
+  saveOutreachSettings(){
+    try{localStorage.setItem('fp-os',JSON.stringify(this.outreachSettings));}catch(e){}
+  },
+
+  getOutreachDays(ev){
+    // School-specific setting takes priority over global
+    const schoolSet=this.outreachSettings[ev.school];
+    if(schoolSet&&schoolSet[ev.type]!==undefined)return schoolSet[ev.type];
+    const globalSet=this.outreachSettings['_global'];
+    if(globalSet&&globalSet[ev.type]!==undefined)return globalSet[ev.type];
+    return ev.outreachDays;
+  },
+  _settingsSchool: '_global',
+
+  openSettings(){
+    this.renderSettingsRows();
+    document.getElementById('setOverlay').classList.add('open');
+  },
+
+  closeSettings(){
+    document.getElementById('setOverlay').classList.remove('open');
+  },
+
+  renderSettingsRows(){
+    const defaults={recruitment:21,bidday:28,philanthropy:14,homecoming:28,
+      parentsweekend:28,formal:21,newmember:14,greekweek:28,social:7,campus:7,intake:21};
+    const scope=this._settingsSchool||'_global';
+    const scopeSet=this.outreachSettings[scope]||{};
+    const globalSet=this.outreachSettings['_global']||{};
+    // School selector
+    const vis=this.visibleSchoolIds();
+    const schoolOpts=`<option value="_global"${scope==='_global'?' selected':''}>🌐 Global Default (all schools)</option>`+
+      vis.map(id=>{
+        const s=this.schools[id];
+        const hasCustom=!!(this.outreachSettings[id]&&Object.keys(this.outreachSettings[id]).length>0);
+        return`<option value="${id}"${scope===id?' selected':''}>${s.short}${hasCustom?' ★':''}</option>`;
+      }).join('');
+    const rows=Object.entries(ETYPES).map(([k,v])=>{
+      const scopeVal=scopeSet[k];
+      const globalVal=globalSet[k];
+      const defVal=defaults[k]||14;
+      const cur=scopeVal!==undefined?scopeVal:(scope!=='_global'&&globalVal!==undefined?globalVal:defVal);
+      const isCustom=scopeVal!==undefined;
+      return`<div class="set-row">
+        <div class="set-type">
+          <div class="set-type-dot" style="background:${v.color}"></div>
+          <div class="set-type-lbl">${v.label}${isCustom?'<span style="font-size:9px;color:var(--fp);margin-left:4px">★</span>':''}</div>
+        </div>
+        <div class="set-input-wrap">
+          <button class="set-adj" onclick="App.adjustSetting('${k}',-1)">&#8722;</button>
+          <div class="set-num" id="set-n-${k}">${cur}</div>
+          <button class="set-adj" onclick="App.adjustSetting('${k}',+1)">+</button>
+          <div class="set-unit">days</div>
+        </div>
+      </div>`;
+    }).join('');
+    document.getElementById('setRows').innerHTML=
+      `<div style="margin-bottom:12px">
+        <label class="epanel-lbl">Apply to school</label>
+        <select class="fsel" style="width:100%" onchange="App._settingsSchool=this.value;App.renderSettingsRows()">${schoolOpts}</select>
+        <div style="font-size:10px;color:var(--muted);margin-top:5px">★ = custom value set · Leave on Global Default to apply the same windows to all schools.</div>
+      </div>`+rows;
+  },
+
+  adjustSetting(type,delta){
+    const defaults={recruitment:21,bidday:28,philanthropy:14,homecoming:28,
+      parentsweekend:28,formal:21,newmember:14,greekweek:28,social:7,campus:7,intake:21};
+    const scope=this._settingsSchool||'_global';
+    if(!this.outreachSettings[scope])this.outreachSettings[scope]={};
+    const scopeSet=this.outreachSettings[scope];
+    const globalSet=this.outreachSettings['_global']||{};
+    const defVal=defaults[type]||14;
+    const cur=scopeSet[type]!==undefined?scopeSet[type]:(scope!=='_global'&&globalSet[type]!==undefined?globalSet[type]:defVal);
+    const next=Math.max(1,Math.min(90,cur+delta));
+    scopeSet[type]=next;
+    this.saveOutreachSettings();
+    const el=document.getElementById('set-n-'+type);
+    if(el)el.textContent=next;
+    this.render();
+  },
+
+  resetSettings(){
+    const scope=this._settingsSchool||'_global';
+    if(this.outreachSettings[scope])delete this.outreachSettings[scope];
+    this.saveOutreachSettings();
+    this.renderSettingsRows();
+    this.render();
+  },
+
+  settingsAiAdvice(){
+    const el=document.getElementById('setAiTip');
+    if(!el)return;
+    el.style.display='block';
+    const tips=[
+      "Bid Day (8-10 weeks out): Most chapters that miss bid day regret waiting. Get to the Rho Gamma in June before summer scatter.",
+      "Recruitment (6-8 weeks out): By the time rush starts every recruitment dollar is committed. Catch them in late June before they lose bandwidth.",
+      "Philanthropy (4-6 weeks out): The chair picked the cause, not the shirt. A pitch in early September turns maybe into yes. Two weeks out you get 'we don't have time.'",
+      "Homecoming (8-10 weeks out): Every chapter needs something for the same weekend. Be in conversation in early August for October homecoming.",
+      "Formals (6-8 weeks out): The social chair plans formals 6-8 weeks out. Get in front of them before the budget is committed to a venue.",
+      "General rule: Double whatever window feels right. The chapter's decision timeline is shorter than you expect and the order-to-delivery window is longer than you think."
+    ];
+    el.innerHTML=tips[Math.floor(Math.random()*tips.length)];
+  },
+
+  // ── ADD SCHOOL MODAL ────────────────────────────────
+  openAs(){document.getElementById('asOverlay').classList.add('open');setTimeout(()=>document.getElementById('asInput').focus(),200);},
+  closeAs(){document.getElementById('asOverlay').classList.remove('open');},
+
+  async generate(){
+    const name=document.getElementById('asInput').value.trim();
+    if(!name){alert('Enter a school name.');return;}
+    const btn=document.getElementById('genBtn');
+    const st=document.getElementById('asStatus');
+    btn.disabled=true;
+    document.getElementById('genBtnTxt').innerHTML='Searching...';
+    st.className='as-status loading';st.style.display='flex';
+    st.innerHTML='Researching '+name+'...';
+    try{
+      const res=await this._webSearch(name);
+      this._addSchool(res.school,res.events);
+      const conf=res.events.filter(e=>!e.approx).length;
+      st.className='as-status success';
+      st.innerHTML='Added '+res.school.name+' with '+res.events.length+' events ('+conf+' confirmed from web).';
+      setTimeout(()=>{this.closeAs();document.getElementById('asInput').value='';st.style.display='none';this.buildFilters();this.render();},2500);
+    }catch(e){
+      console.warn('Web search failed:',e.message);
+      document.getElementById('genBtnTxt').innerHTML='Using template...';
+      st.innerHTML='Web search unavailable. Generating template...';
+      await new Promise(r=>setTimeout(r,500));
+      const sid=name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)||'s'+Date.now();
+      const sh=name.split(' ').filter(w=>w.length>2).map(w=>w[0]).join('').toUpperCase().slice(0,5)||'SCH';
+      const cols=['#7C3AED','#DC2626','#2563EB','#059669','#D97706','#DB2777'];
+      const sc={id:sid,name:name,short:sh,location:'Update location',color:cols[Math.floor(Math.random()*cols.length)],preloaded:false};
+      this._addSchool(sc,this._tmplEvts(sid));
+      st.className='as-status success';
+      st.innerHTML='Added '+name+' with template calendar. Open in Claude.ai for web-researched dates.';
+      setTimeout(()=>{this.closeAs();document.getElementById('asInput').value='';st.style.display='none';this.buildFilters();this.render();},2000);
+    }
+    btn.disabled=false;
+    document.getElementById('genBtnTxt').innerHTML='Research & Generate';
+  },
+
+  async _webSearch(schoolName){
+    const prompt='Research Greek life at "'+schoolName+'" and generate a Fall 2026 sales calendar. Search for: 1) "'+schoolName+' FSL fraternity sorority chapters 2025 2026" 2) "'+schoolName+' panhellenic recruitment dates fall 2026" 3) "'+schoolName+' IFC rush fall 2025 2026" 4) "'+schoolName+' homecoming 2025 2026 date" 5) "'+schoolName+' academic calendar fall 2026 start". Return ONLY valid JSON: {"school":{"id":"3-5charID","name":"Full Name","short":"ABBREV","location":"City, ST","color":"#hex"},"events":[{"id":"id-slug","school":"same-id","orgName":"Org","orgType":"ifc|panhellenic|nphc|campus","title":"Title","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","type":"recruitment|bidday|philanthropy|homecoming|parentsweekend|formal|newmember|greekweek|social|campus|intake","approx":true,"salesPotential":"high|medium|low","outreachDays":42,"notes":"Pitch advice"}]}. Rules: 20+ events Aug-Dec 2026. outreachDays: 56 for bid days/homecoming, 42 for formals, 28 for philanthropy. approx:false only for confirmed dates.';
+    // Try Netlify proxy first (works when hosted on Netlify — API key added server-side)
+    // Falls back to direct API when running inside Claude.ai artifact context
+    const reqBody=JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,
+      tools:[{type:'web_search_20250305',name:'web_search'}],
+      messages:[{role:'user',content:prompt}]});
+    let res;
+    try{
+      res=await fetch('/.netlify/functions/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:reqBody});
+      if(!res.ok)throw new Error('Not on Netlify');
+    }catch(_proxyErr){
+      res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:reqBody});
+    }
+    if(!res.ok)throw new Error('API '+res.status);
+    const d=await res.json();
+    const raw=d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    let p;
+    try{p=JSON.parse(raw);}catch(_){const s=raw.indexOf('{'),e=raw.lastIndexOf('}');if(s>=0&&e>s)p=JSON.parse(raw.slice(s,e+1));else throw new Error('No JSON');}
+    if(!p||!p.school||!p.events)throw new Error('Bad structure');
+    p.events=p.events.map(ev=>Object.assign({},ev,{school:p.school.id}));
+    return p;
+  },
+
+  _addSchool(school,events){
+    this.aiSchools[school.id]={school,events};
+    this.save();
+    this.schools[school.id]=Object.assign({},school,{preloaded:false});
+    events.forEach(ev=>{if(!this.events.find(e=>e.id===ev.id))this.events.push(ev);});
+  },
+
+  _tmplEvts(sid){
+    return[
+      {s:'cpc-rec',oN:'All Panhellenic Sororities',oT:'panhellenic',title:'Panhellenic Formal Recruitment',sD:'2026-09-02',eD:'2026-09-07',type:'recruitment',sp:'high',od:42,notes:'Override dates. Rho Gamma gear, recruitment apparel.'},
+      {s:'cpc-bid',oN:'All Panhellenic Sororities',oT:'panhellenic',title:'Panhellenic Bid Day',sD:'2026-09-07',eD:'2026-09-07',type:'bidday',sp:'high',od:56,notes:'Override date. Bid day boxes, reveal shirts, matching tanks.'},
+      {s:'ifc-rush',oN:'All IFC Fraternities',oT:'ifc',title:'IFC Fall Recruitment',sD:'2026-09-01',eD:'2026-09-18',type:'recruitment',sp:'high',od:42,notes:'Override dates. Rush shirts and event apparel.'},
+      {s:'ifc-bid',oN:'All IFC Fraternities',oT:'ifc',title:'IFC Bid Day',sD:'2026-09-19',eD:'2026-09-19',type:'bidday',sp:'high',od:56,notes:'Override date. Pledge class shirts and new member kits.'},
+      {s:'biglil',oN:'All Panhellenic Sororities',oT:'panhellenic',title:'Big/Little Reveal Week',sD:'2026-10-07',eD:'2026-10-13',type:'social',sp:'high',od:42,notes:'Matching shirts, gift baskets, custom items.'},
+      {s:'hc',oN:'Campus-Wide',oT:'campus',title:'Homecoming Week',sD:'2026-10-15',eD:'2026-10-17',type:'homecoming',sp:'high',od:56,notes:'Override date. Spirit shirts, tailgate gear.'},
+      {s:'parents',oN:'Campus-Wide',oT:'campus',title:'Parents and Family Weekend',sD:'2026-10-09',eD:'2026-10-11',type:'parentsweekend',sp:'high',od:56,notes:'Override date. Parent gift bundles and spirit gear.'},
+      {s:'philan',oN:'All Greek Life',oT:'campus',title:'Fall Philanthropy Window',sD:'2026-10-10',eD:'2026-11-07',type:'philanthropy',sp:'medium',od:28,notes:'Individual chapter events. Reach out 4+ weeks out.'},
+      {s:'nphc',oN:'All NPHC Organizations',oT:'nphc',title:'NPHC Fall Intake Period',sD:'2026-10-01',eD:'2026-10-31',type:'intake',sp:'medium',od:28,notes:'Line jackets and crossing gear.'},
+      {s:'nme',oN:'All Panhellenic Sororities',oT:'panhellenic',title:'New Member Education Period',sD:'2026-09-08',eD:'2026-11-07',type:'newmember',sp:'medium',od:14,notes:'NME shirts and chapter merchandise.'},
+      {s:'formals',oN:'All Greek Life',oT:'campus',title:'Fall Formals and Date Functions',sD:'2026-11-07',eD:'2026-11-21',type:'formal',sp:'high',od:42,notes:'Custom date function shirts.'},
+      {s:'initiate',oN:'All Greek Life',oT:'campus',title:'New Member Initiations',sD:'2026-11-14',eD:'2026-11-21',type:'newmember',sp:'medium',od:14,notes:'Initiation commemorative apparel.'},
+    ].map(t=>({id:sid+'-'+t.s,school:sid,orgName:t.oN,orgType:t.oT,title:t.title,startDate:t.sD,endDate:t.eD,type:t.type,approx:true,salesPotential:t.sp,outreachDays:t.od,notes:t.notes}));
+  },
+
+
+
+    // ── WEEKLY VIEW ────────────────────────────────────────
+  weekStart: null,
+
+  initWeekStart(){
+    if(!this.weekStart){
+      // Start on the Sunday of the first week of the current month
+      const d=new Date(this.year,this.month,1);
+      d.setDate(d.getDate()-d.getDay());
+      this.weekStart=d;
+    }
+  },
+
+  renderWeekly(){
+    this.initWeekStart();
+    const ws=this.weekStart;
+    const days=[];
+    for(let i=0;i<7;i++){const d=new Date(ws);d.setDate(ws.getDate()+i);days.push(d);}
+    const wEnd=new Date(ws);wEnd.setDate(ws.getDate()+6);
+    const lbl=`${MONTHS_S[ws.getMonth()]} ${ws.getDate()} – ${MONTHS_S[wEnd.getMonth()]} ${wEnd.getDate()}`;
+
+    const cols=days.map(d=>{
+      const yr=d.getFullYear(),mo=d.getMonth(),day=d.getDate();
+      const isToday=(yr===2026&&mo===5&&day===5);
+      const devs=this.getForDay(yr,mo,day);
+      const chips=devs.map(ev=>{
+        const t=ETYPES[ev.type],s=this.schools[ev.school];
+        return`<div class="w-chip" style="background:${t.bg};color:${t.color}" onclick="App.openEv('${ev.id}')" title="${s?s.name:ev.school}: ${ev.title}">
+          ${s?`<span class="w-chip-sb" style="background:${s.color}">${s.short}</span>`:''}
+          ${ev.title.replace(/[🎉⚠️]/g,'').trim()}
+        </div>`;
+      }).join('');
+      return`<div class="w-day${isToday?' w-today':''}">
+        <div class="w-day-hdr">
+          <div class="w-dow">${DAYS_S[d.getDay()]}</div>
+          <div class="w-dnum">${d.getDate()}</div>
+          <div class="w-mon-lbl">${MONTHS_S[d.getMonth()]}</div>
+        </div>
+        <div class="w-events">${chips||'<div class="w-empty">—</div>'}</div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('content').innerHTML=`
+      <div class="w-outer"><div class="w-wrap fu">
+        <div class="w-hdr">
+          <button class="cal-nav" onclick="App.prevWeek()">◀</button>
+          <div class="w-hdr-lbl">Week of <span>${lbl}</span></div>
+          <button class="cal-nav" onclick="App.nextWeek()">▶</button>
+        </div>
+        <div class="w-grid">${cols}</div>
+      </div></div>
+      ${this.legendHTML()}`;
+  },
+
+  prevWeek(){
+    const d=new Date(this.weekStart);d.setDate(d.getDate()-7);
+    this.weekStart=d;this.year=d.getFullYear();this.month=d.getMonth();
+    this.renderWeekly();
+  },
+  nextWeek(){
+    const d=new Date(this.weekStart);d.setDate(d.getDate()+7);
+    this.weekStart=d;this.year=d.getFullYear();this.month=d.getMonth();
+    this.renderWeekly();
+  },
+
+  // ── CALENDAR EXPORT ─────────────────────────────────
+  buildIcs(ev){
+    const s=this.schools[ev.school];
+    const sd=this.evDate(ev).replace(/-/g,'');
+    const ed=new Date(this.evEnd(ev)+'T12:00:00');ed.setDate(ed.getDate()+1);
+    const edStr=`${ed.getFullYear()}${String(ed.getMonth()+1).padStart(2,'0')}${String(ed.getDate()).padStart(2,'0')}`;
+    const desc=(ev.notes||'').replace(/\n/g,'\\n').replace(/,/g,'\\,');
+    const sum=`[FP] ${s.short}: ${ev.title.replace(/[,;]/g,'')}`;
+    return`BEGIN:VEVENT\r\nUID:${ev.id}@fp-greek-cal\r\nDTSTART;VALUE=DATE:${sd}\r\nDTEND;VALUE=DATE:${edStr}\r\nSUMMARY:${sum}\r\nDESCRIPTION:Org: ${ev.orgName}\\nSales: ${ev.salesPotential.toUpperCase()}\\nOutreach ${ev.outreachDays}d before\\n\\n${desc}\r\nEND:VEVENT`;
+  },
+  addGoogle(id){
+    const ev=this.events.find(e=>e.id===id);if(!ev)return;
+    const s=this.schools[ev.school];
+    const sd=this.evDate(ev).replace(/-/g,'');
+    const ed=new Date(this.evEnd(ev)+'T12:00:00');ed.setDate(ed.getDate()+1);
+    const edStr=`${ed.getFullYear()}${String(ed.getMonth()+1).padStart(2,'0')}${String(ed.getDate()).padStart(2,'0')}`;
+    const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('[FP] '+s.short+': '+ev.title)}&dates=${sd}/${edStr}&details=${encodeURIComponent('Org: '+ev.orgName+'\nSales: '+ev.salesPotential.toUpperCase()+'\nOutreach: '+ev.outreachDays+'d before\n\n'+ev.notes)}&location=${encodeURIComponent(s.location)}`;
+    window.open(url,'_blank');
+  },
+  dlIcs(id){
+    const ev=this.events.find(e=>e.id===id);if(!ev)return;
+    const cal=`BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Fresh Prints//Greek Cal//EN\r\n${this.buildIcs(ev)}\r\nEND:VCALENDAR`;
+    this.dl(cal,`fp-${ev.id}.ics`,'text/calendar');
+  },
+  dlAll(){
+    const evs=this.getFiltered();
+    if(!evs.length){alert('No events match current filters.');return;}
+    const cal=`BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Fresh Prints//Greek Cal//EN\r\nX-WR-CALNAME:FP Greek Life Fall 2026\r\n${evs.map(ev=>this.buildIcs(ev)).join('\r\n')}\r\nEND:VCALENDAR`;
+    this.dl(cal,'fp-greek-calendar-fall2026.ics','text/calendar');
+  },
+  dl(content,name,type){
+    const b=new Blob([content],{type});
+    const u=URL.createObjectURL(b);
+    const a=document.createElement('a');a.href=u;a.download=name;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);
+  },
+};
+
+(function() {
+  function safeInit() {
+    try { App.init(); }
+    catch(e) {
+      var el = document.getElementById('content');
+      if (el) el.innerHTML = '<div style="padding:20px;background:#fee2e2;border-radius:8px;margin:16px;font-family:sans-serif;color:#991b1b;font-size:13px"><strong>Startup error:</strong> ' + (e.message||e) + '<br><small>Try reloading. On mobile, open in Safari or Chrome directly.</small></div>';
+      console.error('FP Calendar:', e);
+    }
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', safeInit); }
+  else { safeInit(); }
+})();
+</script>
+
+<!-- ADD CUSTOM EVENT MODAL -->
+<div class="overlay" id="ceOverlay" onclick="if(event.target===this)App.closeAddEv()">
+  <div class="as-modal">
+    <div class="as-hdr">
+      <div class="as-title">➕ Add Custom Event</div>
+      <button class="m-close" onclick="App.closeAddEv()" style="background:rgba(255,255,255,.15);color:#fff">✕</button>
+    </div>
+    <div class="as-body">
+      <div class="as-desc">Add a specific event you know about — like a confirmed formal date or philanthropy week.</div>
+      <div class="ce-grid">
+        <div>
+          <label class="ce-lbl">School</label>
+          <select class="ce-select" id="ce-school"></select>
+        </div>
+        <div>
+          <label class="ce-lbl">Event Type</label>
+          <select class="ce-select" id="ce-type"></select>
+        </div>
+        <div class="ce-full">
+          <label class="ce-lbl">Event Title</label>
+          <input type="text" class="ce-input" id="ce-title" placeholder='e.g. "KKG Fall Formal" or "ZTA Bid Day"'>
+        </div>
+        <div class="ce-full">
+          <label class="ce-lbl">Organization</label>
+          <input type="text" class="ce-input" id="ce-org" placeholder='e.g. "Kappa Kappa Gamma"'>
+        </div>
+        <div>
+          <label class="ce-lbl">Start Date</label>
+          <input type="date" class="ce-input" id="ce-start">
+        </div>
+        <div>
+          <label class="ce-lbl">End Date (optional)</label>
+          <input type="date" class="ce-input" id="ce-end">
+        </div>
+        <div class="ce-full">
+          <label class="ce-lbl">Sales Priority</label>
+          <div class="ce-sp-row">
+            <button class="ce-sp-btn csp-h" id="ce-sp-h" onclick="App.setCeSP('high')">🔥 High</button>
+            <button class="ce-sp-btn" id="ce-sp-m" onclick="App.setCeSP('medium')">⚡ Medium</button>
+            <button class="ce-sp-btn" id="ce-sp-l" onclick="App.setCeSP('low')">🌱 Low</button>
+          </div>
+        </div>
+        <div class="ce-full">
+          <label class="ce-lbl">Notes</label>
+          <textarea class="ce-textarea" id="ce-notes" placeholder="Outreach context, who to contact, what to pitch..."></textarea>
+        </div>
+      </div>
+      <button class="gen-btn" onclick="App.saveCustomEvent()">Add to Calendar</button>
+      <div class="as-status" id="ceStatus" style="display:none"></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
