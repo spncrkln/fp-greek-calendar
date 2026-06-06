@@ -13,39 +13,33 @@ exports.handler = async function(event) {
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers: cors, body: 'Method Not Allowed' };
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    console.error('ERROR: ANTHROPIC_API_KEY not set');
-    return {
-      statusCode: 500,
-      headers: { ...cors, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'ANTHROPIC_API_KEY not set' })
-    };
-  }
-
-  console.log('API key present, length:', apiKey.length, 'prefix:', apiKey.slice(0, 7));
+  if (!apiKey) return {
+    statusCode: 500,
+    headers: { ...cors, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ error: 'ANTHROPIC_API_KEY not set' })
+  };
 
   try {
     const requestBody = JSON.parse(event.body);
-    console.log('Model:', requestBody.model, '| Tools:', JSON.stringify(requestBody.tools));
-
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'web-search-2025-03-05'
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify(requestBody)
     });
 
     const data = await response.json();
-    console.log('Anthropic status:', response.status);
 
-    if (!response.ok) {
-      console.error('Anthropic error body:', JSON.stringify(data));
+    if (response.ok && data.content) {
+      const textBlock = data.content.find(b => b.type === 'text');
+      if (textBlock) {
+        console.log('Claude response (first 500 chars):', textBlock.text.slice(0, 500));
+      }
     } else {
-      console.log('Success — content blocks:', data.content ? data.content.length : 0);
+      console.error('Anthropic error:', response.status, JSON.stringify(data));
     }
 
     return {
