@@ -188,7 +188,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 /* ─── ADD SCHOOL MODAL ─── */
 .as-modal{background:var(--white);border-radius:14px;width:100%;max-width:460px;box-shadow:var(--sh3);overflow:hidden;transform:scale(.95) translateY(8px);transition:transform .2s;}
 .overlay.open .as-modal{transform:scale(1) translateY(0);}
-.as-hdr{background:var(--navy);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;}
+.as-hdr{background:var(--navy);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
 .as-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;}
 .as-body{padding:20px;}
 .as-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;font-weight:500;}
@@ -367,6 +367,59 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 .dl-confirm-btns button{font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;padding:10px 16px;border-radius:8px;cursor:pointer;flex:1;}
 .dl-go{background:var(--navy);color:#fff;border:none;}
 .dl-cancel{background:transparent;border:2px solid var(--border);color:var(--text);}
+
+/* ─── ORG PICKER ─── */
+.op-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:flex;align-items:flex-end;justify-content:center;padding:0;}
+.op-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0);}
+.op-hdr{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.op-title{font-size:15px;font-weight:900;color:var(--text);}
+.op-body{overflow-y:auto;padding:12px 16px 8px;flex:1;}
+.op-org-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .1s;}
+.op-org-row:hover{background:var(--tan);}
+.op-org-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--fp);cursor:pointer;flex-shrink:0;}
+.op-org-label{font-size:13px;font-weight:700;color:var(--text);}
+.op-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;}
+.op-save{flex:1;font-family:'Outfit',sans-serif;font-size:13px;font-weight:900;padding:12px;background:var(--fp);color:#fff;border:none;border-radius:10px;cursor:pointer;}
+.op-skip{font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;padding:12px 14px;background:transparent;border:2px solid var(--border);border-radius:10px;cursor:pointer;color:var(--muted);}
+.pipe-org-tag{font-size:10px;background:var(--fp);color:#fff;padding:2px 6px;border-radius:4px;font-weight:800;margin-left:6px;vertical-align:middle;}
+
+/* ─── CM SECTION IN MODAL ─── */
+.m-cm-row{display:flex;gap:8px;align-items:center;margin-top:4px;}
+.m-cm-sel{flex:1;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text);cursor:pointer;}
+.m-cm-add{font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;padding:9px 12px;background:var(--navy);color:#fff;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+/* ─── ADD CM MODAL ─── */
+.cm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9500;display:flex;align-items:flex-end;justify-content:center;}
+.cm-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:24px 20px 32px;}
+.cm-title{font-size:16px;font-weight:900;margin-bottom:18px;}
+.cm-field{margin-bottom:14px;}
+.cm-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:5px;}
+.cm-input{width:100%;box-sizing:border-box;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;color:var(--text);}
+.cm-input:focus{outline:none;border-color:var(--fp);}
+.cm-save{width:100%;font-family:'Outfit',sans-serif;font-size:14px;font-weight:900;padding:13px;background:var(--fp);color:#fff;border:none;border-radius:10px;cursor:pointer;margin-top:8px;}
+
+
+/* ─── ADD ORG MODAL ─── */
+.ao-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9600;display:flex;align-items:flex-end;justify-content:center;}
+.ao-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:520px;display:flex;flex-direction:column;max-height:90vh;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,0);}
+.ao-hdr{background:var(--navy);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;border-radius:20px 20px 0 0;flex-shrink:0;}
+.ao-hdr-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;}
+.ao-body{overflow-y:auto;padding:20px 20px 4px;flex:1;}
+.ao-field{margin-bottom:16px;}
+.ao-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:6px;display:block;}
+.ao-input{width:100%;box-sizing:border-box;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;padding:11px 13px;border:1.5px solid var(--border);border-radius:9px;color:var(--text);background:#fff;-webkit-appearance:none;appearance:none;}
+.ao-input:focus{outline:none;border-color:var(--fp);box-shadow:0 0 0 3px rgba(255,77,0,.1);}
+.ao-seg{display:flex;background:var(--tan);border-radius:10px;padding:3px;gap:3px;margin-bottom:16px;}
+.ao-seg-btn{flex:1;font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;padding:9px 4px;border:none;border-radius:7px;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s;}
+.ao-seg-btn.on{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.12);}
+.ao-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ao-type-card{font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;padding:11px 8px;border:2px solid var(--border);border-radius:10px;cursor:pointer;background:#fff;color:var(--muted);transition:all .15s;text-align:center;line-height:1.3;}
+.ao-type-card.on{border-color:var(--fp);background:#fff7f4;color:var(--fp);}
+.ao-footer{padding:14px 20px 20px;border-top:1px solid var(--border);flex-shrink:0;}
+.ao-save-btn{width:100%;font-family:'Outfit',sans-serif;font-size:14px;font-weight:900;padding:14px;background:var(--fp);color:#fff;border:none;border-radius:11px;cursor:pointer;letter-spacing:.2px;}
+.ao-cancel-btn{width:100%;margin-top:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;padding:10px;background:transparent;border:none;cursor:pointer;color:var(--muted);}
+
+.pipe-rm{background:transparent;border:none;color:var(--muted);font-size:13px;font-weight:900;cursor:pointer;padding:4px 6px;border-radius:6px;flex-shrink:0;line-height:1;}
+.pipe-rm:hover{background:#fee2e2;color:#ef4444;}
 </style>
 </head>
 <body>
@@ -406,6 +459,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
   <div class="fg">
     <span class="fl">Org</span>
     <select class="fsel" id="orgSel" onchange="App.setOrg(this.value)"></select>
+    <button class="dl-offline-btn" onclick="App.openAddOrg()" title="Add an organization" style="padding:5px 8px;font-size:11px;">➕ Org</button>
   </div>
   <div class="fg">
     <span class="fl">Type</span>
@@ -434,6 +488,13 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
       <div class="m-info-grid" id="mInfoGrid"></div>
       <div class="m-notes-box" id="mNotes" contenteditable="true" onblur="App.saveNote(this)" spellcheck="false"></div>
       <div class="m-notes-hint">✏️ Click to edit notes</div>
+      <div class="m-sec" style="margin-top:14px">Campus Manager</div>
+      <div class="m-cm-row">
+        <select class="m-cm-sel" id="mCMSel" onchange="App.assignCM(App.activeId,this.value)">
+          <option value="">— None assigned —</option>
+        </select>
+        <button class="m-cm-add" onclick="App.openAddCM()">+ Add CM</button>
+      </div>
       <div class="m-div"></div>
       <div class="m-sec">Add to Calendar</div>
       <div class="m-acts">
@@ -562,74 +623,81 @@ const DAYS_S=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 // ─── ORG DIRECTORY last updated from FP system screenshots 2026-06-05 ───
 const ORG_DIRECTORY = {
   gcsu: {
-    // CPC Sororities — confirmed from FP accounts list (92 accounts at GCSU)
+    // CPC Sororities — 8 chapters, verified gcsu.edu/fsl/panhellenic (2025)
     panhellenic: ['Alpha Delta Pi','Alpha Gamma Delta','Alpha Omicron Pi','Delta Gamma',
                   'Delta Zeta','Kappa Delta','Phi Mu','Zeta Tau Alpha'],
-    // IFC Fraternities — confirmed from FP accounts list
+    // IFC Fraternities — 7 active, verified gcsu.edu/fsl/ifc (2026)
+    // Note: Kappa Alpha Order suspended through July 2027
     ifc: ['Alpha Tau Omega','Delta Sigma Phi','Kappa Alpha Order','Kappa Sigma',
           'Phi Delta Theta','Pi Kappa Alpha','Pi Kappa Phi','Theta Chi'],
-    // NPHC
-    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Delta Sigma Theta',
-           'Kappa Alpha Psi','Omega Psi Phi'],
-    // Service sorority (not CPC)
-    service: ['Gamma Sigma Sigma'],
-    // Professional/honor fraternities (not IFC social)
-    professional: ['Delta Sigma Pi','Phi Alpha Delta','Chi Epsilon'],
-    // Key account values (from FP system, for context):
-    // Delta Zeta $14,644 | ZTA $7,488 | ADPi $4,286 | AOII $1,632 | ATO $1,966
+    // NPHC — verified gcsu.edu/fsl/nphc
+    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Kappa Alpha Psi','Zeta Phi Beta'],
+    professional: ['Delta Sigma Pi'],
+    campus: []
   },
   csu: {
-    // PHA Sororities (12 chapters) — confirmed from FP accounts (170 accounts at CSU)
-    // KEY ACCOUNTS: Pi Beta Phi $27,668 | KAT $20,230 | ZTA $19,469 | KSig $16,043 | LCA $10,711
+    // PHA Sororities — 10-13 chapters, verified fsl.colostate.edu 2025-26 guide
     panhellenic: ['Alpha Chi Omega','Alpha Phi','Alpha Xi Delta','Chi Omega',
                   'Delta Delta Delta','Delta Gamma','Gamma Phi Beta','Kappa Alpha Theta',
-                  'Kappa Kappa Gamma','Phi Mu','Pi Beta Phi','Zeta Tau Alpha'],
-    // IFC Fraternities (23 chapters) — confirmed from FP accounts
+                  'Kappa Kappa Gamma','Pi Beta Phi','Zeta Tau Alpha'],
+    // IFC Fraternities — 23 chapters, verified fsl.colostate.edu 2025-26 guide
     ifc: ['Alpha Gamma Rho','Alpha Sigma Phi','Alpha Tau Omega','Beta Theta Pi',
           'Delta Chi','Delta Tau Delta','FarmHouse','Kappa Sigma','Lambda Chi Alpha',
-          'Phi Delta Theta','Phi Gamma Delta','Phi Kappa Tau','Phi Kappa Theta',
-          'Pi Kappa Alpha','Pi Kappa Phi','Sigma Alpha Epsilon','Sigma Nu',
-          'Sigma Phi Epsilon','Sigma Pi','Sigma Tau Gamma','Tau Kappa Epsilon',
-          'Theta Chi','Triangle'],
-    // Multicultural Greek Council
-    multicultural: ['Alpha Epsilon Pi','Kappa Delta Chi','Lambda Theta Nu',
-                    'Lambda Theta Phi','Mu Sigma Upsilon','Nu Alpha Kappa','Sigma Lambda Beta'],
-    // Professional fraternities (not IFC social)
-    professional: ['Delta Mu Delta','Delta Sigma Pi'],
-    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Delta Sigma Theta',
-           'Kappa Alpha Psi','Omega Psi Phi'],
+          'Phi Delta Theta','Phi Gamma Delta','Phi Kappa Tau','Pi Kappa Alpha',
+          'Pi Kappa Phi','Sigma Alpha Epsilon','Sigma Nu','Sigma Phi Epsilon',
+          'Sigma Pi','Sigma Tau Gamma','Tau Kappa Epsilon','Theta Chi','Triangle'],
+    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Delta Sigma Theta','Omega Psi Phi','Phi Beta Sigma'],
+    mgc: ['Nu Alpha Kappa','Alpha Phi Gamma','Sigma Lambda Gamma','Kappa Delta Chi'],
+    professional: ['Delta Sigma Pi'],
+    campus: []
   },
   drexel: {
-    // PHC: Delta Zeta $46,447 | SigEp $24,220 | DKE $19,750 | PhiSigSig $14,536
+    // PHC — 5 sororities, verified drexel.edu/studentlife/..../sororities (Aug 2025)
+    // Note: Phi Mu (2020) and Sigma Sigma Sigma (2019) are UNRECOGNIZED — removed
     panhellenic: ['Alpha Sigma Alpha','Delta Gamma','Delta Phi Epsilon','Delta Zeta','Phi Sigma Sigma'],
-    ifc: ['Alpha Chi Rho','Alpha Epsilon Pi','Delta Kappa Epsilon','Delta Sigma Phi',
-          'Lambda Chi Alpha','Pi Kappa Alpha','Pi Kappa Phi','Pi Lambda Phi',
-          'Sigma Alpha Mu','Sigma Phi Epsilon','Tau Kappa Epsilon','Theta Chi','Theta Tau'],
+    // IFC — verified drexel.edu official recognized fraternities page (Aug 2025)
+    // + drexelifc.org for full chapter list
+    // EXCLUDED: Beta Theta Pi (unrecognized 2025), Phi Kappa Psi (unrecognized 2025)
+    // EXCLUDED: Delta Kappa Epsilon, Sigma Alpha Epsilon, Tau Kappa Epsilon, Theta Tau
+    ifc: ['Alpha Chi Rho','Alpha Epsilon Pi','Alpha Pi Lambda','Beta Chi Theta',
+          'Delta Sigma Phi','Lambda Chi Alpha','Pi Kappa Alpha','Pi Kappa Phi',
+          'Pi Lambda Phi','Sigma Alpha Mu','Sigma Phi Epsilon','Theta Chi'],
+    // IGC / MGC — verified drexel.edu/studentlife/..../intercultural-greek-council
     mgc: ['Alpha Phi Lambda','Chi Upsilon Sigma','Delta Epsilon Psi','Delta Phi Omega',
           'Groove Phi Groove','Iota Nu Delta','Kappa Phi Lambda','Lambda Alpha Upsilon','Sigma Beta Rho'],
-    professional: ['Delta Sigma Pi','Kappa Phi Gamma','Phi Alpha Delta','Phi Chi'],
-    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Delta Sigma Theta','Kappa Alpha Psi','Omega Psi Phi'],
-  },
-  monmouth: {
-    // PHA Sororities confirmed — KEY: Alpha Sigma Tau $13,478 | Panhellenic Board $5,064
-    panhellenic: ['Alpha Omicron Pi','Alpha Sigma Tau','Alpha Xi Delta',
-                  'Delta Phi Epsilon','Phi Sigma Sigma','Zeta Tau Alpha'],
-    ifc: ['Alpha Chi Rho','Kappa Sigma','Phi Kappa Psi',
-          'Sigma Pi','Sigma Tau Gamma','Tau Delta Phi'],
-    multicultural: ['Chi Upsilon Sigma','Lambda Theta Alpha','Lambda Theta Phi'],
-    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Omega Psi Phi'],
-  },
-  marshall: {
-    // KEY: Alpha Xi Delta $16,965 | Delta Zeta $9,125 | AChiO $7,294 | Kappa Sigma $2,173 (CONFIRMED)
-    panhellenic: ['Alpha Chi Omega','Alpha Xi Delta','Delta Zeta','Sigma Sigma Sigma'],
-    // Kappa Sigma confirmed from FP system ($2,173) — now 8 IFC chapters
-    ifc: ['Alpha Tau Omega','Kappa Alpha Order','Kappa Sigma','Pi Kappa Alpha',
-          'Sigma Alpha Epsilon','Sigma Nu','Sigma Phi Epsilon','Sigma Tau Gamma'],
     nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Delta Sigma Theta','Kappa Alpha Psi','Omega Psi Phi'],
     professional: ['Delta Sigma Pi'],
+    campus: []
+  },
+  monmouth: {
+    // PHA Sororities — 6 chapters, verified monmouth.edu/fraternity-and-sorority-life/register (Nov 2025)
+    // Confirmed: AOII, AST, AXiD, DPE, PhiSigSig, ZTA — Alpha Chi Omega is NOT at Monmouth
+    panhellenic: ['Alpha Omicron Pi','Alpha Sigma Tau','Alpha Xi Delta',
+                  'Delta Phi Epsilon','Phi Sigma Sigma','Zeta Tau Alpha'],
+    // IFC — 6 fraternities, verified from Monmouth academic reports & chapter listings
+    ifc: ['Alpha Chi Rho','Kappa Sigma','Phi Kappa Psi',
+          'Sigma Pi','Sigma Tau Gamma','Tau Delta Phi'],
+    // MGC — verified monmouth.edu councils-and-chapters
+    mgc: ['Chi Upsilon Sigma','Lambda Theta Alpha','Lambda Theta Phi'],
+    // NPHC — verified
+    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Omega Psi Phi'],
+    professional: [],
+    campus: []
+  },
+  marshall: {
+    // PHC — 4 sororities, verified marshall.edu/fsl/councils/panhellenic (2025)
+    panhellenic: ['Alpha Chi Omega','Alpha Xi Delta','Delta Zeta','Sigma Sigma Sigma'],
+    // IFC — 7 fraternities, verified marshall.edu/fsl/interfraternity (Aug 2025)
+    // Confirmed: Alpha Sigma Phi, ATO, KAO, KSig, SAE, SigEp, SigTauGam
+    // Removed Pi Kappa Alpha and Sigma Nu — not on official list
+    ifc: ['Alpha Sigma Phi','Alpha Tau Omega','Kappa Alpha Order','Kappa Sigma',
+          'Sigma Alpha Epsilon','Sigma Phi Epsilon','Sigma Tau Gamma'],
+    // NPHC — 5 chapters, verified marshall.edu/fsl/councils/national-pan-hellenic (2025)
+    nphc: ['Alpha Kappa Alpha','Alpha Phi Alpha','Delta Sigma Theta','Kappa Alpha Psi','Omega Psi Phi'],
+    professional: ['Delta Sigma Pi'],
+    campus: []
   },
 };
-
 // Council-level orgName keywords for smart org filtering
 const COUNCIL_KEYS = {
   panhellenic:   ['Panhellenic','CPC','PHC','PHA'],
@@ -817,7 +885,7 @@ const App = {
   year:2026, month:7, // 0-indexed: 7 = August
   activeId:null, showEdit:false, showRemind:false,
   schools:{}, events:[], hiddenSchools:[], aiSchools:{}, customEvents:[],
-  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{}, noteOverrides:{},
+  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{}, noteOverrides:{}, pipeOrgs:{}, cms:[], cmAssign:{}, customOrgs:[],
 
   // ── INIT ────────────────────────────────────────────
   init(){
@@ -827,6 +895,9 @@ const App = {
     this.loadSalesOverrides();
     this.loadOrderStatus();
     this.loadNoteOverrides();
+    this.loadPipeOrgs();
+    this.loadCMs();
+    this.loadCustomOrgs();
     this.loadCustomEvents();
     try{this.reminders=JSON.parse(localStorage.getItem('fp-rm')||'{}');}catch(e){}
     try{this.hiddenSchools=JSON.parse(localStorage.getItem('fp-hidden')||'[]');}catch(e){}
@@ -903,6 +974,10 @@ const App = {
       if(selOrg==='all')return true;
       if(ev.orgName===selOrg)return true;
 
+      // Explicit council-level filters
+      if(selOrg==='All Greek Life') return ev.orgType==='panhellenic'||ev.orgType==='ifc'||ev.orgType==='nphc'||ev.orgType==='mgc'||(ev.orgName&&ev.orgName.startsWith('All'));
+      if(selOrg==='All Non-Greek Life') return ev.orgType==='campus'||ev.orgType==='professional';
+      if(selOrg==='Campus-Wide') return ev.orgType==='campus';
       // Smart council matching: show council events for the org's council at that school
       const ct=orgCouncils[ev.school];
       if(!ct)return false; // org not at this school
@@ -966,25 +1041,38 @@ const App = {
         `<option value="__add__">➕ Add New School...</option>`+
         `<option value="__manage__">⚙️ Manage Schools...</option>`;
     }
-    // Org select — built from ORG_DIRECTORY (all orgs at visible schools) + event orgNames
+    // Org select — when a specific school is selected, show only that school's orgs
     const visible=this.visibleSchoolIds();
-    const councilOpts=['All Greek Life','Campus-Wide','All IFC Fraternities',
-      'All Panhellenic Sororities','All CPC Sororities','All PHC Sororities',
-      'All NPHC Organizations','IGC / NPHC Organizations'];
+    // Council-level labels used in event orgName — exclude from individual org list
+    const councilLabels=new Set(['All Greek Life','All Non-Greek Life','Campus-Wide',
+      'All IFC Fraternities','All Panhellenic Sororities','All PHC Sororities',
+      'All CPC Sororities','All NPHC Organizations','IGC / NPHC Organizations',
+      'All MGC Organizations','Campus-Wide']);
+    const topOpts=['All Greek Life','All Non-Greek Life','Campus-Wide'];
     const orgSet=new Set(['all']);
-    councilOpts.forEach(o=>orgSet.add(o));
-    visible.forEach(sid=>{
+    topOpts.forEach(o=>orgSet.add(o));
+    const schoolsToScan=this.school!=='all'?[this.school]:visible;
+    // Add individual orgs from ORG_DIRECTORY for scanned schools only
+    schoolsToScan.forEach(sid=>{
       const dir=ORG_DIRECTORY[sid];
       if(!dir)return;
-      Object.values(dir).flat().forEach(org=>orgSet.add(org));
+      Object.values(dir).flat().forEach(org=>{if(org&&org.trim())orgSet.add(org);});
     });
-    this.events.filter(e=>visible.includes(e.school)).forEach(e=>{
-      if(!councilOpts.includes(e.orgName))orgSet.add(e.orgName);
+    // Add individual orgNames from events at scanned schools
+    // exclude council-level labels and anything starting with 'All '
+    const allEventsToScan=[...this.events,...(this.customEvents||[])];
+    allEventsToScan.filter(e=>schoolsToScan.includes(e.school)).forEach(e=>{
+      if(e.orgName&&!councilLabels.has(e.orgName)&&!e.orgName.startsWith('All '))
+        orgSet.add(e.orgName);
     });
+    // If the currently selected org isn't available for the selected school, reset it
+    if(this.org!=='all'&&!orgSet.has(this.org)){
+      this.org='all';
+    }
     const orgs=Array.from(orgSet).sort((a,b)=>{
       if(a==='all')return -1; if(b==='all')return 1;
-      const ac=councilOpts.includes(a),bc=councilOpts.includes(b);
-      if(ac&&!bc)return -1; if(!ac&&bc)return 1;
+      const at=topOpts.includes(a),bt=topOpts.includes(b);
+      if(at&&!bt)return -1; if(!at&&bt)return 1;
       return a.localeCompare(b);
     });
     const osel=document.getElementById('orgSel');
@@ -1209,47 +1297,167 @@ const App = {
 
   // ── PIPELINE VIEW ─────────────────────────────────────
   renderPipeline(){
-    const allEvs=this.getFiltered();
+    const allEvs=[...this.events,...(this.customEvents||[])];
+    const evMap={};allEvs.forEach(function(e){evMap[e.id]=e;});
     const statuses=[
       {k:'won',    label:'✅ Won',      color:'#059669'},
       {k:'proposal',label:'📋 Proposal Sent',color:'#7C3AED'},
       {k:'pitched', label:'📤 Pitched',  color:'#2563EB'},
       {k:'lost',    label:'❌ Lost',     color:'#EF4444'},
     ];
-    // Build org → latest event map for each status
+    // Build pipeline entries — org-level entries take priority over event-level
+    var entries=[]; // {ev, orgLabel, key}
+    var coveredEvIds=new Set();
+    // First: org-level entries from pipeOrgs
+    Object.keys(this.pipeOrgs||{}).forEach(function(key){
+      var parts=key.split('___');
+      var evId=parts[0],org=parts[1],st=App.pipeOrgs[key];
+      var ev=evMap[evId];if(!ev)return;
+      coveredEvIds.add(evId);
+      entries.push({ev:ev,orgLabel:org,status:st,key:key});
+    });
+    // Second: event-level entries (only if no org-level entries for that event)
+    allEvs.forEach(function(ev){
+      var st=App.getOrderStatus(ev.id);
+      if(st&&!coveredEvIds.has(ev.id)){
+        entries.push({ev:ev,orgLabel:null,status:st,key:ev.id});
+      }
+    });
     let html='';
     let anyFound=false;
-    statuses.forEach(st=>{
-      const tagged=allEvs.filter(ev=>this.getOrderStatus(ev.id)===st.k);
-      if(!tagged.length)return;
+    statuses.forEach(function(st){
+      var group=entries.filter(function(e){return e.status===st.k;});
+      if(!group.length)return;
       anyFound=true;
-      const s=this.schools[tagged[0].school];
-      html+='<div class="pipe-section"><div class="pipe-section-hdr"><span class="ord-dot" style="background:'+st.color+'"></span>'+st.label+' <span style="color:var(--muted);font-weight:500">('+tagged.length+')</span></div>';
-      html+=tagged.map(function(ev){
+      html+='<div class="pipe-section"><div class="pipe-section-hdr"><span class="ord-dot" style="background:'+st.color+'"></span>'+st.label+' <span style="color:var(--muted);font-weight:500">('+group.length+')</span></div>';
+      group.forEach(function(entry){
+        var ev=entry.ev;
         var sc=App.schools[ev.school];
         var days=App.daysUntil(App.evDate(ev));
-        var card=document.createElement('div');
-        card.className='pipe-card';
-        card.setAttribute('data-eid',ev.id);
-        card.addEventListener('click',function(){App.openEv(ev.id);});
-        card.innerHTML='<div style="flex:1;min-width:0">'+
-          '<div class="pipe-org">'+ev.orgName+'</div>'+
-          '<div class="pipe-event">'+ev.title+' &mdash; '+App.fmtDate(App.evDate(ev))+'</div>'+
+        var displayName=entry.orgLabel
+          ? ev.title+' <span class="pipe-org-tag">'+entry.orgLabel+'</span>'
+          : ev.orgName;
+        html+='<div class="pipe-card" data-eid="'+ev.id+'" data-rmkey="'+entry.key+'" data-rmevid="'+ev.id+'">'+
+          '<div style="flex:1;min-width:0">'+
+          '<div class="pipe-org">'+displayName+'</div>'+
+          '<div class="pipe-event">'+ev.title+' &mdash; '+App.fmt(App.evDate(ev))+'</div>'+
           '</div>'+
           (sc?'<div class="pipe-school" style="background:'+sc.color+'">'+sc.short+'</div>':'')+
-          (days>=0?'<div class="pipe-days">'+days+'d away</div>':'');
-        var tmp=document.createElement('div');
-        tmp.appendChild(card);
-        return tmp.innerHTML;
-      }).join('');
+          (days>=0?'<div class="pipe-days">'+days+'d away</div>':'')+
+          '<button class="pipe-rm" data-rmkey="'+entry.key+'" data-rmevid="'+ev.id+'">✕</button>'+
+          '</div>';
+      });
       html+='</div>';
     });
     if(!anyFound){
-      html='<div class="pipe-empty"><div style="font-size:32px;margin-bottom:12px">📊</div><strong>No pipeline activity yet</strong><p style="margin-top:8px">Open any event and set its Order Status to Pitched, Proposal, Won, or Lost to track it here.</p></div>';
+      html='<div class="pipe-empty"><div style="font-size:32px;margin-bottom:12px">📊</div><strong>No pipeline activity yet</strong><p style="margin-top:8px">Open any event and tag orgs as Pitched, Proposal, Won, or Lost to track them here.</p></div>';
     }
-    document.getElementById('content').innerHTML='<div class="fu">'+html+'</div>';
+    var cont=document.getElementById('content');
+    cont.innerHTML='<div class="fu">'+html+'</div>';
+    // Event delegation — one listener handles all pipe-card clicks and ✕ removes
+    cont.addEventListener('click',function pipeDel(e){
+      var rm=e.target.closest('.pipe-rm');
+      if(rm){
+        e.stopPropagation();
+        App.removePipeEntry(rm.getAttribute('data-rmkey'),rm.getAttribute('data-rmevid'));
+        return;
+      }
+      var card=e.target.closest('.pipe-card');
+      if(card)App.openEv(card.getAttribute('data-eid'));
+    },{once:true});
   },
   pipeClick(e){var c=e.target.closest('[data-eid]');if(c)this.openEv(c.getAttribute('data-eid'));},
+
+  // ── ORG PICKER ──────────────────────────────────────
+  openOrgPicker(status,ev,orgs){
+    // Get already-selected orgs for this event+status combo
+    var selected=new Set();
+    Object.keys(this.pipeOrgs).forEach(function(key){
+      var parts=key.split('___');
+      if(parts[0]===ev.id&&App.pipeOrgs[key]===status)selected.add(parts[1]);
+    });
+    var sheet=document.createElement('div');
+    sheet.className='op-overlay';
+    sheet.id='opOverlay';
+    var inner=document.createElement('div');
+    inner.className='op-sheet';
+    // Header
+    var hdr=document.createElement('div');
+    hdr.className='op-hdr';
+    hdr.innerHTML='<div class="op-title">Which orgs did you '+status+'?</div>';
+    var closeBtn=document.createElement('button');
+    closeBtn.className='m-close';closeBtn.textContent='✕';
+    closeBtn.style.cssText='background:var(--tan);color:var(--text);';
+    closeBtn.onclick=function(){sheet.remove();};
+    hdr.appendChild(closeBtn);
+    // Body
+    var body=document.createElement('div');
+    body.className='op-body';
+    orgs.sort().forEach(function(org){
+      var row=document.createElement('label');
+      row.className='op-org-row';
+      var cb=document.createElement('input');
+      cb.type='checkbox';cb.value=org;cb.name='op-org';
+      if(selected.has(org))cb.checked=true;
+      var lbl=document.createElement('span');
+      lbl.className='op-org-label';lbl.textContent=org;
+      row.appendChild(cb);row.appendChild(lbl);
+      body.appendChild(row);
+    });
+    // Footer
+    var footer=document.createElement('div');
+    footer.className='op-footer';
+    var skipBtn=document.createElement('button');
+    skipBtn.className='op-skip';skipBtn.textContent='Skip (event-level only)';
+    skipBtn.onclick=function(){sheet.remove();App.setOrderStatus(ev.id,status);};
+    var saveBtn=document.createElement('button');
+    saveBtn.className='op-save';saveBtn.textContent='Save to Pipeline';
+    saveBtn.onclick=function(){
+      var checked=[].slice.call(body.querySelectorAll('input[name=op-org]:checked')).map(function(c){return c.value;});
+      sheet.remove();
+      // Clear previous org entries for this event regardless
+      Object.keys(App.pipeOrgs).forEach(function(key){
+        if(key.startsWith(ev.id+'___'))delete App.pipeOrgs[key];
+      });
+      if(checked.length===0){
+        // Nothing selected — remove from pipeline entirely
+        App.savePipeOrgs();
+        App.setOrderStatus(ev.id,null);
+        return;
+      }
+      // Set new org entries
+      checked.forEach(function(org){
+        App.pipeOrgs[ev.id+'___'+org]=status;
+      });
+      App.savePipeOrgs();
+      App.setOrderStatus(ev.id,status);
+    };
+    footer.appendChild(skipBtn);footer.appendChild(saveBtn);
+    inner.appendChild(hdr);inner.appendChild(body);inner.appendChild(footer);
+    sheet.appendChild(inner);
+    document.body.appendChild(sheet);
+  },
+
+  removePipeEntry(key,evId){
+    // If it's an org-level entry (contains ___), remove just that org
+    if(key.includes('___')){
+      delete this.pipeOrgs[key];
+      this.savePipeOrgs();
+      // If no more org entries for this event, also clear event-level status
+      var hasMore=Object.keys(this.pipeOrgs).some(function(k){return k.startsWith(evId+'___');});
+      if(!hasMore)this.setOrderStatus(evId,null);
+      else this.render();
+    } else {
+      // Event-level entry — clear order status
+      this.setOrderStatus(evId,null);
+    }
+  },
+  savePipeOrgs(){
+    try{localStorage.setItem('fp-pipe-orgs',JSON.stringify(this.pipeOrgs));}catch(e){}
+  },
+  loadPipeOrgs(){
+    try{this.pipeOrgs=JSON.parse(localStorage.getItem('fp-pipe-orgs')||'{}');}catch(e){this.pipeOrgs={};}
+  },
 
   // ── EVENT MODAL ─────────────────────────────────────
   openEv(id){
@@ -1269,12 +1477,19 @@ const App = {
        ${this.isOverridden(id)?'<span class="badge b-override">✏️ Overridden</span>':ev.approx?'<span class="badge b-approx">~ Approximate</span>':'<span class="badge b-confirmed">✓ Confirmed</span>'}`;
     document.getElementById('mTitle').textContent=ev.title;
     const endStr=ev.endDate&&this.evEnd(ev)!==this.evDate(ev)?` → ${this.fmt(this.evEnd(ev))}`:'';
+    // Build chapter list for council-level events
+    const dir=ORG_DIRECTORY[ev.school];
+    const chapterList=dir&&ev.orgType&&ev.orgType!=='campus'&&ev.orgType!=='professional'?
+      (dir[ev.orgType]||[]).filter(o=>o&&o.trim()):[];
+    const orgDisplay=chapterList.length>0
+      ?chapterList.join(', ')
+      :ev.orgName;
     document.getElementById('mInfoGrid').innerHTML=
       `<div class="m-info"><div class="m-info-l">Date</div><div class="m-info-v">${this.fmt(this.evDate(ev))}${endStr}</div></div>
-       <div class="m-info"><div class="m-info-l">Organization</div><div class="m-info-v">${ev.orgName}</div></div>
        <div class="m-info"><div class="m-info-l">Timing</div><div class="m-info-v">${days<0?'Past event':days===0?'Today!':days+' days away'}</div></div>
        <div class="m-info"><div class="m-info-l">Outreach Window</div><div class="m-info-v">${dtOut<=0?'📣 Window is OPEN':'Opens in '+dtOut+' days'}</div></div>
-       <div class="m-info" style="grid-column:1/-1"><div class="m-info-l">Sales Opportunity</div><div class="m-info-v">${sl[ev.salesPotential]}</div></div>`;
+       <div class="m-info" style="grid-column:1/-1"><div class="m-info-l">Sales Opportunity</div><div class="m-info-v">${sl[ev.salesPotential]}</div></div>
+       <div class="m-info" style="grid-column:1/-1"><div class="m-info-l">${chapterList.length>0?'Chapters at '+s.short:ev.orgName!==ev.title?'Organization':''}</div><div class="m-info-v" style="font-size:12px;line-height:1.6">${orgDisplay}</div></div>`;
     // Notes field — editable, saved to localStorage
     const savedNote=this.noteOverrides?.[ev.id];
     const notesEl=document.getElementById('mNotes');
@@ -1284,6 +1499,7 @@ const App = {
       notesEl.setAttribute('data-default',ev.notes);
     }
     document.getElementById('mGoogle').onclick=()=>this.addGoogle(id);
+    if(ev&&s)this.populateCMDropdown(id,ev.school);
     document.getElementById('mIcal').onclick=()=>this.dlIcs(id);
     const hasR=!!this.reminders[id];
     document.getElementById('mRemindBtn').classList.toggle('on',hasR);
@@ -1367,7 +1583,36 @@ const App = {
   clickOrd(btn){
     const k=btn.getAttribute('data-ord');
     const cur=this.getOrderStatus(this.activeId);
-    this.setOrderStatus(this.activeId,cur===k?null:k);
+    const ev=this.events.concat(this.customEvents||[]).find(e=>e.id===this.activeId);
+    if(!ev){this.setOrderStatus(this.activeId,cur===k?null:k);return;}
+    const dir=ORG_DIRECTORY[ev.school];
+    // Filter orgs by event's orgType so sorority events only show sororities, etc.
+    var allOrgs=[];
+    if(dir){
+      if(ev.orgType&&ev.orgType!=='campus'&&ev.orgType!=='professional'&&dir[ev.orgType]){
+        allOrgs=dir[ev.orgType].filter(function(o){return o&&o.trim();});
+      } else {
+        allOrgs=Object.values(dir).flat().filter(function(o){return o&&o.trim();});
+      }
+    }
+
+    if(cur===k){
+      // Same status — if orgs available, reopen picker to add/remove orgs
+      // Saving with 0 orgs checked will fully remove from pipeline
+      if(allOrgs.length>0){
+        this.openOrgPicker(k,ev,allOrgs);
+      } else {
+        // No orgs for this school — toggle off
+        this.setOrderStatus(this.activeId,null);
+      }
+      return;
+    }
+    // Switching to a new status
+    if(allOrgs.length>0){
+      this.openOrgPicker(k,ev,allOrgs);
+    } else {
+      this.setOrderStatus(this.activeId,k);
+    }
   },
   ordBadge(id){
     const s=this.getOrderStatus(id);
@@ -1524,6 +1769,221 @@ const App = {
       a.click();
     };
     xhr.send();
+  },
+
+  // ── CM MANAGEMENT ────────────────────────────────────
+  loadCMs(){
+    try{this.cms=JSON.parse(localStorage.getItem('fp-cms')||'[]');}catch(e){this.cms=[];}
+    try{this.cmAssign=JSON.parse(localStorage.getItem('fp-cm-assign')||'{}');}catch(e){this.cmAssign={};}
+  },
+  saveCMs(){
+    try{
+      localStorage.setItem('fp-cms',JSON.stringify(this.cms));
+      localStorage.setItem('fp-cm-assign',JSON.stringify(this.cmAssign));
+    }catch(e){}
+  },
+  getCMsForSchool(schoolId){
+    return this.cms.filter(function(c){return c.school===schoolId;});
+  },
+  assignCM(evId,cmId){
+    if(!cmId){delete this.cmAssign[evId];}
+    else{this.cmAssign[evId]=cmId;}
+    this.saveCMs();
+  },
+  populateCMDropdown(evId,schoolId){
+    var sel=document.getElementById('mCMSel');
+    if(!sel)return;
+    var cms=this.getCMsForSchool(schoolId);
+    var assigned=this.cmAssign[evId]||'';
+    sel.innerHTML='<option value="">— None assigned —</option>'+
+      cms.map(function(c){
+        return '<option value="'+c.id+'"'+(c.id===assigned?' selected':'')+'>'+c.firstName+' '+c.lastName+'</option>';
+      }).join('');
+  },
+  openAddCM(){
+    var ev=this.events.concat(this.customEvents||[]).find(function(e){return e.id===App.activeId;});
+    var defaultSchool=ev?ev.school:'';
+    var vis=this.visibleSchoolIds();
+    var overlay=document.createElement('div');
+    overlay.className='cm-overlay';overlay.id='cmOverlay';
+    var sheet=document.createElement('div');
+    sheet.className='cm-sheet';
+    var title=document.createElement('div');
+    title.className='cm-title';title.textContent='Add Campus Manager';
+    var schoolOpts='<option value="">Select school...</option>'+
+      vis.map(function(id){
+        var s=App.schools[id];
+        return '<option value="'+id+'"'+(id===defaultSchool?' selected':'')+'>'+s.name+'</option>';
+      }).join('');
+    sheet.innerHTML='<div class="cm-title">Add Campus Manager</div>'+
+      '<div class="cm-field"><div class="cm-label">First Name</div>'+
+      '<input class="cm-input" id="cmFirst" placeholder="First name" autocomplete="given-name"></div>'+
+      '<div class="cm-field"><div class="cm-label">Last Name</div>'+
+      '<input class="cm-input" id="cmLast" placeholder="Last name" autocomplete="family-name"></div>'+
+      '<div class="cm-field"><div class="cm-label">School</div>'+
+      '<select class="cm-input" id="cmSchool">'+schoolOpts+'</select></div>';
+    var saveBtn=document.createElement('button');
+    saveBtn.className='cm-save';saveBtn.textContent='Add CM';
+    saveBtn.onclick=function(){App.saveNewCM();};
+    sheet.appendChild(saveBtn);
+    var cancelBtn=document.createElement('button');
+    cancelBtn.style.cssText='width:100%;margin-top:8px;font-family:Outfit,sans-serif;font-size:13px;font-weight:700;padding:10px;background:transparent;border:none;cursor:pointer;color:var(--muted);';
+    cancelBtn.textContent='Cancel';
+    cancelBtn.onclick=function(){overlay.remove();};
+    sheet.appendChild(cancelBtn);
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
+    document.getElementById('cmFirst').focus();
+  },
+  saveNewCM(){
+    var first=(document.getElementById('cmFirst').value||'').trim();
+    var last=(document.getElementById('cmLast').value||'').trim();
+    var school=document.getElementById('cmSchool').value;
+    if(!first||!school){alert('First name and school are required.');return;}
+    var cm={id:'cm-'+Date.now(),firstName:first,lastName:last,school:school};
+    this.cms.push(cm);
+    this.saveCMs();
+    document.getElementById('cmOverlay').remove();
+    // Refresh the dropdown in the event modal and auto-assign if desired
+    if(this.activeId){
+      var ev=this.events.concat(this.customEvents||[]).find(function(e){return e.id===App.activeId;});
+      if(ev&&ev.school===school){
+        this.populateCMDropdown(this.activeId,school);
+      }
+    }
+  },
+
+  // ── CUSTOM ORGANIZATIONS ─────────────────────────────
+  loadCustomOrgs(){
+    try{this.customOrgs=JSON.parse(localStorage.getItem('fp-custom-orgs')||'[]');}
+    catch(e){this.customOrgs=[];}
+    this.injectCustomOrgsIntoDir();
+  },
+  saveCustomOrgs(){
+    try{localStorage.setItem('fp-custom-orgs',JSON.stringify(this.customOrgs));}catch(e){}
+    this.injectCustomOrgsIntoDir();
+  },
+  injectCustomOrgsIntoDir(){
+    this.customOrgs.forEach(function(org){
+      if(!ORG_DIRECTORY[org.school])ORG_DIRECTORY[org.school]={panhellenic:[],ifc:[],nphc:[],mgc:[],professional:[],campus:[]};
+      var type=org.isGreek?(org.orgType||'campus'):'campus';
+      if(!ORG_DIRECTORY[org.school][type])ORG_DIRECTORY[org.school][type]=[];
+      if(!ORG_DIRECTORY[org.school][type].includes(org.name)){
+        ORG_DIRECTORY[org.school][type].push(org.name);
+      }
+    });
+  },
+  openAddOrg(){
+    var vis=this.visibleSchoolIds();
+    var defaultSchool=this.school!=='all'?this.school:'';
+    var overlay=document.createElement('div');
+    overlay.className='ao-overlay';overlay.id='aoOverlay';
+    var sheet=document.createElement('div');
+    sheet.className='ao-sheet';
+
+    // Header
+    var hdr=document.createElement('div');
+    hdr.className='ao-hdr';
+    var hdrTitle=document.createElement('div');
+    hdrTitle.className='ao-hdr-title';hdrTitle.textContent='Add Organization';
+    var hdrClose=document.createElement('button');
+    hdrClose.className='m-close';
+    hdrClose.style.cssText='background:rgba(255,255,255,.15);color:#fff;';
+    hdrClose.textContent='✕';
+    hdrClose.onclick=function(){overlay.remove();};
+    hdr.appendChild(hdrTitle);hdr.appendChild(hdrClose);
+
+    // Body
+    var body=document.createElement('div');body.className='ao-body';
+
+    // School field
+    var schoolOpts='<option value="">Select a school...</option>'+
+      vis.map(function(id){
+        var s=App.schools[id];
+        return'<option value="'+id+'"'+(id===defaultSchool?' selected':'')+'>'+s.name+'</option>';
+      }).join('');
+    var cmOpts='<option value="">— None —</option>'+
+      this.cms.map(function(c){
+        return'<option value="'+c.id+'">'+c.firstName+' '+c.lastName+
+          ' ('+((App.schools[c.school]&&App.schools[c.school].short)||c.school)+')</option>';
+      }).join('');
+
+    body.innerHTML=
+      '<div class="ao-field"><label class="ao-label">Organization Name</label>'+
+      '<input class="ao-input" id="aoName" placeholder="e.g. Alpha Sigma Tau" autocomplete="off"></div>'+
+      '<div class="ao-field"><label class="ao-label">School</label>'+
+      '<select class="ao-input" id="aoSchool">'+schoolOpts+'</select></div>'+
+      '<div class="ao-field"><label class="ao-label">Assigned CM (optional)</label>'+
+      '<select class="ao-input" id="aoCM">'+cmOpts+'</select></div>'+
+      '<div class="ao-field"><label class="ao-label">Organization Category</label>'+
+      '<div class="ao-seg" id="aoSeg">'+
+      '<button class="ao-seg-btn on" data-cat="greek" onclick="App.aoSetCat(this)">Greek Life</button>'+
+      '<button class="ao-seg-btn" data-cat="nongk" onclick="App.aoSetCat(this)">Non-Greek</button>'+
+      '</div>'+
+      '<div id="aoGreekTypes" class="ao-type-grid">'+
+      '<button class="ao-type-card on" data-type="panhellenic" onclick="App.aoSetType(this)">🎀<br>Sorority</button>'+
+      '<button class="ao-type-card" data-type="ifc" onclick="App.aoSetType(this)">🏛<br>Fraternity</button>'+
+      '<button class="ao-type-card" data-type="nphc" onclick="App.aoSetType(this)">✊<br>HBCU / Divine Nine</button>'+
+      '<button class="ao-type-card" data-type="mgc" onclick="App.aoSetType(this)">🌐<br>Multicultural</button>'+
+      '</div>'+
+      '<div id="aoNonGreekTypes" class="ao-type-grid" style="display:none">'+
+      '<button class="ao-type-card on" data-type="campus" data-sub="club" onclick="App.aoSetType(this)">🎯<br>Club</button>'+
+      '<button class="ao-type-card" data-type="professional" data-sub="professional" onclick="App.aoSetType(this)">💼<br>Professional Org</button>'+
+      '<button class="ao-type-card" data-type="campus" data-sub="department" onclick="App.aoSetType(this)">🏫<br>Department</button>'+
+      '<button class="ao-type-card" data-type="campus" data-sub="other" onclick="App.aoSetType(this)">📌<br>Other</button>'+
+      '</div></div>';
+
+    // Footer
+    var footer=document.createElement('div');footer.className='ao-footer';
+    var saveBtn=document.createElement('button');
+    saveBtn.className='ao-save-btn';saveBtn.textContent='Add Organization';
+    saveBtn.onclick=function(){App.saveNewOrg();};
+    var cancelBtn=document.createElement('button');
+    cancelBtn.className='ao-cancel-btn';cancelBtn.textContent='Cancel';
+    cancelBtn.onclick=function(){overlay.remove();};
+    footer.appendChild(saveBtn);footer.appendChild(cancelBtn);
+
+    sheet.appendChild(hdr);sheet.appendChild(body);sheet.appendChild(footer);
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
+    setTimeout(function(){var el=document.getElementById('aoName');if(el)el.focus();},80);
+  },
+  aoSetCat(btn){
+    document.querySelectorAll('#aoSeg .ao-seg-btn').forEach(function(b){b.classList.remove('on');});
+    btn.classList.add('on');
+    var isGreek=btn.getAttribute('data-cat')==='greek';
+    var gk=document.getElementById('aoGreekTypes');
+    var ng=document.getElementById('aoNonGreekTypes');
+    if(gk)gk.style.display=isGreek?'':'none';
+    if(ng)ng.style.display=isGreek?'none':'';
+    // Reset selection in the now-visible grid
+    var grid=isGreek?gk:ng;
+    if(grid){
+      grid.querySelectorAll('.ao-type-card').forEach(function(b,i){b.classList.toggle('on',i===0);});
+    }
+  },
+  aoSetType(btn){
+    var parent=btn.closest('.ao-type-grid');
+    if(parent)parent.querySelectorAll('.ao-type-card').forEach(function(b){b.classList.remove('on');});
+    btn.classList.add('on');
+  },
+
+  saveNewOrg(){
+    var name=(document.getElementById('aoName').value||'').trim();
+    var school=document.getElementById('aoSchool').value;
+    var cmId=document.getElementById('aoCM').value;
+    if(!name||!school){alert('Please fill in the organization name and select a school.');return;}
+    var catBtn=document.querySelector('#aoSeg .ao-seg-btn.on');
+    var isGreek=!catBtn||catBtn.getAttribute('data-cat')==='greek';
+    var activeType=document.querySelector('.ao-type-card.on');
+    var orgType=activeType?activeType.getAttribute('data-type'):'campus';
+    var displayType=activeType?activeType.textContent.trim().replace(/[\n\r]+/,' '):'';
+    var org={id:'co-'+Date.now(),name:name,school:school,isGreek:isGreek,orgType:orgType,displayType:displayType,cmId:cmId||null};
+    this.customOrgs.push(org);
+    this.saveCustomOrgs();
+    document.getElementById('aoOverlay').remove();
+    this.buildFilters();
+    this.render();
   },
 
   // ── SCHOOL MANAGER ─────────────────────────────────────
