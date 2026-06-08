@@ -339,6 +339,34 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 .ce-sp-btn.csp-m{background:#FEF3C7;border-color:#D97706;color:#B45309;}
 .ce-sp-btn.csp-l{background:#F1F5F9;border-color:#64748B;color:#475569;}
 .add-ev-btn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;padding:6px 14px;background:var(--fp);color:#fff;border:none;border-radius:7px;cursor:pointer;transition:background .12s;}.add-ev-btn:hover{opacity:.85;}
+
+/* ─── EDITABLE NOTES ─── */
+.m-notes-box{background:var(--fp-tan);border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.5;color:var(--text);min-height:44px;cursor:text;outline:none;transition:box-shadow .15s;}
+.m-notes-box:focus{box-shadow:0 0 0 2px var(--fp);background:#fff;}
+.m-notes-hint{font-size:10px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:4px;}
+
+/* ─── PIPELINE VIEW ─── */
+.pipe-section{margin-bottom:24px;}
+.pipe-section-hdr{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.8px;padding:8px 0;margin-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px;}
+.pipe-card{background:var(--white);border-radius:var(--rs);padding:14px 16px;box-shadow:var(--sh);margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:box-shadow .12s;}
+.pipe-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);}
+.pipe-org{font-size:13px;font-weight:800;color:var(--text);flex:1;}
+.pipe-school{font-size:10px;font-weight:700;color:var(--white);padding:2px 7px;border-radius:4px;flex-shrink:0;}
+.pipe-event{font-size:11px;color:var(--muted);font-weight:600;}
+.pipe-days{font-size:11px;font-weight:800;color:var(--fp);}
+.pipe-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;}
+
+/* ─── OFFLINE DOWNLOAD ─── */
+.dl-offline-btn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:5px 10px;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:7px;cursor:pointer;transition:all .12s;}
+.dl-offline-btn:hover{border-color:var(--fp);color:var(--fp);}
+.dl-confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.dl-confirm-box{background:#fff;border-radius:14px;padding:24px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.dl-confirm-title{font-size:16px;font-weight:900;margin-bottom:10px;}
+.dl-confirm-body{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+.dl-confirm-btns{display:flex;gap:10px;}
+.dl-confirm-btns button{font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;padding:10px 16px;border-radius:8px;cursor:pointer;flex:1;}
+.dl-go{background:var(--navy);color:#fff;border:none;}
+.dl-cancel{background:transparent;border:2px solid var(--border);color:var(--text);}
 </style>
 </head>
 <body>
@@ -365,6 +393,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
       <button class="vtab" onclick="App.setView('week')">📆 Week</button>
       <button class="vtab" onclick="App.setView('list')">📋 Events</button>
       <button class="vtab" onclick="App.setView('outreach')">🎯 Outreach</button>
+      <button class="vtab" onclick="App.setView('pipeline')">📊 Pipeline</button>
     </div>
   </div>
   <div class="fdiv"></div>
@@ -382,6 +411,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
     <span class="fl">Type</span>
     <select class="fsel" id="typeSel" onchange="App.setType(this.value)"></select>
   </div>
+  <button class="dl-offline-btn" onclick="App.confirmDownload()" title="Download for offline use">⬇ Offline</button>
   <button class="add-ev-btn" onclick="App.openAddEv()">+ Add Event</button>
   <button class="dl-btn" onclick="App.dlAll()">📥 Export .ics</button>
 </div>
@@ -402,7 +432,8 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
     </div>
     <div class="m-body">
       <div class="m-info-grid" id="mInfoGrid"></div>
-      <div class="m-notes" id="mNotes"></div>
+      <div class="m-notes-box" id="mNotes" contenteditable="true" onblur="App.saveNote(this)" spellcheck="false"></div>
+      <div class="m-notes-hint">✏️ Click to edit notes</div>
       <div class="m-div"></div>
       <div class="m-sec">Add to Calendar</div>
       <div class="m-acts">
@@ -786,7 +817,7 @@ const App = {
   year:2026, month:7, // 0-indexed: 7 = August
   activeId:null, showEdit:false, showRemind:false,
   schools:{}, events:[], hiddenSchools:[], aiSchools:{}, customEvents:[],
-  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{},
+  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{}, noteOverrides:{},
 
   // ── INIT ────────────────────────────────────────────
   init(){
@@ -795,6 +826,7 @@ const App = {
     this.loadOutreachSettings();
     this.loadSalesOverrides();
     this.loadOrderStatus();
+    this.loadNoteOverrides();
     this.loadCustomEvents();
     try{this.reminders=JSON.parse(localStorage.getItem('fp-rm')||'{}');}catch(e){}
     try{this.hiddenSchools=JSON.parse(localStorage.getItem('fp-hidden')||'[]');}catch(e){}
@@ -923,9 +955,10 @@ const App = {
     const ssel=document.getElementById('schoolSel');
     if(ssel){
       const vis=this.visibleSchoolIds();
+      const sortedVis=[...vis].sort((a,b)=>this.schools[a].name.localeCompare(this.schools[b].name));
       ssel.innerHTML=
         `<option value="all"${this.school==='all'?' selected':''}>All Schools (${vis.length})</option>`+
-        vis.map(id=>{
+        sortedVis.map(id=>{
           const s=this.schools[id];
           return`<option value="${id}"${id===this.school?' selected':''}>${s.name}</option>`;
         }).join('')+
@@ -997,7 +1030,7 @@ const App = {
     this.view=v;
     if(v==='week'){this.weekStart=null;this.initWeekStart();} // sync week to current month
     document.querySelectorAll('.vtab').forEach((t,i)=>{
-      t.classList.toggle('on',['calendar','week','list','outreach'][i]===v);
+      t.classList.toggle('on',['calendar','week','list','outreach','pipeline'][i]===v);
     });
     if(!skipRender)this.render();
     else this.render();
@@ -1010,6 +1043,7 @@ const App = {
     if(this.view==='calendar')this.renderCalendar();
     else if(this.view==='week')this.renderWeekly();
     else if(this.view==='list')this.renderList();
+    else if(this.view==='pipeline')this.renderPipeline();
     else this.renderOutreach();
   },
 
@@ -1173,6 +1207,50 @@ const App = {
     document.getElementById('content').innerHTML='<div class="fu">'+pipeHtml+(html||this.empty('No upcoming events.','Adjust your filters or add more schools.'))+'</div>';
   },
 
+  // ── PIPELINE VIEW ─────────────────────────────────────
+  renderPipeline(){
+    const allEvs=this.getFiltered();
+    const statuses=[
+      {k:'won',    label:'✅ Won',      color:'#059669'},
+      {k:'proposal',label:'📋 Proposal Sent',color:'#7C3AED'},
+      {k:'pitched', label:'📤 Pitched',  color:'#2563EB'},
+      {k:'lost',    label:'❌ Lost',     color:'#EF4444'},
+    ];
+    // Build org → latest event map for each status
+    let html='';
+    let anyFound=false;
+    statuses.forEach(st=>{
+      const tagged=allEvs.filter(ev=>this.getOrderStatus(ev.id)===st.k);
+      if(!tagged.length)return;
+      anyFound=true;
+      const s=this.schools[tagged[0].school];
+      html+='<div class="pipe-section"><div class="pipe-section-hdr"><span class="ord-dot" style="background:'+st.color+'"></span>'+st.label+' <span style="color:var(--muted);font-weight:500">('+tagged.length+')</span></div>';
+      html+=tagged.map(function(ev){
+        var sc=App.schools[ev.school];
+        var days=App.daysUntil(App.evDate(ev));
+        var card=document.createElement('div');
+        card.className='pipe-card';
+        card.setAttribute('data-eid',ev.id);
+        card.addEventListener('click',function(){App.openEv(ev.id);});
+        card.innerHTML='<div style="flex:1;min-width:0">'+
+          '<div class="pipe-org">'+ev.orgName+'</div>'+
+          '<div class="pipe-event">'+ev.title+' &mdash; '+App.fmtDate(App.evDate(ev))+'</div>'+
+          '</div>'+
+          (sc?'<div class="pipe-school" style="background:'+sc.color+'">'+sc.short+'</div>':'')+
+          (days>=0?'<div class="pipe-days">'+days+'d away</div>':'');
+        var tmp=document.createElement('div');
+        tmp.appendChild(card);
+        return tmp.innerHTML;
+      }).join('');
+      html+='</div>';
+    });
+    if(!anyFound){
+      html='<div class="pipe-empty"><div style="font-size:32px;margin-bottom:12px">📊</div><strong>No pipeline activity yet</strong><p style="margin-top:8px">Open any event and set its Order Status to Pitched, Proposal, Won, or Lost to track it here.</p></div>';
+    }
+    document.getElementById('content').innerHTML='<div class="fu">'+html+'</div>';
+  },
+  pipeClick(e){var c=e.target.closest('[data-eid]');if(c)this.openEv(c.getAttribute('data-eid'));},
+
   // ── EVENT MODAL ─────────────────────────────────────
   openEv(id){
     const ev=this.events.find(e=>e.id===id);
@@ -1197,7 +1275,14 @@ const App = {
        <div class="m-info"><div class="m-info-l">Timing</div><div class="m-info-v">${days<0?'Past event':days===0?'Today!':days+' days away'}</div></div>
        <div class="m-info"><div class="m-info-l">Outreach Window</div><div class="m-info-v">${dtOut<=0?'📣 Window is OPEN':'Opens in '+dtOut+' days'}</div></div>
        <div class="m-info" style="grid-column:1/-1"><div class="m-info-l">Sales Opportunity</div><div class="m-info-v">${sl[ev.salesPotential]}</div></div>`;
-    document.getElementById('mNotes').textContent=ev.notes;
+    // Notes field — editable, saved to localStorage
+    const savedNote=this.noteOverrides?.[ev.id];
+    const notesEl=document.getElementById('mNotes');
+    if(notesEl){
+      notesEl.textContent=savedNote||ev.notes;
+      notesEl.setAttribute('data-evid',ev.id);
+      notesEl.setAttribute('data-default',ev.notes);
+    }
     document.getElementById('mGoogle').onclick=()=>this.addGoogle(id);
     document.getElementById('mIcal').onclick=()=>this.dlIcs(id);
     const hasR=!!this.reminders[id];
@@ -1372,6 +1457,73 @@ const App = {
     document.getElementById('ce-end').value='';
     st.className='as-status success';st.style.display='flex';st.innerHTML='✅ Event added!';
     var self=this;setTimeout(function(){self.closeAddEv();st.style.display='none';self.buildFilters();self.render();},1200);
+  },
+
+  // ── EDITABLE NOTES ──────────────────────────────────────
+  saveNote(el){
+    const id=el.getAttribute('data-evid');
+    const def=el.getAttribute('data-default');
+    const val=(el.textContent||'').trim();
+    if(!this.noteOverrides)this.noteOverrides={};
+    if(val&&val!==def){
+      this.noteOverrides[id]=val;
+    } else {
+      delete this.noteOverrides[id];
+    }
+    try{localStorage.setItem('fp-notes',JSON.stringify(this.noteOverrides));}catch(e){}
+  },
+  loadNoteOverrides(){
+    try{this.noteOverrides=JSON.parse(localStorage.getItem('fp-notes')||'{}');}
+    catch(e){this.noteOverrides={};}
+  },
+
+  // ── OFFLINE DOWNLOAD ─────────────────────────────────
+  confirmDownload(){
+    var box=document.createElement('div');
+    box.className='dl-confirm-overlay';
+    box.id='dlConfirm';
+    var inner=document.createElement('div');
+    inner.className='dl-confirm-box';
+    inner.innerHTML='<div class="dl-confirm-title">⬇ Download for Offline Use</div>'+
+      '<div class="dl-confirm-body">Downloads the calendar with all your schools and settings baked in.<br><br>'+
+      '<strong>Note:</strong> The Add School AI feature requires internet and will not work offline. All other features work fine.</div>'+
+      '<div class="dl-confirm-btns" id="dlBtns"></div>';
+    box.appendChild(inner);
+    document.body.appendChild(box);
+    var cancel=document.createElement('button');
+    cancel.className='dl-cancel';cancel.textContent='Cancel';
+    cancel.onclick=function(){box.remove();};
+    var go=document.createElement('button');
+    go.className='dl-go';go.textContent='Download';
+    go.onclick=function(){App.doDownload();};
+    document.getElementById('dlBtns').appendChild(cancel);
+    document.getElementById('dlBtns').appendChild(go);
+  },
+
+  doDownload(){
+    document.getElementById('dlConfirm')&&document.getElementById('dlConfirm').remove();
+    // Read all localStorage keys and embed them in the HTML
+    var lsKeys=['fp-ov','fp-rm','fp-hidden','fp-ai','fp-os','fp-so','fp-ord','fp-ce','fp-notes'];
+    var initScript='<script id="fp-offline-init">\n';
+    lsKeys.forEach(function(k){
+      var v=localStorage.getItem(k);
+      if(v)initScript+='try{localStorage.setItem('+JSON.stringify(k)+','+JSON.stringify(v)+');}catch(e){}\n';
+    });
+    initScript+='<\/script>';
+    // Get current HTML and inject the init script
+    var xhr=new XMLHttpRequest();
+    xhr.open('GET',window.location.href,true);
+    xhr.onload=function(){
+      var src=xhr.responseText;
+      // Inject offline init before </head>
+      src=src.replace('</head>',initScript+'</head>');
+      var blob=new Blob([src],{type:'text/html'});
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='fp-greek-calendar-offline.html';
+      a.click();
+    };
+    xhr.send();
   },
 
   // ── SCHOOL MANAGER ─────────────────────────────────────
@@ -1669,6 +1821,14 @@ const App = {
     this.save();
     this.schools[school.id]=Object.assign({},school,{preloaded:false});
     events.forEach(ev=>{if(!this.events.find(e=>e.id===ev.id))this.events.push(ev);});
+    // Register org names in ORG_DIRECTORY so filters work for AI-added schools
+    var dir={panhellenic:[],ifc:[],nphc:[],mgc:[],professional:[],campus:[]};
+    events.forEach(function(ev){
+      if(ev.orgName&&ev.orgType&&dir[ev.orgType]&&dir[ev.orgType].indexOf(ev.orgName)<0){
+        dir[ev.orgType].push(ev.orgName);
+      }
+    });
+    ORG_DIRECTORY[school.id]=dir;
   },
 
   _tmplEvts(sid){
