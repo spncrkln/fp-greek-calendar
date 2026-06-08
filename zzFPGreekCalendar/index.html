@@ -2219,7 +2219,7 @@ const App = {
     st.innerHTML='Researching '+name+'...';
     try{
       const res=await this._webSearch(name);
-      this._addSchool(res.school,res.events);
+      this._addSchool(res.school,res.events,res.orgs||null);
       const conf=res.events.filter(e=>!e.approx).length;
       st.className='as-status success';
       st.innerHTML='Added '+res.school.name+' with '+res.events.length+' events ('+conf+' confirmed from web).';
@@ -2243,7 +2243,7 @@ const App = {
   },
 
   async _webSearch(schoolName){
-    const prompt='Generate a Fall 2026 Greek life sales calendar for "'+schoolName+'" for a Fresh Prints apparel rep. Use your knowledge of this school\'s actual Greek chapters and academic calendar. Return ONLY raw JSON with no markdown fences, no explanation, no whitespace. Start your response with { and end with }. JSON: {"school":{"id":"4charID","name":"Full Name","short":"ABBREV","location":"City, ST","color":"#hex"},"events":[{"id":"s-slug","school":"same-id","orgName":"Org Name","orgType":"ifc|panhellenic|nphc|campus","title":"Title","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","type":"recruitment|bidday|philanthropy|homecoming|parentsweekend|formal|newmember|greekweek|social|campus|intake","approx":true,"salesPotential":"high|medium|low","outreachDays":42,"notes":"Pitch advice"}]}. Include 12 events Aug-Dec 2026. Use actual chapter names. approx:false for confident dates. outreachDays: 56 bid day/homecoming, 42 formals/recruitment, 28 philanthropy.';
+    const prompt='Generate a Fall 2026 Greek life sales calendar for "'+schoolName+'" for a Fresh Prints apparel rep. Use your knowledge of this school\'s actual Greek chapters. Return ONLY raw JSON, no markdown, no explanation. Start with { end with }. Schema: {"school":{"id":"4charID","name":"Full Name","short":"ABBREV","location":"City, ST","color":"#hex"},"orgs":{"panhellenic":["Full Chapter Name",...],"ifc":["Full Chapter Name",...],"nphc":["Full Chapter Name",...],"mgc":[]},"events":[{"id":"s-slug","school":"same-id","orgName":"Org Name or council label","orgType":"ifc|panhellenic|nphc|campus","title":"Title","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","type":"recruitment|bidday|philanthropy|homecoming|parentsweekend|formal|newmember|greekweek|social|campus|intake","approx":true,"salesPotential":"high|medium|low","outreachDays":42,"notes":"Specific pitch advice naming target chapters"}]}. Include 12 events Aug-Dec 2026 and complete orgs lists with real chapter names. approx:false for confident dates. outreachDays: 56 bid day/homecoming, 42 formals/recruitment, 28 philanthropy.';
     // Try Netlify proxy first (works when hosted on Netlify — API key added server-side)
     // Falls back to direct API when running inside Claude.ai artifact context
     const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:3500,
@@ -2276,18 +2276,27 @@ const App = {
     return p;
   },
 
-  _addSchool(school,events){
+  _addSchool(school,events,orgs){
     this.aiSchools[school.id]={school,events};
     this.save();
     this.schools[school.id]=Object.assign({},school,{preloaded:false});
     events.forEach(ev=>{if(!this.events.find(e=>e.id===ev.id))this.events.push(ev);});
-    // Register org names in ORG_DIRECTORY so filters work for AI-added schools
+    // Build ORG_DIRECTORY: use explicit orgs list if AI returned one, else extract from events
     var dir={panhellenic:[],ifc:[],nphc:[],mgc:[],professional:[],campus:[]};
-    events.forEach(function(ev){
-      if(ev.orgName&&ev.orgType&&dir[ev.orgType]&&dir[ev.orgType].indexOf(ev.orgName)<0){
-        dir[ev.orgType].push(ev.orgName);
-      }
-    });
+    if(orgs&&typeof orgs==='object'){
+      // AI returned a full orgs directory — use it directly
+      ['panhellenic','ifc','nphc','mgc','professional','campus'].forEach(function(type){
+        if(Array.isArray(orgs[type]))dir[type]=orgs[type].filter(function(o){return o&&o.trim();});
+      });
+    } else {
+      // Fallback: extract org names from event orgName fields
+      events.forEach(function(ev){
+        if(ev.orgName&&ev.orgType&&dir[ev.orgType]&&dir[ev.orgType].indexOf(ev.orgName)<0
+           &&!ev.orgName.startsWith('All ')){
+          dir[ev.orgType].push(ev.orgName);
+        }
+      });
+    }
     ORG_DIRECTORY[school.id]=dir;
   },
 
