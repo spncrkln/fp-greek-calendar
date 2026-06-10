@@ -483,7 +483,11 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
     <span class="fl">Type</span>
     <select class="fsel" id="typeSel" onchange="App.setType(this.value)"></select>
   </div>
-  <button class="dl-offline-btn" id="hiddenToggleBtn" onclick="App.toggleShowHidden()" style="display:none" title="Show events hidden this year">👁 Hidden</button>
+  <div class="fg" id="cmFilterDiv" style="display:none">
+    <span class="fl">CM</span>
+    <select class="fsel" id="cmSel" onchange="App.setCMFilter(this.value)"></select>
+  </div>
+  <button class="dl-offline-btn" id="hiddenToggleBtn" onclick="App.toggleShowHidden()" style="opacity:.4;pointer-events:none" title="No hidden events">👁 Hidden</button>
   <button class="dl-offline-btn" onclick="App.confirmDownload()" title="Download for offline use">⬇ Offline</button>
   <button class="add-ev-btn" onclick="App.openAddEv()">+ Add Event</button>
   <button class="dl-btn" onclick="App.dlAll()">📥 Export .ics</button>
@@ -997,6 +1001,7 @@ const App = {
       if(!visible.includes(ev.school))return false;
       if(this.school!=='all'&&ev.school!==this.school)return false;
       if(this.type==='__approx'){if(!App.isApprox(ev))return false;}
+      if(this._cmFilter&&this._cmFilter!=='all'){if(!App.cmAssign||App.cmAssign[ev.id]!==this._cmFilter)return false;}
       else if(this.type!=='all'&&ev.type!==this.type)return false;
       if(selOrg==='all')return true;
       if(ev.orgName===selOrg)return true;
@@ -1102,14 +1107,16 @@ const App = {
       if(at&&!bt)return -1; if(!at&&bt)return 1;
       return a.localeCompare(b);
     });
+    this.buildCMFilter();
     const osel=document.getElementById('orgSel');
     if(!osel)return;
     osel.innerHTML=orgs.map(o=>`<option value="${o}"${o===this.org?' selected':''}>${o==='all'?'All Organizations':o}</option>`).join('');
     // Type select
     const tsel=document.getElementById('typeSel');
-    tsel.innerHTML=`<option value="all"${this.type==='all'?' selected':''}>All Types</option>`+
+    const _sortedTypes=Object.entries(ETYPES).sort(([,a],[,b])=>a.label.localeCompare(b.label));
+  tsel.innerHTML=`<option value="all"${this.type==='all'?' selected':''}>All Types</option>`+
       `<option value="__approx"${this.type==='__approx'?' selected':''}>~ Needs Verification</option>`+
-      Object.entries(ETYPES).map(([k,v])=>`<option value="${k}"${k===this.type?' selected':''}>${v.label}</option>`).join('');
+      _sortedTypes.map(([k,v])=>`<option value="${k}"${k===this.type?' selected':''}>${v.label}</option>`).join('');
   },
 
   hideSchool(id){
@@ -1117,7 +1124,6 @@ const App = {
     this.save();
     this.buildFilters();
     this.render();
-    var _htb=document.getElementById('hiddenToggleBtn');if(_htb){var _hc=Object.keys(this.hiddenEvents||{}).length;_htb.style.display=_hc>0?'':'none';_htb.textContent='👁 '+_hc+' Hidden';}
   },
 
   confirmDelete(id){
@@ -1157,6 +1163,13 @@ const App = {
 
   render(){
     this.renderAlerts();
+    // Update hidden events toggle button state
+    var _htb=document.getElementById('hiddenToggleBtn');
+    if(_htb){
+      var _hc=Object.keys(this.hiddenEvents||{}).length;
+      if(_hc>0){_htb.style.opacity='1';_htb.style.pointerEvents='';_htb.textContent='👁 '+_hc+' Hidden';_htb.style.background=this.showHidden?'var(--fp)':'';_htb.style.color=this.showHidden?'#fff':'';}
+      else{_htb.style.opacity='.4';_htb.style.pointerEvents='none';_htb.textContent='👁 Hidden';_htb.style.background='';_htb.style.color='';}
+    }
     if(this.view==='calendar')this.renderCalendar();
     else if(this.view==='week')this.renderWeekly();
     else if(this.view==='list')this.renderList();
@@ -1327,7 +1340,6 @@ const App = {
   // ── PIPELINE VIEW ─────────────────────────────────────
   renderPipeline(){
     const allEvs=[...this.events,...(this.customEvents||[])];
-    const _activeCM=this._pipelineCMFilter||'all';
     const evMap={};allEvs.forEach(function(e){evMap[e.id]=e;});
     const statuses=[
       {k:'won',    label:'✅ Won',      color:'#059669'},
@@ -1869,6 +1881,18 @@ const App = {
     xhr.send();
   },
 
+  _cmFilter:'all',
+  setCMFilter(v){this._cmFilter=v;this.render();},
+  buildCMFilter(){
+    var div=document.getElementById('cmFilterDiv');
+    var sel=document.getElementById('cmSel');
+    if(!div||!sel)return;
+    var cms=this.cms||[];
+    if(!cms.length){div.style.display='none';return;}
+    div.style.display='';
+    sel.innerHTML='<option value="all">All CMs</option>'+
+      cms.map(function(c){return '<option value="'+c.id+'"'+(c.id===App._cmFilter?' selected':'')+'>'+c.firstName+' '+c.lastName+'</option>';}).join('');
+  },
   // ── CM MANAGEMENT ────────────────────────────────────
   loadCMs(){
     try{this.cms=JSON.parse(localStorage.getItem('fp-cms')||'[]');}catch(e){this.cms=[];}
