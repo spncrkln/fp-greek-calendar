@@ -421,11 +421,16 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 .pipe-rm{background:transparent;border:none;color:var(--muted);font-size:13px;font-weight:900;cursor:pointer;padding:4px 6px;border-radius:6px;flex-shrink:0;line-height:1;}
 .pipe-rm:hover{background:#fee2e2;color:#ef4444;}
 
-/* ─── DATE CONFIRMATION ─── */
-.m-confirm-row{padding:10px 0 4px;display:flex;flex-direction:column;gap:8px;}
-.m-confirm-hint{font-size:11px;color:var(--muted);line-height:1.5;}
-.m-confirm-btn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:900;padding:9px 14px;background:#059669;color:#fff;border:none;border-radius:8px;cursor:pointer;align-self:flex-start;}
-.m-confirm-unset{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;padding:4px 8px;background:transparent;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted);align-self:flex-start;}
+/* ─── CONFIRM DATE BUTTON ─── */
+.mact.confirm-dt{background:var(--tan);color:var(--text);border:1.5px solid var(--border);}
+.mact.confirm-dt.confirmed{background:#d1fae5;color:#059669;border-color:#6ee7b7;}
+.badge.b-user-confirmed{background:#059669;color:#fff;border:none;}
+
+/* ─── SCHOOL MANAGER ROW UPDATES ─── */
+.sm-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.sm-reverify{font-family:'Outfit',sans-serif;font-size:10px;font-weight:800;padding:5px 8px;background:var(--tan);border:1.5px solid var(--border);border-radius:7px;cursor:pointer;color:var(--text);white-space:nowrap;}
+.sm-reverify:hover{border-color:var(--fp);color:var(--fp);}
+.sm-reverify:disabled{opacity:.6;cursor:default;}
 </style>
 </head>
 <body>
@@ -494,7 +499,6 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
       <div class="m-info-grid" id="mInfoGrid"></div>
       <div class="m-notes-box" id="mNotes" contenteditable="true" onblur="App.saveNote(this)" spellcheck="false"></div>
       <div class="m-notes-hint">✏️ Click to edit notes</div>
-      <div id="mConfirmZone"></div>
       <div class="m-sec" style="margin-top:14px">Campus Manager</div>
       <div class="m-cm-row">
         <select class="m-cm-sel" id="mCMSel" onchange="App.assignCM(App.activeId,this.value)">
@@ -514,6 +518,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
       <div class="m-div"></div>
       <div class="m-sec">Customize</div>
       <div class="m-acts">
+        <button class="mact confirm-dt" id="mConfirmBtn" onclick="App.toggleConfirmDate()" style="display:none">📅 Confirm Date</button>
         <button class="mact edit" id="mEditBtn" onclick="App.toggleEdit()">✏️ Override Date</button>
         <button class="mact remind" id="mRemindBtn" onclick="App.toggleRemind()">🔔 Set Reminder</button>
       </div>
@@ -892,7 +897,7 @@ const App = {
   year:2026, month:7, // 0-indexed: 7 = August
   activeId:null, showEdit:false, showRemind:false,
   schools:{}, events:[], hiddenSchools:[], aiSchools:{}, customEvents:[],
-  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{}, noteOverrides:{}, pipeOrgs:{}, cms:[], cmAssign:{}, customOrgs:[], confirmedDates:{},
+  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{}, noteOverrides:{}, pipeOrgs:{}, cms:[], cmAssign:{}, customOrgs:[], confirmedDates:{}, aiDateHints:{},
 
   // ── INIT ────────────────────────────────────────────
   init(){
@@ -906,6 +911,7 @@ const App = {
     this.loadCMs();
     this.loadCustomOrgs();
     this.loadConfirmedDates();
+    this.loadAiDateHints();
     this.loadCustomEvents();
     try{this.reminders=JSON.parse(localStorage.getItem('fp-rm')||'{}');}catch(e){}
     try{this.hiddenSchools=JSON.parse(localStorage.getItem('fp-hidden')||'[]');}catch(e){}
@@ -946,8 +952,8 @@ const App = {
     const t=new Date(d+'T12:00:00');
     return Math.ceil((t-TODAY)/86400000);
   },
-  evDate(ev){return this.overrides[ev.id]||ev.startDate;},
-  evEnd(ev){return this.overrides[ev.id]?(this.overrides[ev.id]):(ev.endDate||ev.startDate);},
+  evDate(ev){return this.overrides[ev.id]||(this.aiDateHints[ev.id]&&this.aiDateHints[ev.id].start)||ev.startDate;},
+  evEnd(ev){return this.overrides[ev.id]?this.overrides[ev.id]:(this.aiDateHints[ev.id]?this.aiDateHints[ev.id].end||this.aiDateHints[ev.id].start:(ev.endDate||ev.startDate));},
   isOverridden(id){return!!this.overrides[id];},
 
   fmt(d){
@@ -1484,28 +1490,23 @@ const App = {
     document.getElementById('mTypebar').innerHTML=
       `<div class="sb" style="background:${s.color}">${s.short}</div>
        <span class="badge" style="background:${t.bg};color:${t.color}">${t.label}</span>
-       ${this.isOverridden(id)?'<span class="badge b-override">✏️ Overridden</span>':ev.approx?'<span class="badge b-approx">~ Approximate</span>':'<span class="badge b-confirmed">✓ Confirmed</span>'}`;
+       ${this.isOverridden(id)?'<span class="badge b-override">✏️ Overridden</span>':ev.approx&&this.confirmedDates[id]?'<span class="badge b-user-confirmed">✅ Confirmed by You</span>':ev.approx?'<span class="badge b-approx">~ Approximate</span>':'<span class="badge b-confirmed">✓ Confirmed</span>'}`;
     // Confirm zone — show for approximate events
-    const _confEl=document.getElementById('mConfirmZone');
-    if(_confEl){
-      _confEl.innerHTML='';
+    // Show/label the Confirm Date button based on approx status
+    const _confBtn=document.getElementById('mConfirmBtn');
+    if(_confBtn){
       if(ev.approx&&!this.confirmedDates[ev.id]){
-        var _cr=document.createElement('div');_cr.className='m-confirm-row';
-        var _ch=document.createElement('span');_ch.className='m-confirm-hint';
-        _ch.textContent='Date is approximate. Verify on the school FSL calendar, then confirm below.';
-        var _cb=document.createElement('button');_cb.className='m-confirm-btn';
-        _cb.textContent='Confirm Date is Correct';
-        _cb.setAttribute('data-eid',ev.id);
-        _cb.onclick=function(){App.confirmEventDate(this.getAttribute('data-eid'));};
-        _cr.appendChild(_ch);_cr.appendChild(_cb);_confEl.appendChild(_cr);
+        _confBtn.style.display='';
+        _confBtn.textContent='📅 Confirm Date';
+        _confBtn.className='mact confirm-dt';
+        _confBtn.title='Mark this approximate date as verified';
       } else if(ev.approx&&this.confirmedDates[ev.id]){
-        var _cr2=document.createElement('div');_cr2.className='m-confirm-row';
-        var _ch2=document.createElement('span');_ch2.className='m-confirm-hint';
-        _ch2.style.color='#059669';_ch2.textContent='You confirmed this date.';
-        var _cu=document.createElement('button');_cu.className='m-confirm-unset';
-        _cu.textContent='Undo';_cu.setAttribute('data-eid',ev.id);
-        _cu.onclick=function(){App.unconfirmDate(this.getAttribute('data-eid'));};
-        _cr2.appendChild(_ch2);_cr2.appendChild(_cu);_confEl.appendChild(_cr2);
+        _confBtn.style.display='';
+        _confBtn.textContent='✅ Date Confirmed';
+        _confBtn.className='mact confirm-dt confirmed';
+        _confBtn.title='You confirmed this date — click to undo';
+      } else {
+        _confBtn.style.display='none';
       }
     }
     document.getElementById('mTitle').textContent=ev.title;
@@ -1886,6 +1887,14 @@ const App = {
     }
   },
 
+  loadAiDateHints(){
+    try{this.aiDateHints=JSON.parse(localStorage.getItem('fp-ai-dates')||'{}');}
+    catch(e){this.aiDateHints={};}
+  },
+  saveAiDateHints(){
+    try{localStorage.setItem('fp-ai-dates',JSON.stringify(this.aiDateHints));}catch(e){}
+  },
+
   loadConfirmedDates(){
     try{this.confirmedDates=JSON.parse(localStorage.getItem('fp-confirmed')||'{}');}
     catch(e){this.confirmedDates={};}
@@ -1896,13 +1905,76 @@ const App = {
   confirmEventDate(id){
     this.confirmedDates[id]=true;
     this.saveConfirmedDates();
-    // Re-render modal to reflect change
     this.openEv(id);
     this.render();
+  },
+  unconfirmDate(id){
+    delete this.confirmedDates[id];
+    this.saveConfirmedDates();
+    this.openEv(id);
+    this.render();
+  },
+  toggleConfirmDate(){
+    if(!this.activeId)return;
+    if(this.confirmedDates[this.activeId])this.unconfirmDate(this.activeId);
+    else this.confirmEventDate(this.activeId);
   },
   isApprox(ev){
     // Returns true if date is unconfirmed
     return (ev.approx||false)&&!this.confirmedDates[ev.id];
+  },
+
+  // ── RE-VERIFY DATES ──────────────────────────────────
+  async reverifyDates(schoolId){
+    const s=this.schools[schoolId];
+    if(!s)return;
+    const btn=document.getElementById('rv-'+schoolId);
+    if(btn){btn.disabled=true;btn.textContent='⏳ Checking...';}
+    // Build list of approximate events for this school
+    const approxEvs=this.events.filter(e=>e.school===schoolId&&e.approx&&!this.confirmedDates[e.id]);
+    if(!approxEvs.length){
+      if(btn){btn.textContent='✓ All confirmed';btn.disabled=false;}
+      return;
+    }
+    const evList=approxEvs.map(e=>'{"id":"'+e.id+'","title":"'+e.title.replace(/"/g,"'")+'","currentDate":"'+this.evDate(e)+'"}').join(',');
+    const prompt='You are reviewing a Fall 2026 Greek life calendar for '+s.name+' ('+s.location+'). '+
+      'Based on your knowledge of this school and typical Greek life scheduling, suggest the most accurate Fall 2026 dates for these approximate events. '+
+      'Return ONLY a raw JSON object with no markdown. Schema: {"updates":[{"id":"event-id","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD"}]}. '+
+      'Events to review: ['+evList+']. '+
+      'Only include events where you can suggest a meaningfully better date. Use Fall 2026 dates (Aug-Dec 2026).';
+    try{
+      const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1500,
+        messages:[{role:'user',content:prompt}]});
+      let res;
+      try{
+        res=await fetch('/.netlify/functions/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:reqBody});
+        if(!res.ok)throw new Error('proxy');
+      }catch(_){
+        res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:reqBody});
+      }
+      const d=await res.json();
+      const raw=d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+      let clean=raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+      const si=clean.indexOf('{');const ei=clean.lastIndexOf('}');
+      if(si>=0&&ei>si)clean=clean.slice(si,ei+1);
+      const parsed=JSON.parse(clean);
+      let count=0;
+      if(parsed.updates&&Array.isArray(parsed.updates)){
+        parsed.updates.forEach(function(u){
+          if(u.id&&u.startDate){
+            App.aiDateHints[u.id]={start:u.startDate,end:u.endDate||u.startDate};
+            count++;
+          }
+        });
+        App.saveAiDateHints();
+        App.render();
+        App.renderSMList();
+      }
+      if(btn){btn.textContent='✓ Updated '+count;btn.disabled=false;}
+    }catch(err){
+      console.warn('Re-verify failed:',err.message);
+      if(btn){btn.textContent='⚠ Failed';btn.disabled=false;setTimeout(function(){App.renderSMList();},2000);}
+    }
   },
 
   // ── CUSTOM ORGANIZATIONS ─────────────────────────────
@@ -2051,6 +2123,7 @@ const App = {
       const s=this.schools[id];
       const isVis=vis.includes(id);
       const isAI=!s.preloaded;
+      const approxCount=this.events.filter(e=>e.school===id&&e.approx&&!this.confirmedDates[e.id]).length;
       return`<div class="sm-row">
         <label class="sm-label">
           <input class="sm-chk" type="checkbox" ${isVis?'checked':''} onchange="App.toggleSchool('${id}',this.checked)">
@@ -2059,7 +2132,10 @@ const App = {
             <div class="sm-loc">${s.location} <span class="sm-tag">${isAI?'Added':'Built-in'}</span></div>
           </div>
         </label>
-        ${isAI?`<button class="sm-del" onclick="App.confirmDelete('${id}')">🗑 Delete</button>`:''}
+        <div class="sm-actions">
+          ${approxCount>0?`<button class="sm-reverify" id="rv-${id}" onclick="App.reverifyDates('${id}')" title="${approxCount} approximate dates">🔄 Re-verify</button>`:''}
+          ${isAI?`<button class="sm-del" onclick="App.confirmDelete('${id}')">🗑</button>`:''}
+        </div>
       </div>`;
     }).join('');
   },
