@@ -932,6 +932,7 @@ const App = {
     this.loadAiDateHints();
     this.loadHiddenEvents();
     this.loadEventTitles();
+    this.loadOrgExtra();
     this.loadCustomEvents();
     try{this.reminders=JSON.parse(localStorage.getItem('fp-rm')||'{}');}catch(e){}
     try{this.hiddenSchools=JSON.parse(localStorage.getItem('fp-hidden')||'[]');}catch(e){}
@@ -2212,7 +2213,8 @@ const App = {
           }
         });
         ORG_DIRECTORY[schoolId]=dir;
-        // Persist for AI-added schools
+        // Persist for ALL schools (baked-in and AI-added) to localStorage
+        App.saveOrgExtra(schoolId,dir);
         if(this.aiSchools&&this.aiSchools[schoolId]){
           this.aiSchools[schoolId].orgs=parsed.orgs;
           this.save();
@@ -2225,6 +2227,36 @@ const App = {
       if(btn){btn.textContent='⚠ Failed';btn.disabled=false;}
     }
   },
+  // ── SUPPLEMENTAL ORG DIRECTORY (persists AI-fetched orgs for baked-in schools) ──
+  loadOrgExtra(){
+    try{
+      var extra=JSON.parse(localStorage.getItem('fp-org-extra')||'{}');
+      Object.keys(extra).forEach(function(sid){
+        if(!ORG_DIRECTORY[sid])ORG_DIRECTORY[sid]={panhellenic:[],ifc:[],nphc:[],mgc:[],professional:[],campus:[]};
+        var types=['panhellenic','ifc','nphc','mgc','professional','campus'];
+        types.forEach(function(type){
+          if(!Array.isArray(extra[sid][type]))return;
+          if(!ORG_DIRECTORY[sid][type])ORG_DIRECTORY[sid][type]=[];
+          extra[sid][type].forEach(function(o){
+            if(o&&o.trim()&&ORG_DIRECTORY[sid][type].indexOf(o)<0)
+              ORG_DIRECTORY[sid][type].push(o);
+          });
+        });
+      });
+    }catch(e){}
+  },
+  saveOrgExtra(schoolId,dir){
+    try{
+      var extra=JSON.parse(localStorage.getItem('fp-org-extra')||'{}');
+      extra[schoolId]=extra[schoolId]||{};
+      var types=['panhellenic','ifc','nphc','mgc','professional','campus'];
+      types.forEach(function(type){
+        extra[schoolId][type]=Array.isArray(dir[type])?dir[type].slice():[];
+      });
+      localStorage.setItem('fp-org-extra',JSON.stringify(extra));
+    }catch(e){}
+  },
+
   // ── CUSTOM ORGANIZATIONS ─────────────────────────────
   loadCustomOrgs(){
     try{this.customOrgs=JSON.parse(localStorage.getItem('fp-custom-orgs')||'[]');}
@@ -2675,6 +2707,7 @@ const App = {
       });
     }
     ORG_DIRECTORY[school.id]=dir;
+    this.saveOrgExtra(school.id,dir);
   },
 
   _tmplEvts(sid){
