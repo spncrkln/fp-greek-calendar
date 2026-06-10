@@ -1077,6 +1077,7 @@ const App = {
         `<option value="__add__">➕ Add New School...</option>`+
         `<option value="__manage__">⚙️ Manage Schools...</option>`;
     }
+    this.buildCMFilter();
     // Org select — grouped by council type with optgroups
     const visible=this.visibleSchoolIds();
     const councilLabels=new Set(['All Greek Life','All Non-Greek Life','Campus-Wide',
