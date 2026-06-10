@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='14' fill='%23FF5500'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-family='Arial Black,sans-serif' font-weight='900' font-size='46' fill='white'%3EFP%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='14' fill='%23FF5500'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-family='Arial Black,sans-serif' font-weight='900' font-size='46' fill='white'%3EFP%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>FP Greek Life Sales Calendar — Fall 2026 v4</title>
+<title>FP Greek Life Sales Calendar — 2026–27 v4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
@@ -449,7 +449,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 <div class="hdr">
   <div class="hdr-l">
     <div class="logo">Fresh Prints<em>×</em>Greek</div>
-    <div class="hdr-sub">Sales Calendar — Fall 2026</div>
+    <div class="hdr-sub">Sales Calendar — 2026–27</div>
     <div class="hdr-pill">v4</div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
@@ -616,7 +616,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
       <button class="m-close" onclick="App.closeAs()" style="background:rgba(255,255,255,.15);color:#fff;">✕</button>
     </div>
     <div class="as-body">
-      <div class="as-desc">Type any school name. When hosted on Netlify, the tool searches the web for their Greek chapters, recruitment dates, homecoming, and academic calendar to build a real Fall 2026 calendar. Falls back to template dates if offline.</div>
+      <div class="as-desc">Type any school name. When hosted on Netlify, the tool searches the web for their Greek chapters, recruitment dates, homecoming, and academic calendar to build a real 2026–27 calendar. Falls back to template dates if offline.</div>
       <div class="as-input-wrap">
         <label class="as-lbl">School Name</label>
         <input type="text" class="as-input" id="asInput" placeholder='e.g. "University of Georgia"' onkeydown="if(event.key==='Enter')App.generate()">
@@ -631,7 +631,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 </div>
 
 <div style="text-align:center;padding:14px 20px;font-size:10px;color:#B0A898;font-weight:600;font-family:sans-serif;">
-  Fresh Prints Greek Life Sales Calendar · Fall 2026
+  Fresh Prints Greek Life Sales Calendar · 2026–27
 </div>
 
 <script>
@@ -2048,7 +2048,7 @@ const App = {
       'Based on your knowledge of this school and typical Greek life scheduling, suggest the most accurate Fall 2026 dates for these approximate events. '+
       'Return ONLY a raw JSON object with no markdown. Schema: {"updates":[{"id":"event-id","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD"}]}. '+
       'Events to review: ['+evList+']. '+
-      'Only include events where you can suggest a meaningfully better date. Use Fall 2026 dates (Aug-Dec 2026).';
+      'Only include events where you can suggest a meaningfully better date. Use 2026-27 school year dates only (2026-08-01 through 2027-05-31).';
     try{
       const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1500,
         messages:[{role:'user',content:prompt}]});
@@ -2546,7 +2546,7 @@ const App = {
         const hasCustom=!!(this.outreachSettings[id]&&Object.keys(this.outreachSettings[id]).length>0);
         return`<option value="${id}"${scope===id?' selected':''}>${s.short}${hasCustom?' ★':''}</option>`;
       }).join('');
-    const rows=Object.entries(ETYPES).map(([k,v])=>{
+    const rows=Object.entries(ETYPES).sort(([,a],[,b])=>a.label.localeCompare(b.label)).map(([k,v])=>{
       const scopeVal=scopeSet[k];
       const globalVal=globalSet[k];
       const defVal=defaults[k]||14;
@@ -2652,10 +2652,10 @@ const App = {
   },
 
   async _webSearch(schoolName){
-    const prompt='Generate a Fall 2026 Greek life sales calendar for "'+schoolName+'" for a Fresh Prints apparel rep. Use your knowledge of this school\'s actual Greek chapters. Return ONLY raw JSON, no markdown, no explanation. Start with { end with }. Schema: {"school":{"id":"4charID","name":"Full Name","short":"ABBREV","location":"City, ST","color":"#hex"},"orgs":{"panhellenic":["Full Chapter Name",...],"ifc":["Full Chapter Name",...],"nphc":["Full Chapter Name",...],"mgc":[],"campus":["Club/Org Name",...]},"events":[{"id":"s-slug","school":"same-id","orgName":"Org Name or council label","orgType":"ifc|panhellenic|nphc|campus","title":"Title","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","type":"recruitment|bidday|philanthropy|homecoming|parentsweekend|formal|newmember|greekweek|social|campus|intake","approx":true,"salesPotential":"high|medium|low","outreachDays":42,"notes":"Specific pitch advice naming target chapters"}]}. Include 12 events Aug-Dec 2026. Populate orgs with real chapter names AND include notable campus clubs/organizations (student newspaper, professional clubs, cultural groups, etc.) in orgs.campus. approx:false for confident dates. outreachDays: 56 bid day/homecoming, 42 formals/recruitment, 28 philanthropy.';
+    const prompt='Generate a Fall 2026 Greek life sales calendar for "'+schoolName+'" for a Fresh Prints apparel rep. Use your knowledge of this school\'s actual Greek chapters. Return ONLY raw JSON, no markdown, no explanation. Start with { end with }. Schema: {"school":{"id":"4charID","name":"Full Name","short":"ABBREV","location":"City, ST","color":"#hex"},"orgs":{"panhellenic":["Full Chapter Name",...],"ifc":["Full Chapter Name",...],"nphc":["Full Chapter Name",...],"mgc":[],"campus":["Club/Org Name",...]},"events":[{"id":"s-slug","school":"same-id","orgName":"Org Name or council label","orgType":"ifc|panhellenic|nphc|campus","title":"Title","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","type":"recruitment|bidday|philanthropy|homecoming|parentsweekend|formal|newmember|greekweek|social|campus|intake","approx":true,"salesPotential":"high|medium|low","outreachDays":42,"notes":"Specific pitch advice naming target chapters"}]}. CRITICAL: ALL startDate and endDate values MUST be between 2026-08-01 and 2027-05-31 only. Include ~20 events covering the full 2026-27 school year: Fall 2026 (Aug-Dec 2026) AND Spring 2027 (Jan-May 2027). Include fall recruitment, bid days, homecoming, formals, philanthropy AND spring recruitment, spring bid day, spring formals, spring philanthropy. Populate orgs with real chapter names AND include notable campus clubs/organizations in orgs.campus. approx:false only for dates you are confident about. outreachDays: 56 bid day/homecoming, 42 formals/recruitment, 28 philanthropy.';
     // Try Netlify proxy first (works when hosted on Netlify — API key added server-side)
     // Falls back to direct API when running inside Claude.ai artifact context
-    const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:3500,
+    const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4500,
       messages:[{role:'user',content:prompt}]});
     let res;
     try{
@@ -2681,7 +2681,13 @@ const App = {
       }
     }
     if(!p||!p.school||!p.events)throw new Error('Missing school or events in: '+JSON.stringify(Object.keys(p||{})));
-    p.events=p.events.map(ev=>Object.assign({},ev,{school:p.school.id}));
+    p.events=p.events
+      .filter(function(ev){
+        var d=ev.startDate||'';
+        return d>='2026-08-01'&&d<='2027-05-31';
+      })
+      .map(ev=>Object.assign({},ev,{school:p.school.id}));
+    if(!p.events.length)throw new Error('AI returned no events in the Aug-Dec 2026 window — try again');
     return p;
   },
 
@@ -2724,6 +2730,17 @@ const App = {
       {s:'nme',oN:'All Panhellenic Sororities',oT:'panhellenic',title:'New Member Education Period',sD:'2026-09-08',eD:'2026-11-07',type:'newmember',sp:'medium',od:14,notes:'NME shirts and chapter merchandise.'},
       {s:'formals',oN:'All Greek Life',oT:'campus',title:'Fall Formals and Date Functions',sD:'2026-11-07',eD:'2026-11-21',type:'formal',sp:'high',od:42,notes:'Custom date function shirts.'},
       {s:'initiate',oN:'All Greek Life',oT:'campus',title:'New Member Initiations',sD:'2026-11-14',eD:'2026-11-21',type:'newmember',sp:'medium',od:14,notes:'Initiation commemorative apparel.'},
+      // Spring 2027
+      {s:'spr-cpc-rec',oN:'All Panhellenic Sororities',oT:'panhellenic',title:'Spring Panhellenic Recruitment',sD:'2027-01-19',eD:'2027-01-26',type:'recruitment',sp:'high',od:42,notes:'Override dates. Spring recruitment apparel, Rho Gamma gear.'},
+      {s:'spr-cpc-bid',oN:'All Panhellenic Sororities',oT:'panhellenic',title:'Spring Panhellenic Bid Day',sD:'2027-01-27',eD:'2027-01-27',type:'bidday',sp:'high',od:56,notes:'Override date. Bid day boxes, reveal shirts, matching tanks.'},
+      {s:'spr-ifc-rush',oN:'All IFC Fraternities',oT:'ifc',title:'Spring IFC Recruitment',sD:'2027-01-20',eD:'2027-02-06',type:'recruitment',sp:'high',od:42,notes:'Override dates. Spring rush shirts and event apparel.'},
+      {s:'spr-ifc-bid',oN:'All IFC Fraternities',oT:'ifc',title:'Spring IFC Bid Day',sD:'2027-02-07',eD:'2027-02-07',type:'bidday',sp:'high',od:56,notes:'Override date. Pledge class shirts, new member kits.'},
+      {s:'spr-biglil',oN:'All Panhellenic Sororities',oT:'panhellenic',title:'Spring Big/Little Reveal',sD:'2027-02-20',eD:'2027-02-26',type:'social',sp:'high',od:42,notes:'Matching shirts, gift baskets, custom big/little items.'},
+      {s:'spr-philan',oN:'All Greek Life',oT:'campus',title:'Spring Philanthropy Window',sD:'2027-02-15',eD:'2027-04-11',type:'philanthropy',sp:'medium',od:28,notes:'Individual chapter philanthropy events spring semester.'},
+      {s:'spr-nme',oN:'All Panhellenic Sororities',oT:'panhellenic',title:'Spring New Member Education',sD:'2027-02-01',eD:'2027-04-01',type:'newmember',sp:'medium',od:14,notes:'NME shirts and chapter merchandise.'},
+      {s:'spr-nphc',oN:'All NPHC Organizations',oT:'nphc',title:'Spring NPHC Intake Period',sD:'2027-02-01',eD:'2027-03-31',type:'intake',sp:'medium',od:28,notes:'Line jackets and crossing gear.'},
+      {s:'spr-formals',oN:'All Greek Life',oT:'campus',title:'Spring Formals and Date Functions',sD:'2027-03-20',eD:'2027-04-24',type:'formal',sp:'high',od:42,notes:'Custom date function shirts, formal apparel.'},
+      {s:'spr-initiate',oN:'All Greek Life',oT:'campus',title:'Spring Initiations',sD:'2027-04-10',eD:'2027-04-24',type:'newmember',sp:'medium',od:14,notes:'Initiation commemorative apparel.'},
     ].map(t=>({id:sid+'-'+t.s,school:sid,orgName:t.oN,orgType:t.oT,title:t.title,startDate:t.sD,endDate:t.eD,type:t.type,approx:true,salesPotential:t.sp,outreachDays:t.od,notes:t.notes}));
   },
 
