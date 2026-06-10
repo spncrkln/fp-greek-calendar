@@ -1910,7 +1910,7 @@ const App = {
     if(!cms.length){div.style.display='none';return;}
     div.style.display='';
     sel.innerHTML='<option value="all">All CMs</option>'+
-      cms.map(function(c){return '<option value="'+c.id+'"'+(c.id===App._cmFilter?' selected':'')+'>'+c.firstName+' '+c.lastName+'</option>';}).join('');
+      cms.slice().sort(function(a,b){return (a.firstName+' '+a.lastName).localeCompare(b.firstName+' '+b.lastName);}).map(function(c){return '<option value="'+c.id+'"'+(c.id===App._cmFilter?' selected':'')+'>'+c.firstName+' '+c.lastName+'</option>';}).join('');
   },
   // ── CM MANAGEMENT ────────────────────────────────────
   loadCMs(){
