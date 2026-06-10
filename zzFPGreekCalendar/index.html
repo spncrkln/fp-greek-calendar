@@ -162,7 +162,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 .m-notes{background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:7px;padding:10px;font-size:11px;color:#1A4731;line-height:1.55;margin-bottom:13px;font-weight:500;}
 .m-div{height:1px;background:var(--border);margin:12px 0;}
 .m-sec{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px;}
-.m-acts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.m-acts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:12px;}
 .mact{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:9px 11px;border-radius:7px;border:2px solid transparent;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;gap:5px;min-height:40px;}
 .mact.google{background:#4285F4;color:#fff;}
 .mact.google:hover{background:#3574E2;}
@@ -431,6 +431,10 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 .sm-reverify{font-family:'Outfit',sans-serif;font-size:10px;font-weight:800;padding:5px 8px;background:var(--tan);border:1.5px solid var(--border);border-radius:7px;cursor:pointer;color:var(--text);white-space:nowrap;}
 .sm-reverify:hover{border-color:var(--fp);color:var(--fp);}
 .sm-reverify:disabled{opacity:.6;cursor:default;}
+
+.ce-org-select{height:120px;padding:4px;font-size:12px;}
+.ce-org-select optgroup{font-weight:900;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+.ce-org-select option{padding:5px 8px;font-size:13px;font-weight:600;}
 </style>
 </head>
 <body>
@@ -507,6 +511,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
         <button class="m-cm-add" onclick="App.openAddCM()">+ Add CM</button>
       </div>
       <div class="m-div"></div>
+      <div id="mEventAdmin"></div>
       <div class="m-sec">Add to Calendar</div>
       <div class="m-acts">
         <button class="mact google" id="mGoogle">
@@ -517,7 +522,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
       </div>
       <div class="m-div"></div>
       <div class="m-sec">Customize</div>
-      <div class="m-acts">
+      <div class="m-acts" id="mActsRow">
         <button class="mact confirm-dt" id="mConfirmBtn" onclick="App.toggleConfirmDate()" style="display:none">📅 Confirm Date</button>
         <button class="mact edit" id="mEditBtn" onclick="App.toggleEdit()">✏️ Override Date</button>
         <button class="mact remind" id="mRemindBtn" onclick="App.toggleRemind()">🔔 Set Reminder</button>
@@ -912,6 +917,8 @@ const App = {
     this.loadCustomOrgs();
     this.loadConfirmedDates();
     this.loadAiDateHints();
+    this.loadHiddenEvents();
+    this.loadEventTitles();
     this.loadCustomEvents();
     try{this.reminders=JSON.parse(localStorage.getItem('fp-rm')||'{}');}catch(e){}
     try{this.hiddenSchools=JSON.parse(localStorage.getItem('fp-hidden')||'[]');}catch(e){}
@@ -982,6 +989,7 @@ const App = {
     }
 
     return this.events.filter(ev=>{
+      if(this.hiddenEvents&&this.hiddenEvents[ev.id])return false;
       if(!visible.includes(ev.school))return false;
       if(this.school!=='all'&&ev.school!==this.school)return false;
       if(this.type==='__approx'){if(!App.isApprox(ev))return false;}
@@ -1495,18 +1503,22 @@ const App = {
     // Show/label the Confirm Date button based on approx status
     const _confBtn=document.getElementById('mConfirmBtn');
     if(_confBtn){
+      var _row=document.getElementById('mActsRow');
       if(ev.approx&&!this.confirmedDates[ev.id]){
         _confBtn.style.display='';
+        if(_row)_row.style.gridTemplateColumns='1fr 1fr 1fr';
         _confBtn.textContent='📅 Confirm Date';
         _confBtn.className='mact confirm-dt';
         _confBtn.title='Mark this approximate date as verified';
       } else if(ev.approx&&this.confirmedDates[ev.id]){
         _confBtn.style.display='';
+        if(_row)_row.style.gridTemplateColumns='1fr 1fr 1fr';
         _confBtn.textContent='✅ Date Confirmed';
         _confBtn.className='mact confirm-dt confirmed';
         _confBtn.title='You confirmed this date — click to undo';
       } else {
         _confBtn.style.display='none';
+        if(_row)_row.style.gridTemplateColumns='1fr 1fr';
       }
     }
     document.getElementById('mTitle').textContent=ev.title;
@@ -1533,6 +1545,37 @@ const App = {
       notesEl.setAttribute('data-default',ev.notes);
     }
     document.getElementById('mGoogle').onclick=()=>this.addGoogle(id);
+    // Event admin: delete (custom events) or hide (built-in), plus rename
+    const _admin=document.getElementById('mEventAdmin');
+    if(_admin){
+      const isCE=this.customEvents&&this.customEvents.some(function(e){return e.id===ev.id;});
+      _admin.innerHTML='';
+      var _adminRow=document.createElement('div');
+      _adminRow.style.cssText='display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;';
+      var _renBtn=document.createElement('button');
+      _renBtn.className='mact edit';_renBtn.style.flex='1';
+      _renBtn.textContent='✏️ Rename Event';
+      _renBtn.setAttribute('data-eid',ev.id);
+      _renBtn.onclick=function(){App.renameEvent(this.getAttribute('data-eid'));};
+      _adminRow.appendChild(_renBtn);
+      if(isCE){
+        var _delBtn=document.createElement('button');
+        _delBtn.className='mact';_delBtn.style.cssText='flex:1;background:#fee2e2;color:#ef4444;border-color:#fca5a5;';
+        _delBtn.textContent='🗑 Delete Event';
+        _delBtn.setAttribute('data-eid',ev.id);
+        _delBtn.onclick=function(){App.deleteEvent(this.getAttribute('data-eid'));};
+        _adminRow.appendChild(_delBtn);
+      } else {
+        var _hideBtn=document.createElement('button');
+        _hideBtn.className='mact';_hideBtn.style.cssText='flex:1;background:#fef3c7;color:#92400e;border-color:#fde68a;';
+        var _isHid=App.hiddenEvents&&App.hiddenEvents[ev.id];
+        _hideBtn.textContent=_isHid?'👁 Unhide Event':'🚫 Hide This Year';
+        _hideBtn.setAttribute('data-eid',ev.id);
+        _hideBtn.onclick=function(){App.toggleHideEvent(this.getAttribute('data-eid'));};
+        _adminRow.appendChild(_hideBtn);
+      }
+      _admin.appendChild(_adminRow);
+    }
     if(ev&&s)this.populateCMDropdown(id,ev.school);
     document.getElementById('mIcal').onclick=()=>this.dlIcs(id);
     const hasR=!!this.reminders[id];
@@ -1705,7 +1748,12 @@ const App = {
   _ceSP:'high',
   openAddEv(){
     var ss=document.getElementById('ce-school');
-    if(ss){ss.innerHTML=this.visibleSchoolIds().map(function(id){return '<option value="'+id+'">'+App.schools[id].name+'</option>';}).join('');}
+    if(ss){
+      ss.innerHTML=this.visibleSchoolIds().map(function(id){return '<option value="'+id+'">'+App.schools[id].name+'</option>';}).join('');
+      ss.onchange=function(){App.refreshCeOrgList(this.value);};
+      // Pre-populate orgs for first school
+      if(ss.value)App.refreshCeOrgList(ss.value);
+    }
     var ts=document.getElementById('ce-type');
     if(ts){ts.innerHTML=Object.entries(ETYPES).map(function(e){return '<option value="'+e[0]+'">'+e[1].label+'</option>';}).join('');}
     this._ceSP='high';this.updateCeSPBtns();
@@ -1722,7 +1770,9 @@ const App = {
   saveCustomEvent(){
     var school=document.getElementById('ce-school').value;
     var title=(document.getElementById('ce-title').value||'').trim();
-    var org=(document.getElementById('ce-org').value||'').trim();
+    var orgSel=document.getElementById('ce-org');
+    var selectedOrgs=[].slice.call(orgSel&&orgSel.selectedOptions||[]).map(function(o){return o.value;}).filter(Boolean);
+    var org=selectedOrgs.join(', ')||orgSel.value||'';
     var start=document.getElementById('ce-start').value;
     var end=document.getElementById('ce-end').value||start;
     var type=document.getElementById('ce-type').value||'social';
@@ -1977,6 +2027,91 @@ const App = {
     }
   },
 
+  refreshCeOrgList(schoolId){
+    var sel=document.getElementById('ce-org');
+    if(!sel)return;
+    var dir=ORG_DIRECTORY[schoolId];
+    var allOrgs=[];
+    if(dir){
+      // Greek orgs by council
+      if(dir.panhellenic&&dir.panhellenic.length){
+        var g=document.createElement('optgroup');g.label='Sororities (PHC)';
+        dir.panhellenic.forEach(function(o){var op=document.createElement('option');op.value=o;op.textContent=o;g.appendChild(op);});
+        allOrgs.push(g);
+      }
+      if(dir.ifc&&dir.ifc.length){
+        var g2=document.createElement('optgroup');g2.label='Fraternities (IFC)';
+        dir.ifc.forEach(function(o){var op=document.createElement('option');op.value=o;op.textContent=o;g2.appendChild(op);});
+        allOrgs.push(g2);
+      }
+      if(dir.nphc&&dir.nphc.length){
+        var g3=document.createElement('optgroup');g3.label='HBCU / Divine Nine (NPHC)';
+        dir.nphc.forEach(function(o){var op=document.createElement('option');op.value=o;op.textContent=o;g3.appendChild(op);});
+        allOrgs.push(g3);
+      }
+      if(dir.mgc&&dir.mgc.length){
+        var g4=document.createElement('optgroup');g4.label='Multicultural (MGC)';
+        dir.mgc.forEach(function(o){var op=document.createElement('option');op.value=o;op.textContent=o;g4.appendChild(op);});
+        allOrgs.push(g4);
+      }
+      if(dir.professional&&dir.professional.length){
+        var g5=document.createElement('optgroup');g5.label='Professional';
+        dir.professional.forEach(function(o){var op=document.createElement('option');op.value=o;op.textContent=o;g5.appendChild(op);});
+        allOrgs.push(g5);
+      }
+      if(dir.campus&&dir.campus.length){
+        var g6=document.createElement('optgroup');g6.label='Campus Organizations';
+        dir.campus.forEach(function(o){var op=document.createElement('option');op.value=o;op.textContent=o;g6.appendChild(op);});
+        allOrgs.push(g6);
+      }
+    }
+    // Also add custom orgs for this school
+    (this.customOrgs||[]).filter(function(o){return o.school===schoolId;}).forEach(function(o){
+      var op=document.createElement('option');op.value=o.name;op.textContent=o.name+' (custom)';
+      sel.appendChild(op);
+    });
+    sel.innerHTML='';
+    if(!allOrgs.length){var def=document.createElement('option');def.value='';def.textContent='No orgs on file for this school';sel.appendChild(def);}
+    else{allOrgs.forEach(function(g){sel.appendChild(g);});}
+  },
+  // ── EVENT ADMIN ──────────────────────────────────────
+  
+  loadHiddenEvents(){
+    try{this.hiddenEvents=JSON.parse(localStorage.getItem('fp-hev')||'{}');}catch(e){this.hiddenEvents={};}
+  },
+  saveHiddenEvents(){
+    try{localStorage.setItem('fp-hev',JSON.stringify(this.hiddenEvents));}catch(e){}
+  },
+  toggleHideEvent(id){
+    if(this.hiddenEvents[id])delete this.hiddenEvents[id];
+    else this.hiddenEvents[id]=true;
+    this.saveHiddenEvents();
+    this.closeModal();this.render();
+  },
+  deleteEvent(id){
+    if(!confirm('Delete this event? This cannot be undone.'))return;
+    this.customEvents=this.customEvents.filter(function(e){return e.id!==id;});
+    try{localStorage.setItem('fp-ce',JSON.stringify(this.customEvents));}catch(e){}
+    this.closeModal();this.render();
+  },
+  renameEvent(id){
+    const ev=this.events.concat(this.customEvents||[]).find(function(e){return e.id===id;});
+    if(!ev)return;
+    var newName=prompt('Rename this event:',ev.title);
+    if(!newName||!newName.trim())return;
+    // Store rename in overrides-style object
+    if(!this.eventTitles)this.eventTitles={};
+    this.eventTitles[id]=newName.trim();
+    try{localStorage.setItem('fp-titles',JSON.stringify(this.eventTitles));}catch(e){}
+    this.openEv(id);this.render();
+  },
+  loadEventTitles(){
+    try{this.eventTitles=JSON.parse(localStorage.getItem('fp-titles')||'{}');}catch(e){this.eventTitles={};}
+  },
+  evTitle(ev){
+    return(this.eventTitles&&this.eventTitles[ev.id])||ev.title;
+  },
+
   // ── CUSTOM ORGANIZATIONS ─────────────────────────────
   loadCustomOrgs(){
     try{this.customOrgs=JSON.parse(localStorage.getItem('fp-custom-orgs')||'[]');}
@@ -2117,7 +2252,7 @@ const App = {
   renderSMList(){
     const el=document.getElementById('smList');
     if(!el)return;
-    const all=Object.keys(this.schools);
+    const all=Object.keys(this.schools).sort((a,b)=>this.schools[a].name.localeCompare(this.schools[b].name));
     const vis=this.visibleSchoolIds();
     el.innerHTML=all.map(id=>{
       const s=this.schools[id];
@@ -2371,7 +2506,7 @@ const App = {
   },
 
   async _webSearch(schoolName){
-    const prompt='Generate a Fall 2026 Greek life sales calendar for "'+schoolName+'" for a Fresh Prints apparel rep. Use your knowledge of this school\'s actual Greek chapters. Return ONLY raw JSON, no markdown, no explanation. Start with { end with }. Schema: {"school":{"id":"4charID","name":"Full Name","short":"ABBREV","location":"City, ST","color":"#hex"},"orgs":{"panhellenic":["Full Chapter Name",...],"ifc":["Full Chapter Name",...],"nphc":["Full Chapter Name",...],"mgc":[]},"events":[{"id":"s-slug","school":"same-id","orgName":"Org Name or council label","orgType":"ifc|panhellenic|nphc|campus","title":"Title","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","type":"recruitment|bidday|philanthropy|homecoming|parentsweekend|formal|newmember|greekweek|social|campus|intake","approx":true,"salesPotential":"high|medium|low","outreachDays":42,"notes":"Specific pitch advice naming target chapters"}]}. Include 12 events Aug-Dec 2026 and complete orgs lists with real chapter names. approx:false for confident dates. outreachDays: 56 bid day/homecoming, 42 formals/recruitment, 28 philanthropy.';
+    const prompt='Generate a Fall 2026 Greek life sales calendar for "'+schoolName+'" for a Fresh Prints apparel rep. Use your knowledge of this school\'s actual Greek chapters. Return ONLY raw JSON, no markdown, no explanation. Start with { end with }. Schema: {"school":{"id":"4charID","name":"Full Name","short":"ABBREV","location":"City, ST","color":"#hex"},"orgs":{"panhellenic":["Full Chapter Name",...],"ifc":["Full Chapter Name",...],"nphc":["Full Chapter Name",...],"mgc":[],"campus":["Club/Org Name",...]},"events":[{"id":"s-slug","school":"same-id","orgName":"Org Name or council label","orgType":"ifc|panhellenic|nphc|campus","title":"Title","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","type":"recruitment|bidday|philanthropy|homecoming|parentsweekend|formal|newmember|greekweek|social|campus|intake","approx":true,"salesPotential":"high|medium|low","outreachDays":42,"notes":"Specific pitch advice naming target chapters"}]}. Include 12 events Aug-Dec 2026. Populate orgs with real chapter names AND include notable campus clubs/organizations (student newspaper, professional clubs, cultural groups, etc.) in orgs.campus. approx:false for confident dates. outreachDays: 56 bid day/homecoming, 42 formals/recruitment, 28 philanthropy.';
     // Try Netlify proxy first (works when hosted on Netlify — API key added server-side)
     // Falls back to direct API when running inside Claude.ai artifact context
     const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:3500,
@@ -2586,8 +2721,10 @@ const App = {
           <input type="text" class="ce-input" id="ce-title" placeholder='e.g. "KKG Fall Formal" or "ZTA Bid Day"'>
         </div>
         <div class="ce-full">
-          <label class="ce-lbl">Organization</label>
-          <input type="text" class="ce-input" id="ce-org" placeholder='e.g. "Kappa Kappa Gamma"'>
+          <label class="ce-lbl">Organization(s) <span style="font-weight:400;font-size:10px;color:var(--muted)">(hold Ctrl/⌘ to pick multiple)</span></label>
+          <select class="ce-input ce-org-select" id="ce-org" multiple size="5">
+            <option value="">— Select a school first —</option>
+          </select>
         </div>
         <div>
           <label class="ce-lbl">Start Date</label>
