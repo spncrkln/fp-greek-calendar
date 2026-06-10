@@ -431,10 +431,13 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 .sm-reverify{font-family:'Outfit',sans-serif;font-size:10px;font-weight:800;padding:5px 8px;background:var(--tan);border:1.5px solid var(--border);border-radius:7px;cursor:pointer;color:var(--text);white-space:nowrap;}
 .sm-reverify:hover{border-color:var(--fp);color:var(--fp);}
 .sm-reverify:disabled{opacity:.6;cursor:default;}
+.sm-reverify.on-cm{background:var(--fp);color:#fff;border-color:var(--fp);}
 
 .ce-org-select{height:120px;padding:4px;font-size:12px;}
 .ce-org-select optgroup{font-weight:900;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
 .ce-org-select option{padding:5px 8px;font-size:13px;font-weight:600;}
+
+.pipe-cm-tag{font-size:10px;color:var(--muted);font-weight:700;margin-left:6px;}
 </style>
 </head>
 <body>
@@ -480,6 +483,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
     <span class="fl">Type</span>
     <select class="fsel" id="typeSel" onchange="App.setType(this.value)"></select>
   </div>
+  <button class="dl-offline-btn" id="hiddenToggleBtn" onclick="App.toggleShowHidden()" style="display:none" title="Show events hidden this year">👁 Hidden</button>
   <button class="dl-offline-btn" onclick="App.confirmDownload()" title="Download for offline use">⬇ Offline</button>
   <button class="add-ev-btn" onclick="App.openAddEv()">+ Add Event</button>
   <button class="dl-btn" onclick="App.dlAll()">📥 Export .ics</button>
@@ -902,7 +906,7 @@ const App = {
   year:2026, month:7, // 0-indexed: 7 = August
   activeId:null, showEdit:false, showRemind:false,
   schools:{}, events:[], hiddenSchools:[], aiSchools:{}, customEvents:[],
-  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{}, noteOverrides:{}, pipeOrgs:{}, cms:[], cmAssign:{}, customOrgs:[], confirmedDates:{}, aiDateHints:{},
+  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{}, noteOverrides:{}, pipeOrgs:{}, cms:[], cmAssign:{}, customOrgs:[], confirmedDates:{}, aiDateHints:{}, hiddenEvents:{}, eventTitles:{}, showHidden:false,
 
   // ── INIT ────────────────────────────────────────────
   init(){
@@ -989,7 +993,7 @@ const App = {
     }
 
     return this.events.filter(ev=>{
-      if(this.hiddenEvents&&this.hiddenEvents[ev.id])return false;
+      if(!this.showHidden&&this.hiddenEvents&&this.hiddenEvents[ev.id])return false;
       if(!visible.includes(ev.school))return false;
       if(this.school!=='all'&&ev.school!==this.school)return false;
       if(this.type==='__approx'){if(!App.isApprox(ev))return false;}
@@ -1113,6 +1117,7 @@ const App = {
     this.save();
     this.buildFilters();
     this.render();
+    var _htb=document.getElementById('hiddenToggleBtn');if(_htb){var _hc=Object.keys(this.hiddenEvents||{}).length;_htb.style.display=_hc>0?'':'none';_htb.textContent='👁 '+_hc+' Hidden';}
   },
 
   confirmDelete(id){
@@ -1322,6 +1327,7 @@ const App = {
   // ── PIPELINE VIEW ─────────────────────────────────────
   renderPipeline(){
     const allEvs=[...this.events,...(this.customEvents||[])];
+    const _activeCM=this._pipelineCMFilter||'all';
     const evMap={};allEvs.forEach(function(e){evMap[e.id]=e;});
     const statuses=[
       {k:'won',    label:'✅ Won',      color:'#059669'},
@@ -1350,7 +1356,12 @@ const App = {
     let html='';
     let anyFound=false;
     statuses.forEach(function(st){
-      var group=entries.filter(function(e){return e.status===st.k;});
+      var group=entries.filter(function(e){
+        if(e.status!==st.k)return false;
+        if(_activeCM==='all')return true;
+        var _eid=e.ev.id;
+        return App.cmAssign&&App.cmAssign[_eid]===_activeCM;
+      });
       if(!group.length)return;
       anyFound=true;
       html+='<div class="pipe-section"><div class="pipe-section-hdr"><span class="ord-dot" style="background:'+st.color+'"></span>'+st.label+' <span style="color:var(--muted);font-weight:500">('+group.length+')</span></div>';
@@ -1361,9 +1372,12 @@ const App = {
         var displayName=entry.orgLabel
           ? ev.title+' <span class="pipe-org-tag">'+entry.orgLabel+'</span>'
           : ev.orgName;
+        var _cmId=App.cmAssign&&App.cmAssign[ev.id];
+        var _cm=_cmId&&App.cms&&App.cms.find(function(c){return c.id===_cmId;});
+        var _cmTag=_cm?'<span class="pipe-cm-tag">👤 '+_cm.firstName+' '+_cm.lastName+'</span>':'';
         html+='<div class="pipe-card" data-eid="'+ev.id+'" data-rmkey="'+entry.key+'" data-rmevid="'+ev.id+'">'+
           '<div style="flex:1;min-width:0">'+
-          '<div class="pipe-org">'+displayName+'</div>'+
+          '<div class="pipe-org">'+displayName+(_cmTag?'':'')+_cmTag+'</div>'+
           '<div class="pipe-event">'+ev.title+' &mdash; '+App.fmt(App.evDate(ev))+'</div>'+
           '</div>'+
           (sc?'<div class="pipe-school" style="background:'+sc.color+'">'+sc.short+'</div>':'')+
@@ -1749,7 +1763,7 @@ const App = {
   openAddEv(){
     var ss=document.getElementById('ce-school');
     if(ss){
-      ss.innerHTML=this.visibleSchoolIds().map(function(id){return '<option value="'+id+'">'+App.schools[id].name+'</option>';}).join('');
+      ss.innerHTML=this.visibleSchoolIds().slice().sort(function(a,b){return App.schools[a].name.localeCompare(App.schools[b].name);}).map(function(id){return '<option value="'+id+'">'+App.schools[id].name+'</option>';}).join('');
       ss.onchange=function(){App.refreshCeOrgList(this.value);};
       // Pre-populate orgs for first school
       if(ss.value)App.refreshCeOrgList(ss.value);
@@ -2074,6 +2088,12 @@ const App = {
     if(!allOrgs.length){var def=document.createElement('option');def.value='';def.textContent='No orgs on file for this school';sel.appendChild(def);}
     else{allOrgs.forEach(function(g){sel.appendChild(g);});}
   },
+  toggleShowHidden(){
+    this.showHidden=!this.showHidden;
+    var btn=document.getElementById('hiddenToggleBtn');
+    if(btn){btn.style.background=this.showHidden?'var(--fp)':'';btn.style.color=this.showHidden?'#fff':'';}
+    this.render();
+  },
   // ── EVENT ADMIN ──────────────────────────────────────
   
   loadHiddenEvents(){
@@ -2086,13 +2106,13 @@ const App = {
     if(this.hiddenEvents[id])delete this.hiddenEvents[id];
     else this.hiddenEvents[id]=true;
     this.saveHiddenEvents();
-    this.closeModal();this.render();
+    this.closeEv();this.render();
   },
   deleteEvent(id){
     if(!confirm('Delete this event? This cannot be undone.'))return;
     this.customEvents=this.customEvents.filter(function(e){return e.id!==id;});
     try{localStorage.setItem('fp-ce',JSON.stringify(this.customEvents));}catch(e){}
-    this.closeModal();this.render();
+    this.closeEv();this.render();
   },
   renameEvent(id){
     const ev=this.events.concat(this.customEvents||[]).find(function(e){return e.id===id;});
@@ -2112,6 +2132,57 @@ const App = {
     return(this.eventTitles&&this.eventTitles[ev.id])||ev.title;
   },
 
+  async populateCampusOrgs(schoolId){
+    const s=this.schools[schoolId];
+    if(!s)return;
+    const btn=document.getElementById('oc-'+schoolId);
+    if(btn){btn.disabled=true;btn.textContent='⏳...';}
+    const prompt='List the Greek organizations AND notable campus clubs and student organizations at '+s.name+' ('+s.location+'). '+
+      'Include student government, cultural orgs, professional clubs (business, engineering, nursing, etc.), media (newspaper, radio), service clubs, and any other prominent student orgs. '+
+      'Return ONLY raw JSON, no markdown. Schema: {"orgs":{"panhellenic":["Full Name"...],"ifc":["Full Name"...],"nphc":["Full Name"...],"mgc":[],"professional":[],"campus":["Club Name",...]}}. '+
+      'Use full official chapter/organization names. Include 10-20 campus orgs minimum.';
+    try{
+      const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,
+        messages:[{role:'user',content:prompt}]});
+      let res;
+      try{
+        res=await fetch('/.netlify/functions/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:reqBody});
+        if(!res.ok)throw new Error('proxy');
+      }catch(_){
+        res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:reqBody});
+      }
+      const d=await res.json();
+      const raw=d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+      let clean=raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+      const si=clean.indexOf('{');const ei=clean.lastIndexOf('}');
+      if(si>=0&&ei>si)clean=clean.slice(si,ei+1);
+      const parsed=JSON.parse(clean);
+      if(parsed.orgs){
+        const dir=ORG_DIRECTORY[schoolId]||{panhellenic:[],ifc:[],nphc:[],mgc:[],professional:[],campus:[]};
+        ['panhellenic','ifc','nphc','mgc','professional','campus'].forEach(function(type){
+          if(Array.isArray(parsed.orgs[type])&&parsed.orgs[type].length){
+            // Merge — add new orgs without removing existing
+            var existing=dir[type]||[];
+            parsed.orgs[type].forEach(function(o){
+              if(o&&o.trim()&&!existing.includes(o))existing.push(o);
+            });
+            dir[type]=existing;
+          }
+        });
+        ORG_DIRECTORY[schoolId]=dir;
+        // Persist for AI-added schools
+        if(this.aiSchools&&this.aiSchools[schoolId]){
+          this.aiSchools[schoolId].orgs=parsed.orgs;
+          this.save();
+        }
+        this.buildFilters();
+        if(btn){btn.textContent='✓ Done';btn.disabled=false;}
+      }
+    }catch(err){
+      console.warn('Populate orgs failed:',err.message);
+      if(btn){btn.textContent='⚠ Failed';btn.disabled=false;}
+    }
+  },
   // ── CUSTOM ORGANIZATIONS ─────────────────────────────
   loadCustomOrgs(){
     try{this.customOrgs=JSON.parse(localStorage.getItem('fp-custom-orgs')||'[]');}
@@ -2268,7 +2339,8 @@ const App = {
           </div>
         </label>
         <div class="sm-actions">
-          ${approxCount>0?`<button class="sm-reverify" id="rv-${id}" onclick="App.reverifyDates('${id}')" title="${approxCount} approximate dates">🔄 Re-verify</button>`:''}
+          ${approxCount>0?`<button class="sm-reverify" id="rv-${id}" onclick="App.reverifyDates('${id}')" title="${approxCount} approximate dates">🔄 Dates</button>`:''}
+          <button class="sm-reverify" id="oc-${id}" onclick="App.populateCampusOrgs('${id}')" title="Pull campus clubs for this school">🏫 Orgs</button>
           ${isAI?`<button class="sm-del" onclick="App.confirmDelete('${id}')">🗑</button>`:''}
         </div>
       </div>`;
