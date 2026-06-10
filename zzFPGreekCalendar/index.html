@@ -420,6 +420,12 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 
 .pipe-rm{background:transparent;border:none;color:var(--muted);font-size:13px;font-weight:900;cursor:pointer;padding:4px 6px;border-radius:6px;flex-shrink:0;line-height:1;}
 .pipe-rm:hover{background:#fee2e2;color:#ef4444;}
+
+/* ─── DATE CONFIRMATION ─── */
+.m-confirm-row{padding:10px 0 4px;display:flex;flex-direction:column;gap:8px;}
+.m-confirm-hint{font-size:11px;color:var(--muted);line-height:1.5;}
+.m-confirm-btn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:900;padding:9px 14px;background:#059669;color:#fff;border:none;border-radius:8px;cursor:pointer;align-self:flex-start;}
+.m-confirm-unset{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;padding:4px 8px;background:transparent;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted);align-self:flex-start;}
 </style>
 </head>
 <body>
@@ -488,6 +494,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
       <div class="m-info-grid" id="mInfoGrid"></div>
       <div class="m-notes-box" id="mNotes" contenteditable="true" onblur="App.saveNote(this)" spellcheck="false"></div>
       <div class="m-notes-hint">✏️ Click to edit notes</div>
+      <div id="mConfirmZone"></div>
       <div class="m-sec" style="margin-top:14px">Campus Manager</div>
       <div class="m-cm-row">
         <select class="m-cm-sel" id="mCMSel" onchange="App.assignCM(App.activeId,this.value)">
@@ -885,7 +892,7 @@ const App = {
   year:2026, month:7, // 0-indexed: 7 = August
   activeId:null, showEdit:false, showRemind:false,
   schools:{}, events:[], hiddenSchools:[], aiSchools:{}, customEvents:[],
-  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{}, noteOverrides:{}, pipeOrgs:{}, cms:[], cmAssign:{}, customOrgs:[],
+  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{}, noteOverrides:{}, pipeOrgs:{}, cms:[], cmAssign:{}, customOrgs:[], confirmedDates:{},
 
   // ── INIT ────────────────────────────────────────────
   init(){
@@ -898,6 +905,7 @@ const App = {
     this.loadPipeOrgs();
     this.loadCMs();
     this.loadCustomOrgs();
+    this.loadConfirmedDates();
     this.loadCustomEvents();
     try{this.reminders=JSON.parse(localStorage.getItem('fp-rm')||'{}');}catch(e){}
     try{this.hiddenSchools=JSON.parse(localStorage.getItem('fp-hidden')||'[]');}catch(e){}
@@ -970,7 +978,8 @@ const App = {
     return this.events.filter(ev=>{
       if(!visible.includes(ev.school))return false;
       if(this.school!=='all'&&ev.school!==this.school)return false;
-      if(this.type!=='all'&&ev.type!==this.type)return false;
+      if(this.type==='__approx'){if(!App.isApprox(ev))return false;}
+      else if(this.type!=='all'&&ev.type!==this.type)return false;
       if(selOrg==='all')return true;
       if(ev.orgName===selOrg)return true;
 
@@ -1081,6 +1090,7 @@ const App = {
     // Type select
     const tsel=document.getElementById('typeSel');
     tsel.innerHTML=`<option value="all"${this.type==='all'?' selected':''}>All Types</option>`+
+      `<option value="__approx"${this.type==='__approx'?' selected':''}>~ Needs Verification</option>`+
       Object.entries(ETYPES).map(([k,v])=>`<option value="${k}"${k===this.type?' selected':''}>${v.label}</option>`).join('');
   },
 
@@ -1475,6 +1485,29 @@ const App = {
       `<div class="sb" style="background:${s.color}">${s.short}</div>
        <span class="badge" style="background:${t.bg};color:${t.color}">${t.label}</span>
        ${this.isOverridden(id)?'<span class="badge b-override">✏️ Overridden</span>':ev.approx?'<span class="badge b-approx">~ Approximate</span>':'<span class="badge b-confirmed">✓ Confirmed</span>'}`;
+    // Confirm zone — show for approximate events
+    const _confEl=document.getElementById('mConfirmZone');
+    if(_confEl){
+      _confEl.innerHTML='';
+      if(ev.approx&&!this.confirmedDates[ev.id]){
+        var _cr=document.createElement('div');_cr.className='m-confirm-row';
+        var _ch=document.createElement('span');_ch.className='m-confirm-hint';
+        _ch.textContent='Date is approximate. Verify on the school FSL calendar, then confirm below.';
+        var _cb=document.createElement('button');_cb.className='m-confirm-btn';
+        _cb.textContent='Confirm Date is Correct';
+        _cb.setAttribute('data-eid',ev.id);
+        _cb.onclick=function(){App.confirmEventDate(this.getAttribute('data-eid'));};
+        _cr.appendChild(_ch);_cr.appendChild(_cb);_confEl.appendChild(_cr);
+      } else if(ev.approx&&this.confirmedDates[ev.id]){
+        var _cr2=document.createElement('div');_cr2.className='m-confirm-row';
+        var _ch2=document.createElement('span');_ch2.className='m-confirm-hint';
+        _ch2.style.color='#059669';_ch2.textContent='You confirmed this date.';
+        var _cu=document.createElement('button');_cu.className='m-confirm-unset';
+        _cu.textContent='Undo';_cu.setAttribute('data-eid',ev.id);
+        _cu.onclick=function(){App.unconfirmDate(this.getAttribute('data-eid'));};
+        _cr2.appendChild(_ch2);_cr2.appendChild(_cu);_confEl.appendChild(_cr2);
+      }
+    }
     document.getElementById('mTitle').textContent=ev.title;
     const endStr=ev.endDate&&this.evEnd(ev)!==this.evDate(ev)?` → ${this.fmt(this.evEnd(ev))}`:'';
     // Build chapter list for council-level events
@@ -1851,6 +1884,25 @@ const App = {
         this.populateCMDropdown(this.activeId,school);
       }
     }
+  },
+
+  loadConfirmedDates(){
+    try{this.confirmedDates=JSON.parse(localStorage.getItem('fp-confirmed')||'{}');}
+    catch(e){this.confirmedDates={};}
+  },
+  saveConfirmedDates(){
+    try{localStorage.setItem('fp-confirmed',JSON.stringify(this.confirmedDates));}catch(e){}
+  },
+  confirmEventDate(id){
+    this.confirmedDates[id]=true;
+    this.saveConfirmedDates();
+    // Re-render modal to reflect change
+    this.openEv(id);
+    this.render();
+  },
+  isApprox(ev){
+    // Returns true if date is unconfirmed
+    return (ev.approx||false)&&!this.confirmedDates[ev.id];
   },
 
   // ── CUSTOM ORGANIZATIONS ─────────────────────────────
