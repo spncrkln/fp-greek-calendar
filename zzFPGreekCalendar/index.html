@@ -438,6 +438,10 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 .ce-org-select option{padding:5px 8px;font-size:13px;font-weight:600;}
 
 .pipe-cm-tag{font-size:10px;color:var(--muted);font-weight:700;margin-left:6px;}
+
+/* ─── HIDDEN EVENTS ─── */
+.ecard-hidden{opacity:.45;border-style:dashed !important;position:relative;}
+.ecard-hidden::after{content:'Hidden';position:absolute;top:6px;right:8px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:var(--tan);padding:2px 5px;border-radius:4px;}
 </style>
 </head>
 <body>
@@ -1073,44 +1077,57 @@ const App = {
         `<option value="__add__">➕ Add New School...</option>`+
         `<option value="__manage__">⚙️ Manage Schools...</option>`;
     }
-    // Org select — when a specific school is selected, show only that school's orgs
+    // Org select — grouped by council type with optgroups
     const visible=this.visibleSchoolIds();
-    // Council-level labels used in event orgName — exclude from individual org list
     const councilLabels=new Set(['All Greek Life','All Non-Greek Life','Campus-Wide',
       'All IFC Fraternities','All Panhellenic Sororities','All PHC Sororities',
       'All CPC Sororities','All NPHC Organizations','IGC / NPHC Organizations',
       'All MGC Organizations','Campus-Wide']);
-    const topOpts=['All Greek Life','All Non-Greek Life','Campus-Wide'];
-    const orgSet=new Set(['all']);
-    topOpts.forEach(o=>orgSet.add(o));
     const schoolsToScan=this.school!=='all'?[this.school]:visible;
-    // Add individual orgs from ORG_DIRECTORY for scanned schools only
+    // Collect orgs by type across scanned schools
+    const byType={panhellenic:new Set(),ifc:new Set(),nphc:new Set(),mgc:new Set(),professional:new Set(),campus:new Set()};
     schoolsToScan.forEach(sid=>{
       const dir=ORG_DIRECTORY[sid];
       if(!dir)return;
-      Object.values(dir).flat().forEach(org=>{if(org&&org.trim())orgSet.add(org);});
+      Object.entries(byType).forEach(([type,set])=>{
+        (dir[type]||[]).forEach(o=>{if(o&&o.trim())set.add(o);});
+      });
     });
-    // Add individual orgNames from events at scanned schools
-    // exclude council-level labels and anything starting with 'All '
+    // Also scan event orgNames (exclude council labels + 'All ' prefix)
     const allEventsToScan=[...this.events,...(this.customEvents||[])];
     allEventsToScan.filter(e=>schoolsToScan.includes(e.school)).forEach(e=>{
-      if(e.orgName&&!councilLabels.has(e.orgName)&&!e.orgName.startsWith('All '))
-        orgSet.add(e.orgName);
+      if(e.orgName&&!councilLabels.has(e.orgName)&&!e.orgName.startsWith('All ')&&e.orgType&&byType[e.orgType]){
+        byType[e.orgType].add(e.orgName);
+      }
     });
-    // If the currently selected org isn't available for the selected school, reset it
-    if(this.org!=='all'&&!orgSet.has(this.org)){
-      this.org='all';
-    }
-    const orgs=Array.from(orgSet).sort((a,b)=>{
-      if(a==='all')return -1; if(b==='all')return 1;
-      const at=topOpts.includes(a),bt=topOpts.includes(b);
-      if(at&&!bt)return -1; if(!at&&bt)return 1;
-      return a.localeCompare(b);
-    });
-    this.buildCMFilter();
+    // Reset org if not valid for this school
+    const allOrgNames=new Set(['all','All Greek Life','All Non-Greek Life','Campus-Wide']);
+    Object.values(byType).forEach(s=>s.forEach(o=>allOrgNames.add(o)));
+    if(this.org!=='all'&&!allOrgNames.has(this.org))this.org='all';
+    // Build optgroup HTML
     const osel=document.getElementById('orgSel');
     if(!osel)return;
-    osel.innerHTML=orgs.map(o=>`<option value="${o}"${o===this.org?' selected':''}>${o==='all'?'All Organizations':o}</option>`).join('');
+    const sorted=o=>Array.from(o).sort((a,b)=>a.localeCompare(b));
+    const makeOpts=(arr,cur)=>arr.map(o=>`<option value="${o}"${o===cur?' selected':''}>${o}</option>`).join('');
+    const makeGroup=(label,orgs,cur)=>orgs.length?`<optgroup label="${label}">${makeOpts(orgs,cur)}</optgroup>`:'';
+    const hasGreek=byType.panhellenic.size||byType.ifc.size||byType.nphc.size||byType.mgc.size;
+    const hasNonGreek=byType.campus.size||byType.professional.size;
+    osel.innerHTML=
+      `<option value="all"${this.org==='all'?' selected':''}>All Organizations</option>`+
+      `<optgroup label="── Quick Filters ──">`+
+      `<option value="All Greek Life"${'All Greek Life'===this.org?' selected':''}>All Greek Life</option>`+
+      `<option value="All Non-Greek Life"${'All Non-Greek Life'===this.org?' selected':''}>All Non-Greek Life</option>`+
+      `<option value="Campus-Wide"${'Campus-Wide'===this.org?' selected':''}>Campus-Wide</option>`+
+      `</optgroup>`+
+      (hasGreek?`<optgroup label="── Greek Organizations ──"></optgroup>`+
+        makeGroup('🎀 Sororities (PHC)',sorted(byType.panhellenic),this.org)+
+        makeGroup('🏛 Fraternities (IFC)',sorted(byType.ifc),this.org)+
+        makeGroup('✊ HBCU / Divine Nine (NPHC)',sorted(byType.nphc),this.org)+
+        makeGroup('🌐 Multicultural (MGC)',sorted(byType.mgc),this.org):'')+
+      (hasNonGreek?`<optgroup label="── Non-Greek Organizations ──"></optgroup>`+
+        makeGroup('💼 Professional',sorted(byType.professional),this.org)+
+        makeGroup('🎯 Campus & Clubs',sorted(byType.campus),this.org):'');
+
     // Type select
     const tsel=document.getElementById('typeSel');
     const _sortedTypes=Object.entries(ETYPES).sort(([,a],[,b])=>a.label.localeCompare(b.label));
@@ -1284,7 +1301,8 @@ const App = {
     const rb=rem?`<span class="badge b-remind">🔔 ${rem}d</span>`:'';
     const ob=this.ordBadge(ev.id);
     const dTxt=days<0?'Past':days===0?'Today!':days>365?`${Math.round(days/30)}mo`:`${days}d`;
-    return`<div class="ecard" style="border-left-color:${t.color}" onclick="App.openEv('${ev.id}')">
+    const _isHid=App.showHidden&&App.hiddenEvents&&App.hiddenEvents[ev.id];
+    return`<div class="ecard${_isHid?' ecard-hidden':''}" style="border-left-color:${t.color}" onclick="App.openEv('${ev.id}')">
       <div class="ecard-dt">
         ${isMulti?`<div class="ecard-range-s">${MONTHS_S[sd.getMonth()]} ${sd.getDate()}</div><div class="ecard-range-sep">—</div><div class="ecard-range-e">${MONTHS_S[ed.getMonth()]} ${ed.getDate()}</div>`:`<div class="ecard-mo">${MONTHS_S[sd.getMonth()]}</div><div class="ecard-d">${sd.getDate()}</div>`}
       </div>
@@ -1339,7 +1357,10 @@ const App = {
 
   // ── PIPELINE VIEW ─────────────────────────────────────
   renderPipeline(){
-    const allEvs=[...this.events,...(this.customEvents||[])];
+    const _cmF=this._cmFilter||'all';
+    const allEvs=[...this.events,...(this.customEvents||[])].filter(function(ev){
+      return _cmF==='all'||(App.cmAssign&&App.cmAssign[ev.id]===_cmF);
+    });
     const evMap={};allEvs.forEach(function(e){evMap[e.id]=e;});
     const statuses=[
       {k:'won',    label:'✅ Won',      color:'#059669'},
@@ -1368,12 +1389,7 @@ const App = {
     let html='';
     let anyFound=false;
     statuses.forEach(function(st){
-      var group=entries.filter(function(e){
-        if(e.status!==st.k)return false;
-        if(_activeCM==='all')return true;
-        var _eid=e.ev.id;
-        return App.cmAssign&&App.cmAssign[_eid]===_activeCM;
-      });
+      var group=entries.filter(function(e){return e.status===st.k;});
       if(!group.length)return;
       anyFound=true;
       html+='<div class="pipe-section"><div class="pipe-section-hdr"><span class="ord-dot" style="background:'+st.color+'"></span>'+st.label+' <span style="color:var(--muted);font-weight:500">('+group.length+')</span></div>';
