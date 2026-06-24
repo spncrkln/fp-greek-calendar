@@ -461,6 +461,38 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 .ct-org-contact a{color:var(--fp);text-decoration:none;}
 .ct-save-bar{padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;}
 .ct-save-btn{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:900;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:10px;cursor:pointer;}
+
+/* ─── ORGS VIEW ─── */
+.ov-hdr{padding:14px 16px 10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--border);}
+.ov-search{flex:1;min-width:140px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;color:var(--text);}
+.ov-search:focus{outline:none;border-color:var(--fp);}
+.ov-filter-row{padding:10px 16px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+.ov-ftag{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;padding:5px 10px;border:1.5px solid var(--border);border-radius:20px;cursor:pointer;background:transparent;color:var(--muted);white-space:nowrap;}
+.ov-ftag.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+.ov-grid{padding:12px 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+.ov-card{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:var(--sh);border-left:3px solid transparent;}
+.ov-card.has-contact{border-left-color:var(--fp);}
+.ov-card-name{font-size:14px;font-weight:900;color:var(--text);margin-bottom:4px;line-height:1.3;}
+.ov-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+.ov-type-badge{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border-radius:4px;background:var(--tan);color:var(--muted);}
+.ov-school-badge{font-size:9px;font-weight:900;padding:2px 7px;border-radius:4px;color:#fff;}
+.ov-field{font-size:12px;color:var(--text);margin-bottom:3px;line-height:1.5;display:flex;align-items:flex-start;gap:5px;}
+.ov-field-icon{font-size:11px;flex-shrink:0;margin-top:1px;width:14px;}
+.ov-field a{color:var(--fp);text-decoration:none;font-weight:600;}
+.ov-field a:hover{text-decoration:underline;}
+.ov-social{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+.ov-social a{font-size:11px;font-weight:800;padding:3px 8px;border-radius:5px;text-decoration:none;color:#fff;}
+.ov-social .ig{background:#E1306C;}
+.ov-social .tw{background:#1DA1F2;}
+.ov-social .fb{background:#1877F2;}
+.ov-social .tk{background:#000;}
+.ov-officers{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.ov-officers-title{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px;}
+.ov-officer-row{font-size:11px;color:var(--text);margin-bottom:2px;}
+.ov-officer-pos{font-weight:800;}
+.ov-no-info{text-align:center;padding:20px 16px;color:var(--muted);font-size:12px;}
+.ov-empty{text-align:center;padding:48px 24px;color:var(--muted);}
+.ov-count{font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -488,6 +520,7 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
       <button class="vtab" onclick="App.setView('list')">📋 Events</button>
       <button class="vtab" onclick="App.setView('outreach')">🎯 Outreach</button>
       <button class="vtab" onclick="App.setView('pipeline')">📊 Pipeline</button>
+      <button class="vtab" onclick="App.setView('orgs')">🏛 Orgs</button>
     </div>
   </div>
   <div class="fdiv"></div>
@@ -1193,7 +1226,7 @@ const App = {
     this.view=v;
     if(v==='week'){this.weekStart=null;this.initWeekStart();} // sync week to current month
     document.querySelectorAll('.vtab').forEach((t,i)=>{
-      t.classList.toggle('on',['calendar','week','list','outreach','pipeline'][i]===v);
+      t.classList.toggle('on',['calendar','week','list','outreach','pipeline','orgs'][i]===v);
     });
     if(!skipRender)this.render();
     else this.render();
@@ -1214,6 +1247,7 @@ const App = {
     else if(this.view==='week')this.renderWeekly();
     else if(this.view==='list')this.renderList();
     else if(this.view==='pipeline')this.renderPipeline();
+    else if(this.view==='orgs')this.renderOrgs();
     else this.renderOutreach();
   },
 
@@ -1376,6 +1410,150 @@ const App = {
       return`<div class="ov-sec"><div class="ov-hdr"><span class="ov-lbl">${g.l}</span><span class="ov-sub">${g.sub} · ${ge.length}</span></div>${ge.map(ev=>this.ecard(ev)).join('')}</div>`;
     }).join('');
     document.getElementById('content').innerHTML='<div class="fu">'+pipeHtml+(html||this.empty('No upcoming events.','Adjust your filters or add more schools.'))+'</div>';
+  },
+
+  // ── ORGS VIEW ─────────────────────────────────────────
+  _ovFilter:'all',   // active type filter
+  _ovSearch:'',      // search string
+
+  renderOrgs(){
+    const schoolsToShow=this.school!=='all'?[this.school]:this.visibleSchoolIds();
+    const typeDefs=[
+      {key:'all',      label:'All Orgs'},
+      {key:'panhellenic',label:'🎀 PHC'},
+      {key:'ifc',      label:'🏛 IFC'},
+      {key:'nphc',     label:'✊ NPHC'},
+      {key:'mgc',      label:'🌐 MGC'},
+      {key:'professional',label:'💼 Professional'},
+      {key:'campus',   label:'🎯 Campus & Clubs'},
+    ];
+    const typeLabels={panhellenic:'PHC',ifc:'IFC',nphc:'NPHC',mgc:'MGC',professional:'Prof',campus:'Campus'};
+
+    // Collect all orgs with metadata
+    var allOrgs=[];
+    schoolsToShow.forEach(function(sid){
+      var dir=ORG_DIRECTORY[sid];
+      var sc=App.schools[sid];
+      if(!dir||!sc)return;
+      var types=['panhellenic','ifc','nphc','mgc','professional','campus'];
+      types.forEach(function(type){
+        (dir[type]||[]).forEach(function(name){
+          if(!name)return;
+          var contact=App.getContact(sid,name);
+          allOrgs.push({name:name,type:type,school:sid,sc:sc,contact:contact});
+        });
+      });
+    });
+
+    // Apply type filter
+    if(this._ovFilter!=='all'){
+      allOrgs=allOrgs.filter(function(o){return o.type===App._ovFilter;});
+    }
+
+    // Apply search filter
+    var q=(this._ovSearch||'').toLowerCase().trim();
+    if(q){
+      allOrgs=allOrgs.filter(function(o){
+        return o.name.toLowerCase().includes(q)||
+          (o.contact&&o.contact.email&&o.contact.email.toLowerCase().includes(q));
+      });
+    }
+
+    // Sort: has contact info first, then alpha
+    allOrgs.sort(function(a,b){
+      var aHas=!!(a.contact&&(a.contact.email||a.contact.instagram||(a.contact.officers&&a.contact.officers.length)));
+      var bHas=!!(b.contact&&(b.contact.email||b.contact.instagram||(b.contact.officers&&b.contact.officers.length)));
+      if(aHas!==bHas)return aHas?-1:1;
+      return a.name.localeCompare(b.name);
+    });
+
+    var withInfo=allOrgs.filter(function(o){
+      var c=o.contact;
+      return c&&(c.email||c.phone||c.website||c.instagram||c.twitter||c.facebook||(c.officers&&c.officers.length));
+    }).length;
+
+    // ── Build HTML ──
+    var filterBtns=typeDefs.map(function(t){
+      return'<button class="ov-ftag'+(App._ovFilter===t.key?' on':'')+
+        '" onclick="App._ovFilter=\''+t.key+'\';App.renderOrgs()">'+t.label+'</button>';
+    }).join('');
+
+    var cards=allOrgs.length?allOrgs.map(function(o){
+      return App._ovCard(o,typeLabels,schoolsToShow.length>1);
+    }).join(''):'<div class="ov-empty">'+
+      '<div style="font-size:32px;margin-bottom:12px">🏛</div>'+
+      '<strong>No organizations found</strong>'+
+      '<p style="margin-top:8px;font-size:13px">'+
+        (Object.keys(App.contacts||{}).length===0
+          ? 'Run the 📇 Contacts search in Manage Schools to populate org data.'
+          : 'Try adjusting your search or type filter.')+
+      '</p></div>';
+
+    document.getElementById('content').innerHTML=
+      '<div class="fu" style="padding:0">'+
+      '<div class="ov-hdr">'+
+        '<input class="ov-search" placeholder="Search orgs..." value="'+
+          (this._ovSearch||'').replace(/"/g,'&quot;')+
+          '" onkeyup="App._ovSearch=this.value;App.renderOrgs()">'+
+        '<span class="ov-count">'+allOrgs.length+' orgs &nbsp;·&nbsp; '+withInfo+' with leads</span>'+
+      '</div>'+
+      '<div class="ov-filter-row">'+filterBtns+'</div>'+
+      '<div class="ov-grid">'+cards+'</div>'+
+      '</div>';
+  },
+
+  _ovCard(o, typeLabels, showSchool){
+    var c=o.contact||{};
+    var hasAny=c.email||c.phone||c.website||c.instagram||c.twitter||c.facebook||(c.officers&&c.officers.length);
+    var html='<div class="ov-card'+(hasAny?' has-contact':'')+'">'+
+      '<div class="ov-card-name">'+o.name+'</div>'+
+      '<div class="ov-badges">'+
+        (typeLabels[o.type]?'<span class="ov-type-badge">'+typeLabels[o.type]+'</span>':'')+
+        (showSchool&&o.sc?'<span class="ov-school-badge" style="background:'+o.sc.color+'">'+o.sc.short+'</span>':'')+
+      '</div>';
+    if(c.email)html+='<div class="ov-field"><span class="ov-field-icon">✉️</span>'+
+      '<a href="mailto:'+c.email+'">'+c.email+'</a></div>';
+    if(c.phone)html+='<div class="ov-field"><span class="ov-field-icon">📞</span>'+c.phone+'</div>';
+    if(c.website)html+='<div class="ov-field"><span class="ov-field-icon">🌐</span>'+
+      '<a href="'+c.website+'" target="_blank">'+c.website.replace(/^https?:\/\//,'')+'</a></div>';
+
+    // Social links
+    var socials='';
+    if(c.instagram)socials+='<a class="ig" href="https://instagram.com/'+c.instagram+'" target="_blank">IG @'+c.instagram+'</a>';
+    if(c.twitter)socials+='<a class="tw" href="https://twitter.com/'+c.twitter+'" target="_blank">𝕏 @'+c.twitter+'</a>';
+    if(c.facebook)socials+='<a class="fb" href="'+c.facebook+'" target="_blank">Facebook</a>';
+    if(c.tiktok)socials+='<a class="tk" href="'+c.tiktok+'" target="_blank">TikTok</a>';
+    if(socials)html+='<div class="ov-social">'+socials+'</div>';
+
+    // Officers
+    if(c.officers&&c.officers.length){
+      html+='<div class="ov-officers"><div class="ov-officers-title">Officers</div>';
+      c.officers.forEach(function(p){
+        html+='<div class="ov-officer-row"><span class="ov-officer-pos">'+p.position+'</span>: '+p.name;
+        if(p.email)html+=' &mdash; <a href="mailto:'+p.email+'">'+p.email+'</a>';
+        html+='</div>';
+      });
+      html+='</div>';
+    }
+
+    // Advisor
+    if(c.advisor&&c.advisor.name){
+      html+='<div class="ov-field" style="margin-top:6px;color:var(--muted)">'+
+        '<span class="ov-field-icon">👤</span>'+
+        'Advisor: '+c.advisor.name+
+        (c.advisor.email?' &mdash; <a href="mailto:'+c.advisor.email+'">'+c.advisor.email+'</a>':'')+
+      '</div>';
+    }
+
+    // Fallback: no info at all
+    if(!hasAny){
+      html+='<div class="ov-no-info">';
+      if(c.profileUrl)html+='<a href="'+c.profileUrl+'" target="_blank" style="color:var(--muted)">View on CampusLabs ↗</a>';
+      else html+='No contact info on file yet.';
+      html+='</div>';
+    }
+    html+='</div>';
+    return html;
   },
 
   // ── PIPELINE VIEW ─────────────────────────────────────
