@@ -442,6 +442,25 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 /* ─── HIDDEN EVENTS ─── */
 .ecard-hidden{opacity:.45;border-style:dashed !important;position:relative;}
 .ecard-hidden::after{content:'Hidden';position:absolute;top:6px;right:8px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:var(--tan);padding:2px 5px;border-radius:4px;}
+
+/* ─── CONTACTS MODAL ─── */
+.ct-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9800;display:flex;align-items:flex-end;justify-content:center;}
+.ct-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:560px;display:flex;flex-direction:column;max-height:90vh;}
+.ct-hdr{background:var(--navy);padding:16px 20px;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.ct-hdr-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;}
+.ct-url-row{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+.ct-url-input{flex:1;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;color:var(--text);}
+.ct-url-input:focus{outline:none;border-color:var(--fp);}
+.ct-search-btn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:900;padding:9px 14px;background:var(--fp);color:#fff;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.ct-status{padding:8px 16px;font-size:11px;color:var(--muted);font-weight:600;flex-shrink:0;}
+.ct-list{overflow-y:auto;flex:1;padding:0 0 8px;}
+.ct-org-row{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:2px;}
+.ct-org-name{font-size:13px;font-weight:800;color:var(--text);}
+.ct-org-cat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);}
+.ct-org-contact{font-size:12px;color:var(--fp);font-weight:600;}
+.ct-org-contact a{color:var(--fp);text-decoration:none;}
+.ct-save-bar{padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;}
+.ct-save-btn{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:900;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:10px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -915,7 +934,7 @@ const App = {
   year:2026, month:7, // 0-indexed: 7 = August
   activeId:null, showEdit:false, showRemind:false,
   schools:{}, events:[], hiddenSchools:[], aiSchools:{}, customEvents:[],
-  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{}, noteOverrides:{}, pipeOrgs:{}, cms:[], cmAssign:{}, customOrgs:[], confirmedDates:{}, aiDateHints:{}, hiddenEvents:{}, eventTitles:{}, showHidden:false,
+  overrides:{}, reminders:{}, salesOverrides:{}, orderStatus:{}, noteOverrides:{}, pipeOrgs:{}, cms:[], cmAssign:{}, customOrgs:[], contacts:{}, confirmedDates:{}, aiDateHints:{}, hiddenEvents:{}, eventTitles:{}, showHidden:false,
 
   // ── INIT ────────────────────────────────────────────
   init(){
@@ -933,6 +952,7 @@ const App = {
     this.loadHiddenEvents();
     this.loadEventTitles();
     this.loadOrgExtra();
+    this.loadContacts();
     this.loadCustomEvents();
     try{this.reminders=JSON.parse(localStorage.getItem('fp-rm')||'{}');}catch(e){}
     try{this.hiddenSchools=JSON.parse(localStorage.getItem('fp-hidden')||'[]');}catch(e){}
@@ -1468,8 +1488,10 @@ const App = {
       var cb=document.createElement('input');
       cb.type='checkbox';cb.value=org;cb.name='op-org';
       if(selected.has(org))cb.checked=true;
-      var lbl=document.createElement('span');
-      lbl.className='op-org-label';lbl.textContent=org;
+      var ct=App.getContact(ev.school,org);
+      var lbl=document.createElement('span');lbl.className='op-org-label';
+      lbl.textContent=org;
+      if(ct&&ct.email){var ctag=document.createElement('span');ctag.style.cssText='font-size:10px;color:var(--muted);margin-left:6px;font-weight:600;';ctag.textContent=ct.email;lbl.appendChild(ctag);}
       row.appendChild(cb);row.appendChild(lbl);
       body.appendChild(row);
     });
@@ -2227,6 +2249,126 @@ const App = {
       if(btn){btn.textContent='⚠ Failed';btn.disabled=false;}
     }
   },
+  // ── ORG CONTACTS ─────────────────────────────────────
+  loadContacts(){
+    try{this.contacts=JSON.parse(localStorage.getItem('fp-contacts')||'{}');}
+    catch(e){this.contacts={};}
+  },
+  saveContacts(){
+    try{localStorage.setItem('fp-contacts',JSON.stringify(this.contacts));}catch(e){}
+  },
+  getContact(schoolId,orgName){
+    var key=schoolId+'|'+orgName.toLowerCase();
+    return(this.contacts&&this.contacts[key])||null;
+  },
+  openContactSearch(schoolId){
+    const s=this.schools[schoolId];
+    if(!s)return;
+    // Guess the CampusLabs URL from school name
+    const guess=s.name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,12);
+    const overlay=document.createElement('div');
+    overlay.className='ct-overlay';overlay.id='ctOverlay';
+    const sheet=document.createElement('div');
+    sheet.className='ct-sheet';
+    const hdr=document.createElement('div');hdr.className='ct-hdr';
+    const title=document.createElement('div');title.className='ct-hdr-title';
+    title.textContent='📇 Find Org Contacts — '+s.name;
+    const closeBtn=document.createElement('button');
+    closeBtn.className='m-close';closeBtn.style.cssText='background:rgba(255,255,255,.15);color:#fff;';
+    closeBtn.textContent='✕';closeBtn.onclick=function(){overlay.remove();};
+    hdr.appendChild(title);hdr.appendChild(closeBtn);
+    const urlRow=document.createElement('div');urlRow.className='ct-url-row';
+    const input=document.createElement('input');
+    input.className='ct-url-input';input.id='ctUrlInput';input.type='text';
+    input.placeholder='e.g. msstate.campuslabs.com/engage';
+    input.value=guess+'.campuslabs.com/engage';
+    const searchBtn=document.createElement('button');
+    searchBtn.className='ct-search-btn';searchBtn.textContent='Search';
+    searchBtn.onclick=function(){App.runContactSearch(schoolId,document.getElementById('ctUrlInput').value);};
+    urlRow.appendChild(input);urlRow.appendChild(searchBtn);
+    const status=document.createElement('div');status.className='ct-status';status.id='ctStatus';
+    status.textContent='Enter the school’s Engage URL above and hit Search.';
+    const list=document.createElement('div');list.className='ct-list';list.id='ctList';
+    const saveBar=document.createElement('div');saveBar.className='ct-save-bar';saveBar.id='ctSaveBar';
+    saveBar.style.display='none';
+    const saveBtn=document.createElement('button');
+    saveBtn.className='ct-save-btn';saveBtn.id='ctSaveBtn';
+    saveBtn.textContent='Save All Contacts';
+    saveBtn.onclick=function(){App.saveContactResults(schoolId);};
+    saveBar.appendChild(saveBtn);
+    sheet.appendChild(hdr);sheet.appendChild(urlRow);sheet.appendChild(status);
+    sheet.appendChild(list);sheet.appendChild(saveBar);
+    overlay.appendChild(sheet);document.body.appendChild(overlay);
+    input.focus();
+    // Allow Enter key to search
+    input.onkeydown=function(e){if(e.key==='Enter')searchBtn.click();};
+  },
+  async runContactSearch(schoolId,url){
+    const status=document.getElementById('ctStatus');
+    const list=document.getElementById('ctList');
+    const searchBtn=document.querySelector('.ct-search-btn');
+    if(status)status.textContent='Searching… this may take 10-20 seconds.';
+    if(list)list.innerHTML='';
+    if(searchBtn)searchBtn.disabled=true;
+    document.getElementById('ctSaveBar').style.display='none';
+    try{
+      const res=await fetch('/.netlify/functions/contacts',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({engageUrl:url})
+      });
+      const d=await res.json();
+      if(!res.ok)throw new Error(d.error||'Search failed');
+      App._ctResults={schoolId:schoolId,orgs:d.orgs};
+      const total=d.orgs.length;
+      if(status)status.textContent='Found '+total+' organizations. Review below, then save.';
+      if(list){
+        const withContact=d.orgs.filter(function(o){return o.email||o.phone||o.website;});
+        const noContact=d.orgs.filter(function(o){return!o.email&&!o.phone&&!o.website;});
+        var html='';
+        if(withContact.length){
+          html+='<div style="padding:8px 16px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">'+withContact.length+' with contact info</div>';
+          withContact.forEach(function(o){html+=App._ctCard(o);});
+        }
+        if(noContact.length){
+          html+='<div style="padding:8px 16px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">'+noContact.length+' — no public contact info</div>';
+          noContact.forEach(function(o){html+=App._ctCard(o);});
+        }
+        list.innerHTML=html;
+      }
+      if(total>0&&document.getElementById('ctSaveBar'))
+        document.getElementById('ctSaveBar').style.display='';
+    }catch(err){
+      if(status)status.textContent='⚠️ '+err.message;
+      if(list)list.innerHTML='<div style="padding:20px;font-size:13px;color:var(--muted)">Try a different URL format, e.g.:<br><code>msstate.campuslabs.com/engage</code><br><code>engage.university.edu</code></div>';
+    }
+    if(searchBtn)searchBtn.disabled=false;
+  },
+  _ctCard(o){
+    var cats=(o.categories||[]).slice(0,2).join(' · ');
+    var contact='';
+    if(o.email)contact+='<a href="mailto:'+o.email+'">'+o.email+'</a> ';
+    if(o.phone)contact+='· '+o.phone+' ';
+    if(o.website)contact+='· <a href="'+o.website+'" target="_blank">Website</a>';
+    return'<div class="ct-org-row">'+
+      '<div class="ct-org-name">'+o.name+'</div>'+
+      (cats?'<div class="ct-org-cat">'+cats+'</div>':'')+
+      (contact?'<div class="ct-org-contact">'+contact+'</div>':'')+
+      '</div>';
+  },
+  saveContactResults(schoolId){
+    if(!App._ctResults||!App._ctResults.orgs)return;
+    App._ctResults.orgs.forEach(function(o){
+      if(!o.name)return;
+      var key=schoolId+'|'+o.name.toLowerCase();
+      App.contacts[key]={name:o.name,email:o.email||null,phone:o.phone||null,website:o.website||null,categories:o.categories||[]};
+    });
+    App.saveContacts();
+    var btn=document.getElementById('ctSaveBtn');
+    if(btn){btn.textContent='✓ Saved!';btn.style.background='#059669';}
+    setTimeout(function(){document.getElementById('ctOverlay')&&document.getElementById('ctOverlay').remove();},800);
+  },
+
   // ── SUPPLEMENTAL ORG DIRECTORY (persists AI-fetched orgs for baked-in schools) ──
   loadOrgExtra(){
     try{
@@ -2415,6 +2557,7 @@ const App = {
         <div class="sm-actions">
           ${approxCount>0?`<button class="sm-reverify" id="rv-${id}" onclick="App.reverifyDates('${id}')" title="${approxCount} approximate dates">🔄 Dates</button>`:''}
           <button class="sm-reverify" id="oc-${id}" onclick="App.populateCampusOrgs('${id}')" title="Pull campus clubs for this school">🏫 Orgs</button>
+          <button class="sm-reverify" onclick="App.openContactSearch('${id}')" title="Search for org contact info">📇 Contacts</button>
           ${isAI?`<button class="sm-del" onclick="App.confirmDelete('${id}')">🗑</button>`:''}
         </div>
       </div>`;
