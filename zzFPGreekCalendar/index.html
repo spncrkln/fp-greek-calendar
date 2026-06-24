@@ -2321,10 +2321,10 @@ const App = {
       if(!res.ok)throw new Error(d.error||'Search failed');
       App._ctResults={schoolId:schoolId,orgs:d.orgs};
       const total=d.orgs.length;
-      if(status)status.textContent='Found '+total+' organizations. Review below, then save.';
+      if(status)status.textContent='Found '+total+' organizations. Save to populate your org directory and store any available contact info.';
       if(list){
-        const withContact=d.orgs.filter(function(o){return o.email||o.phone||o.website;});
-        const noContact=d.orgs.filter(function(o){return!o.email&&!o.phone&&!o.website;});
+        const withContact=d.orgs.filter(function(o){return o.email||o.phone||o.website||o.instagram||o.twitter||o.facebook||(o.officers&&o.officers.length);});
+        const noContact=d.orgs.filter(function(o){return!o.email&&!o.phone&&!o.website&&!o.instagram&&!o.twitter&&!o.facebook&&(!o.officers||!o.officers.length);});
         var html='';
         if(withContact.length){
           html+='<div style="padding:8px 16px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">'+withContact.length+' with contact info</div>';
@@ -2345,28 +2345,120 @@ const App = {
     if(searchBtn)searchBtn.disabled=false;
   },
   _ctCard(o){
-    var cats=(o.categories||[]).slice(0,2).join(' · ');
-    var contact='';
-    if(o.email)contact+='<a href="mailto:'+o.email+'">'+o.email+'</a> ';
-    if(o.phone)contact+='· '+o.phone+' ';
-    if(o.website)contact+='· <a href="'+o.website+'" target="_blank">Website</a>';
+    var orgType=this._classifyOrg(o.categories);
+    var typeLabel={panhellenic:'🎀 PHC',ifc:'🏛 IFC',nphc:'✊ NPHC',mgc:'🌐 MGC',professional:'💼 Prof',campus:'🎯 Campus'}[orgType]||'';
+    var rows='';
+    // Primary contact
+    var primary='';
+    if(o.email)primary+='<a href="mailto:'+o.email+'" style="color:var(--fp)">'+o.email+'</a>';
+    if(o.phone)primary+=(primary?' &nbsp;·&nbsp; ':'')+o.phone;
+    if(o.website)primary+=(primary?' &nbsp;·&nbsp; ':'')+
+      '<a href="'+o.website+'" target="_blank" style="color:var(--fp)">Website ↗</a>';
+    if(primary)rows+='<div class="ct-org-contact" style="margin-top:3px">'+primary+'</div>';
+    // Social media
+    var social='';
+    if(o.instagram)social+='<a href="https://instagram.com/'+o.instagram+'" target="_blank" style="color:#E1306C">IG @'+o.instagram+'</a>';
+    if(o.twitter)social+=(social?' &nbsp;·&nbsp; ':'')+
+      '<a href="https://twitter.com/'+o.twitter+'" target="_blank" style="color:#1DA1F2">𝕏 @'+o.twitter+'</a>';
+    if(o.facebook)social+=(social?' &nbsp;·&nbsp; ':'')+
+      '<a href="'+o.facebook+'" target="_blank" style="color:#1877F2">FB</a>';
+    if(o.tiktok)social+=(social?' &nbsp;·&nbsp; ':'')+
+      '<a href="'+o.tiktok+'" target="_blank" style="color:#000">TikTok</a>';
+    if(social)rows+='<div class="ct-org-contact" style="margin-top:2px">'+social+'</div>';
+    // Officers
+    if(o.officers&&o.officers.length){
+      var offRows=o.officers.map(function(p){
+        var r='<span style="font-weight:800">'+p.position+'</span>: '+p.name;
+        if(p.email)r+=' &mdash; <a href="mailto:'+p.email+'" style="color:var(--fp)">'+p.email+'</a>';
+        if(p.phone)r+=' &nbsp;'+p.phone;
+        return r;
+      }).join('<br>');
+      rows+='<div class="ct-org-contact" style="margin-top:4px;font-size:11px">'+offRows+'</div>';
+    }
+    // Advisor
+    if(o.advisor&&o.advisor.name){
+      var advRow='<span style="font-weight:800">Advisor</span>: '+o.advisor.name;
+      if(o.advisor.email)advRow+=' &mdash; <a href="mailto:'+o.advisor.email+'" style="color:var(--muted)">'+o.advisor.email+'</a>';
+      rows+='<div class="ct-org-contact" style="margin-top:2px;font-size:11px;color:var(--muted)">'+advRow+'</div>';
+    }
+    // If nothing was found, link directly to their CampusLabs page
+    var hasAny=o.email||o.phone||o.website||o.instagram||o.twitter||o.facebook||
+               (o.officers&&o.officers.length);
+    if(!hasAny&&o.profileUrl){
+      rows='<div class="ct-org-contact" style="margin-top:3px">'+
+        '<a href="'+o.profileUrl+'" target="_blank" style="color:var(--muted)">'+
+        'View on CampusLabs ↗</a></div>';
+    }
     return'<div class="ct-org-row">'+
-      '<div class="ct-org-name">'+o.name+'</div>'+
-      (cats?'<div class="ct-org-cat">'+cats+'</div>':'')+
-      (contact?'<div class="ct-org-contact">'+contact+'</div>':'')+
+      '<div style="display:flex;align-items:baseline;gap:6px">'+
+        '<div class="ct-org-name">'+o.name+'</div>'+
+        (typeLabel?'<span style="font-size:9px;font-weight:800;color:var(--muted)">'+typeLabel+'</span>':'')+
+      '</div>'+
+      rows+
       '</div>';
+  },
+  // Map CampusLabs category strings → our orgType keys
+  _classifyOrg(categories){
+    var cats=(categories||[]).map(function(c){return c.toLowerCase();});
+    var any=function(terms){return terms.some(function(t){return cats.some(function(c){return c.includes(t);});});};
+    if(any(['nphc','national pan-hellenic','divine nine']))return 'nphc';
+    if(any(['multicultural greek','mgc']))return 'mgc';
+    if(any(['panhellenic sorority','panhellenic council','cpc sorority','npc sorority']))return 'panhellenic';
+    if(any(['sorority']) && !any(['latina','asian','cultural','christian']))return 'panhellenic';
+    if(any(['ifc fraternity','interfraternity']))return 'ifc';
+    if(any(['fraternity']) && !any(['latina','asian','cultural','christian','professional','service']))return 'ifc';
+    if(any(['professional','pre-professional','pre-law','pre-med','business']))return 'professional';
+    return 'campus';
   },
   saveContactResults(schoolId){
     if(!App._ctResults||!App._ctResults.orgs)return;
+    // ── 1. Save contact info ──
+    var contactCount=0;
     App._ctResults.orgs.forEach(function(o){
       if(!o.name)return;
       var key=schoolId+'|'+o.name.toLowerCase();
-      App.contacts[key]={name:o.name,email:o.email||null,phone:o.phone||null,website:o.website||null,categories:o.categories||[]};
+      App.contacts[key]={
+        name:o.name,
+        email:o.email||null,phone:o.phone||null,website:o.website||null,
+        instagram:o.instagram||null,twitter:o.twitter||null,facebook:o.facebook||null,tiktok:o.tiktok||null,
+        advisor:o.advisor||null,officers:o.officers||[],
+        profileUrl:o.profileUrl||null,
+        categories:o.categories||[]
+      };
+      if(o.email||o.phone||o.website||o.instagram||o.twitter||o.officers&&o.officers.length)contactCount++;
     });
     App.saveContacts();
+    // ── 2. Populate ORG_DIRECTORY from CampusLabs categories ──
+    var dir={panhellenic:[],ifc:[],nphc:[],mgc:[],professional:[],campus:[]};
+    App._ctResults.orgs.forEach(function(o){
+      if(!o.name)return;
+      var type=App._classifyOrg(o.categories);
+      if(!dir[type])dir[type]=[];
+      if(dir[type].indexOf(o.name)<0)dir[type].push(o.name);
+    });
+    // Sort each list
+    Object.keys(dir).forEach(function(k){dir[k].sort();});
+    // Merge into existing ORG_DIRECTORY (don't wipe manually curated data)
+    if(!ORG_DIRECTORY[schoolId])ORG_DIRECTORY[schoolId]={panhellenic:[],ifc:[],nphc:[],mgc:[],professional:[],campus:[]};
+    var existing=ORG_DIRECTORY[schoolId];
+    Object.keys(dir).forEach(function(type){
+      dir[type].forEach(function(name){
+        if(existing[type].indexOf(name)<0)existing[type].push(name);
+      });
+      existing[type].sort();
+    });
+    // Persist so it survives redeploys
+    App.saveOrgExtra(schoolId,existing);
+    App.buildFilters();
+    // ── 3. Update UI ──
+    var greekCount=dir.panhellenic.length+dir.ifc.length+dir.nphc.length+dir.mgc.length;
+    var campusCount=dir.campus.length+dir.professional.length;
     var btn=document.getElementById('ctSaveBtn');
-    if(btn){btn.textContent='✓ Saved!';btn.style.background='#059669';}
-    setTimeout(function(){document.getElementById('ctOverlay')&&document.getElementById('ctOverlay').remove();},800);
+    if(btn){
+      btn.textContent='✓ Saved '+greekCount+' Greek + '+campusCount+' campus orgs'+(contactCount?' | '+contactCount+' contacts':'');
+      btn.style.background='#059669';
+    }
+    setTimeout(function(){document.getElementById('ctOverlay')&&document.getElementById('ctOverlay').remove();},1200);
   },
 
   // ── SUPPLEMENTAL ORG DIRECTORY (persists AI-fetched orgs for baked-in schools) ──
