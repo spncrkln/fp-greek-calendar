@@ -2501,16 +2501,23 @@ const App = {
       const total=d.orgs.length;
       if(status)status.textContent='Found '+total+' organizations. Save to populate your org directory and store any available contact info.';
       if(list){
-        const withContact=d.orgs.filter(function(o){return o.email||o.phone||o.website||o.instagram||o.twitter||o.facebook||(o.officers&&o.officers.length);});
-        const noContact=d.orgs.filter(function(o){return!o.email&&!o.phone&&!o.website&&!o.instagram&&!o.twitter&&!o.facebook&&(!o.officers||!o.officers.length);});
+        var withEmail=d.orgs.filter(function(o){return o.email;});
+        var withSocial=d.orgs.filter(function(o){return !o.email&&(o.instagram||o.twitter||o.facebook||(o.officers&&o.officers.length));});
+        var linkOnly=d.orgs.filter(function(o){return !o.email&&!o.instagram&&!o.twitter&&!o.facebook&&(!o.officers||!o.officers.length);});
+        // Update status with breakdown
+        if(status)status.textContent='Found '+d.orgs.length+' orgs: '+withEmail.length+' with email, '+withSocial.length+' with social/officers only, '+linkOnly.length+' link-only. Save to store all.';
         var html='';
-        if(withContact.length){
-          html+='<div style="padding:8px 16px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">'+withContact.length+' with contact info</div>';
-          withContact.forEach(function(o){html+=App._ctCard(o);});
+        if(withEmail.length){
+          html+='<div style="padding:8px 16px 4px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:#059669">✅ '+withEmail.length+' — Email found</div>';
+          withEmail.forEach(function(o){html+=App._ctCard(o);});
         }
-        if(noContact.length){
-          html+='<div style="padding:8px 16px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">'+noContact.length+' — no public contact info</div>';
-          noContact.forEach(function(o){html+=App._ctCard(o);});
+        if(withSocial.length){
+          html+='<div style="padding:8px 16px 4px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:#2563EB">🔗 '+withSocial.length+' — Social / Officers only</div>';
+          withSocial.forEach(function(o){html+=App._ctCard(o);});
+        }
+        if(linkOnly.length){
+          html+='<div style="padding:8px 16px 4px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">🔍 '+linkOnly.length+' — CampusLabs link only</div>';
+          linkOnly.forEach(function(o){html+=App._ctCard(o);});
         }
         list.innerHTML=html;
       }
@@ -2567,8 +2574,10 @@ const App = {
         '<a href="'+o.profileUrl+'" target="_blank" style="color:var(--muted)">'+
         'View on CampusLabs ↗</a></div>';
     }
-    return'<div class="ct-org-row">'+
-      '<div style="display:flex;align-items:baseline;gap:6px">'+
+    var dotColor=o.email?'#059669':(o.instagram||o.twitter||(o.officers&&o.officers.length))?'#2563EB':'var(--border)';
+    var dotTitle=o.email?'Has email':(o.instagram||o.twitter)?'Has social':'No contact info yet';
+    return'<div class="ct-org-row" style="border-left:3px solid '+dotColor+'">'+
+      '<div style="display:flex;align-items:center;gap:6px">'+
         '<div class="ct-org-name">'+o.name+'</div>'+
         (typeLabel?'<span style="font-size:9px;font-weight:800;color:var(--muted)">'+typeLabel+'</span>':'')+
       '</div>'+
