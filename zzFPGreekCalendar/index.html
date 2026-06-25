@@ -1448,6 +1448,7 @@ const App = {
   _ovSearch:'',      // search string
 
   renderOrgs(){
+    this._ovReg=[];
     const schoolsToShow=this.school!=='all'?[this.school]:this.visibleSchoolIds();
     const typeDefs=[
       {key:'all',      label:'All Orgs'},
@@ -1537,11 +1538,11 @@ const App = {
       cont.addEventListener('click',function ovDel(e){
         var card=e.target.closest('.ov-card');
         if(!card)return;
-        var oid=card.getAttribute('data-oid');
-        if(!oid)return;
-        var sep=oid.indexOf('||');
-        if(sep<0)return;
-        App.openOrgCard(oid.slice(0,sep),oid.slice(sep+2));
+        var ri=card.getAttribute('data-ri');
+        if(ri===null||!App._ovReg)return;
+        var entry=App._ovReg[parseInt(ri)];
+        if(!entry)return;
+        App.openOrgCard(entry.sid,entry.name);
       });
     }
   },
@@ -1549,8 +1550,10 @@ const App = {
   _ovCard(o, typeLabels, showSchool){
     var c=o.contact||{};
     var hasAny=c.email||c.phone||c.website||c.instagram||c.twitter||c.facebook||(c.officers&&c.officers.length);
-    var _oid=(o.school+'||'+o.name);
-    var html='<div class="ov-card'+(hasAny?' has-contact':'')+'" data-oid="'+_oid.replace(/"/g,'&quot;')+'">'+
+    if(!App._ovReg)App._ovReg=[];
+    var _ri=App._ovReg.length;
+    App._ovReg.push({sid:o.school,name:o.name});
+    var html='<div class="ov-card'+(hasAny?' has-contact':'')+' ov-clickable" data-ri="'+_ri+'">'+
       '<div class="ov-card-name">'+o.name+'</div>'+
       '<div class="ov-badges">'+
         (typeLabels[o.type]?'<span class="ov-type-badge">'+typeLabels[o.type]+'</span>':'')+(c.manualContacts&&c.manualContacts.length?'<span class="ov-type-badge" style="background:var(--fp);color:#fff">'+c.manualContacts.length+' contact'+(c.manualContacts.length>1?'s':'')+'</span>':'')+
@@ -2675,7 +2678,9 @@ const App = {
     var existing=ORG_DIRECTORY[schoolId];
     Object.keys(dir).forEach(function(type){
       dir[type].forEach(function(name){
-        if(existing[type].indexOf(name)<0)existing[type].push(name);
+        var nameLow=name.toLowerCase();
+        var already=existing[type].some(function(e){return e.toLowerCase()===nameLow;});
+        if(!already)existing[type].push(name);
       });
       existing[type].sort();
     });
