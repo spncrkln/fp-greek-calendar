@@ -186,11 +186,11 @@ body{font-family:'Outfit',sans-serif;background:var(--tan);color:var(--text);min
 .rbtn.clr:hover{background:#FEF2F2;border-color:#EF4444;}
 
 /* ─── ADD SCHOOL MODAL ─── */
-.as-modal{background:var(--white);border-radius:14px;width:100%;max-width:460px;box-shadow:var(--sh3);overflow:hidden;transform:scale(.95) translateY(8px);transition:transform .2s;}
+.as-modal{background:var(--white);border-radius:14px;width:100%;max-width:460px;max-height:88vh;box-shadow:var(--sh3);overflow:hidden;transform:scale(.95) translateY(8px);transition:transform .2s;display:flex;flex-direction:column;}
 .overlay.open .as-modal{transform:scale(1) translateY(0);}
 .as-hdr{background:var(--navy);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
 .as-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;}
-.as-body{padding:20px;}
+.as-body{padding:20px;overflow-y:auto;flex:1;}
 .as-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;font-weight:500;}
 .as-input-wrap{margin-bottom:14px;}
 .as-lbl{display:block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:7px;}
@@ -2298,7 +2298,7 @@ const App = {
       'Events to review: ['+evList+']. '+
       'Only include events where you can suggest a meaningfully better date. Use 2026-27 school year dates only (2026-08-01 through 2027-05-31).';
     try{
-      const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1500,
+      const reqBody=JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1500,
         messages:[{role:'user',content:prompt}]});
       let res;
       try{
@@ -2428,12 +2428,14 @@ const App = {
     if(!s)return;
     const btn=document.getElementById('oc-'+schoolId);
     if(btn){btn.disabled=true;btn.textContent='⏳...';}
-    const prompt='List the Greek organizations AND notable campus clubs and student organizations at '+s.name+' ('+s.location+'). '+
-      'Include student government, cultural orgs, professional clubs (business, engineering, nursing, etc.), media (newspaper, radio), service clubs, and any other prominent student orgs. '+
-      'Return ONLY raw JSON, no markdown. Schema: {"orgs":{"panhellenic":["Full Name"...],"ifc":["Full Name"...],"nphc":["Full Name"...],"mgc":[],"professional":[],"campus":["Club Name",...]}}. '+
-      'Use full official chapter/organization names. Include 10-20 campus orgs minimum.';
+    const prompt='List ONLY the Greek chapters and campus organizations that are currently and officially active at '+s.name+' ('+s.location+'). '+
+      'CRITICAL: Do not invent or guess chapters. Only include Greek chapters you are highly confident exist and are active at this specific school. '+
+      'Some schools have very limited Greek life — if that is the case, return empty arrays rather than fabricating chapters. '+
+      'Also include real campus clubs: student government, professional orgs, cultural groups, media, service clubs. '+
+      'Return ONLY raw JSON, no markdown. Schema: {"orgs":{"panhellenic":["Full Chapter Name"...],"ifc":["Full Chapter Name"...],"nphc":["Full Chapter Name"...],"mgc":[],"professional":[],"campus":["Club Name",...]}}. '+
+      'Use full official chapter names. Accuracy over completeness — if unsure whether a chapter exists at this school, leave it out.';
     try{
-      const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,
+      const reqBody=JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,
         messages:[{role:'user',content:prompt}]});
       let res;
       try{
@@ -2862,8 +2864,8 @@ const App = {
   },
 
   // ── SCHOOL MANAGER ─────────────────────────────────────
-  openSM(){this.renderSMList();document.getElementById('smOverlay').classList.add('open');},
-  closeSM(){document.getElementById('smOverlay').classList.remove('open');},
+  openSM(){this.renderSMList();document.getElementById('smOverlay').classList.add('open');document.body.style.overflow='hidden';},
+  closeSM(){document.getElementById('smOverlay').classList.remove('open');document.body.style.overflow='';},
 
   renderSMList(){
     const el=document.getElementById('smList');
@@ -3127,7 +3129,7 @@ const App = {
     const prompt='Generate a Fall 2026 Greek life sales calendar for "'+schoolName+'" for a Fresh Prints apparel rep. Use your knowledge of this school\'s actual Greek chapters. Return ONLY raw JSON, no markdown, no explanation. Start with { end with }. Schema: {"school":{"id":"4charID","name":"Full Name","short":"ABBREV","location":"City, ST","color":"#hex"},"orgs":{"panhellenic":["Full Chapter Name",...],"ifc":["Full Chapter Name",...],"nphc":["Full Chapter Name",...],"mgc":[],"campus":["Club/Org Name",...]},"events":[{"id":"s-slug","school":"same-id","orgName":"Org Name or council label","orgType":"ifc|panhellenic|nphc|campus","title":"Title","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","type":"recruitment|bidday|philanthropy|homecoming|parentsweekend|formal|newmember|greekweek|social|campus|intake","approx":true,"salesPotential":"high|medium|low","outreachDays":42,"notes":"Specific pitch advice naming target chapters"}]}. CRITICAL: ALL startDate and endDate values MUST be between 2026-08-01 and 2027-05-31 only. Include ~20 events covering the full 2026-27 school year: Fall 2026 (Aug-Dec 2026) AND Spring 2027 (Jan-May 2027). Include fall recruitment, bid days, homecoming, formals, philanthropy AND spring recruitment, spring bid day, spring formals, spring philanthropy. Populate orgs with real chapter names AND include notable campus clubs/organizations in orgs.campus. approx:false only for dates you are confident about. outreachDays: 56 bid day/homecoming, 42 formals/recruitment, 28 philanthropy.';
     // Try Netlify proxy first (works when hosted on Netlify — API key added server-side)
     // Falls back to direct API when running inside Claude.ai artifact context
-    const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4500,
+    const reqBody=JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4500,
       messages:[{role:'user',content:prompt}]});
     let res;
     try{
