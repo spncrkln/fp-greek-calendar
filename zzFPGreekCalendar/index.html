@@ -3108,18 +3108,29 @@ const App = {
       st.innerHTML='Added '+res.school.name+' with '+res.events.length+' events ('+conf+' confirmed from web).';
       setTimeout(()=>{this.closeAs();document.getElementById('asInput').value='';st.style.display='none';this.buildFilters();this.render();},2500);
     }catch(e){
-      console.warn('Web search failed:',e.message);
-      document.getElementById('genBtnTxt').innerHTML='Using template...';
-      st.innerHTML='Search note: '+e.message.slice(0,80)+'. Generating template...';
-      await new Promise(r=>setTimeout(r,500));
-      const sid=name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)||'s'+Date.now();
-      const sh=name.split(' ').filter(w=>w.length>2).map(w=>w[0]).join('').toUpperCase().slice(0,5)||'SCH';
-      const cols=['#7C3AED','#DC2626','#2563EB','#059669','#D97706','#DB2777'];
-      const sc={id:sid,name:name,short:sh,location:'Update location',color:cols[Math.floor(Math.random()*cols.length)],preloaded:false};
-      this._addSchool(sc,this._tmplEvts(sid));
-      st.className='as-status success';
-      st.innerHTML='Added '+name+' with template calendar. Open in Claude.ai for web-researched dates.';
-      setTimeout(()=>{this.closeAs();document.getElementById('asInput').value='';st.style.display='none';this.buildFilters();this.render();},2000);
+      console.error('AI generation failed:',e.message);
+      // Show full error so user can diagnose — common causes: API key not set, function timeout
+      const isKeyErr=e.message.includes('not set')||e.message.includes('401')||e.message.includes('API');
+      const hint=isKeyErr
+        ? 'Check that ANTHROPIC_API_KEY is set in your Netlify environment variables and redeploy.'
+        : 'The AI call failed or timed out. Adding template calendar instead.';
+      st.className='as-status';
+      st.style.cssText='display:flex;background:#FEF3C7;border-color:#F59E0B;color:#92400E;flex-direction:column;gap:6px;';
+      st.innerHTML='<strong>⚠️ AI failed:</strong> '+e.message.slice(0,120)+'<span style="font-size:11px">'+hint+'</span>';
+      document.getElementById('genBtnTxt').innerHTML='Add with template';
+      // Let them read the error — they must click the button to continue with template
+      btn.disabled=false;
+      btn.onclick=()=>{
+        const sid=name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)||'s'+Date.now();
+        const sh=name.split(' ').filter(w=>w.length>2).map(w=>w[0]).join('').toUpperCase().slice(0,5)||'SCH';
+        const cols=['#7C3AED','#DC2626','#2563EB','#059669','#D97706','#DB2777'];
+        const sc={id:sid,name:name,short:sh,location:'Update location',color:cols[Math.floor(Math.random()*cols.length)],preloaded:false};
+        App._addSchool(sc,App._tmplEvts(sid));
+        st.style.cssText='';st.className='as-status success';
+        st.innerHTML='Added '+name+' with template calendar.';
+        setTimeout(()=>{App.closeAs();document.getElementById('asInput').value='';st.style.display='none';App.buildFilters();App.render();btn.onclick=null;},1800);
+      };
+      return;
     }
     btn.disabled=false;
     document.getElementById('genBtnTxt').innerHTML='Research & Generate';
@@ -3129,7 +3140,7 @@ const App = {
     const prompt='Generate a Fall 2026 Greek life sales calendar for "'+schoolName+'" for a Fresh Prints apparel rep. Use your knowledge of this school\'s actual Greek chapters. Return ONLY raw JSON, no markdown, no explanation. Start with { end with }. Schema: {"school":{"id":"4charID","name":"Full Name","short":"ABBREV","location":"City, ST","color":"#hex"},"orgs":{"panhellenic":["Full Chapter Name",...],"ifc":["Full Chapter Name",...],"nphc":["Full Chapter Name",...],"mgc":[],"campus":["Club/Org Name",...]},"events":[{"id":"s-slug","school":"same-id","orgName":"Org Name or council label","orgType":"ifc|panhellenic|nphc|campus","title":"Title","startDate":"YYYY-MM-DD","endDate":"YYYY-MM-DD","type":"recruitment|bidday|philanthropy|homecoming|parentsweekend|formal|newmember|greekweek|social|campus|intake","approx":true,"salesPotential":"high|medium|low","outreachDays":42,"notes":"Specific pitch advice naming target chapters"}]}. CRITICAL: ALL startDate and endDate values MUST be between 2026-08-01 and 2027-05-31 only. Include ~20 events covering the full 2026-27 school year: Fall 2026 (Aug-Dec 2026) AND Spring 2027 (Jan-May 2027). Include fall recruitment, bid days, homecoming, formals, philanthropy AND spring recruitment, spring bid day, spring formals, spring philanthropy. Populate orgs with real chapter names AND include notable campus clubs/organizations in orgs.campus. approx:false only for dates you are confident about. outreachDays: 56 bid day/homecoming, 42 formals/recruitment, 28 philanthropy.';
     // Try Netlify proxy first (works when hosted on Netlify — API key added server-side)
     // Falls back to direct API when running inside Claude.ai artifact context
-    const reqBody=JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4500,
+    const reqBody=JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4500,
       messages:[{role:'user',content:prompt}]});
     let res;
     try{
